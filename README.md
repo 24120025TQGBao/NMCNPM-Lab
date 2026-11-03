@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Hôm nay ăn gì?
 
 React + Vite frontend, Supabase email authentication, and Express API. Uses the database you already initialized; no schema migrations are applied by this repository.
@@ -72,3 +73,6 @@ References: [Supabase password auth](https://supabase.com/docs/guides/auth/passw
 ## Included scope
 
 Signup, login, session restoration, logout, authenticated profile retrieval, and public active-dish discovery. Recipes, posts, menus, uploads, moderation, and recommendations remain future application features.
+=======
+# NMCNPM-Lab
+>>>>>>> origin/main
