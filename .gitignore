@@ -1,0 +1,38 @@
+# Dependencies and build output (all packages)
+node_modules/
+dist/
+dist-ssr/
+coverage/
+*.tsbuildinfo
+
+# Local credentials; keep safe setup templates in Git
+.env
+.env.*
+!.env.example
+*.local
+/.aws/
+
+# Hosting and Supabase CLI local state
+.vercel/
+supabase/.temp/
+supabase/.branches/
+
+# Logs and caches
+logs/
+*.log
+.npm/
+.cache/
+
+# Local agent workspace files
+/.agents/
+/.codex/
+
+# Editor and OS files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
