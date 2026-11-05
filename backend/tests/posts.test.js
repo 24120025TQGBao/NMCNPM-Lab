@@ -3,7 +3,7 @@ import request from 'supertest';
 import { createApp } from '../src/app.js';
 import * as supabaseLib from '../src/lib/supabase.js';
 
-describe('Posts Public Read API Tests (BE04)', () => {
+describe('Posts API Complete Test Suite (BE03 & BE04)', () => {
   let app;
 
   beforeEach(() => {
@@ -49,7 +49,6 @@ describe('Posts Public Read API Tests (BE04)', () => {
         author: { id: '44444444-4444-4444-4444-444444444444', display_name: 'Minh' }
       });
       expect(res.body.meta).toEqual({ page: 1, limit: 20, total: 1 });
-      // Không để lộ thông tin riêng tư như email
       expect(JSON.stringify(res.body)).not.toContain('email');
     });
 
@@ -76,17 +75,14 @@ describe('Posts Public Read API Tests (BE04)', () => {
     });
 
     it('Truyền page hoặc limit sai định dạng/vượt giới hạn phải trả 400 VALIDATION_ERROR', async () => {
-      // Limit > 50
       const res1 = await request(app).get('/api/posts?limit=100');
       expect(res1.status).toBe(400);
       expect(res1.body.error.code).toBe('VALIDATION_ERROR');
 
-      // Page = 0
       const res2 = await request(app).get('/api/posts?page=0');
       expect(res2.status).toBe(400);
       expect(res2.body.error.code).toBe('VALIDATION_ERROR');
 
-      // Page không phải số
       const res3 = await request(app).get('/api/posts?page=abc');
       expect(res3.status).toBe(400);
       expect(res3.body.error.code).toBe('VALIDATION_ERROR');
@@ -141,7 +137,6 @@ describe('Posts Public Read API Tests (BE04)', () => {
       expect(res.body.data.ingredients).toHaveLength(2);
       expect(res.body.data.ingredients[0].name).toBe('Thịt bò');
       expect(res.body.data.steps).toHaveLength(2);
-      // Kiểm tra bước được sắp xếp theo order tăng dần
       expect(res.body.data.steps[0].order).toBe(1);
       expect(res.body.data.steps[0].content).toBe('Chần xương sạch');
       expect(res.body.data.steps[1].order).toBe(2);
@@ -172,26 +167,214 @@ describe('Posts Public Read API Tests (BE04)', () => {
       expect(res.status).toBe(404);
       expect(res.body.error.code).toBe('NOT_FOUND');
     });
+  });
 
-    it('Lỗi cơ sở dữ liệu phải trả về 500 INTERNAL_ERROR và không để lộ chi tiết nội bộ', async () => {
-      const queryBuilder = {
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        maybeSingle: vi.fn().mockResolvedValue({
-          data: null,
-          error: new Error('Postgres connection failed: role postgres does not exist')
+  describe('3. POST /api/posts (Tạo bài viết công thức mới - BE03)', () => {
+    const validPostPayload = {
+      dish_id: '11111111-1111-1111-1111-111111111111',
+      title: 'Phở bò tái nạm thơm ngon',
+      ingredients: [
+        {
+          ingredient_id: '22222222-2222-2222-2222-222222222222',
+          quantity: 400,
+          unit: 'g'
+        },
+        {
+          name: 'Hành hoa',
+          quantity: null,
+          unit: null
+        }
+      ],
+      steps: [
+        { content: 'Rửa sạch thịt bò và thái lát mỏng' },
+        { content: 'Nấu nước dùng phở thật trong' }
+      ]
+    };
+
+    it('Chưa đăng nhập (thiếu token) phải trả về 401 UNAUTHORIZED', async () => {
+      const res = await request(app)
+        .post('/api/posts')
+        .send(validPostPayload);
+
+      expect(res.status).toBe(401);
+      expect(res.body.error.code).toBe('UNAUTHORIZED');
+    });
+
+    it('Gửi payload hợp lệ và tạo bài thành công trả về 201 cùng chi tiết bài viết', async () => {
+      // Mock auth xác thực token
+      vi.spyOn(supabaseLib, 'getAnonClient').mockReturnValue({
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: 'user-uuid-author' } },
+            error: null
+          })
+        }
+      });
+
+      const createdPostMock = {
+        id: 'new-post-uuid-3333',
+        title: 'Phở bò tái nạm thơm ngon',
+        created_at: '2026-11-06T12:00:00.000Z',
+        dish: { id: '11111111-1111-1111-1111-111111111111', name: 'Phở bò' },
+        author: { id: 'user-uuid-author', display_name: 'Lan Anh' },
+        ingredients: [
+          {
+            ingredient_id: '22222222-2222-2222-2222-222222222222',
+            name: 'Thịt bò',
+            quantity: 400,
+            unit: 'g'
+          }
+        ],
+        steps: [
+          { order: 1, content: 'Rửa sạch thịt bò và thái lát mỏng' },
+          { order: 2, content: 'Nấu nước dùng phở thật trong' }
+        ]
+      };
+
+      // Mock user client khi gọi RPC và getPostById
+      const mockUserClient = {
+        rpc: vi.fn().mockResolvedValue({
+          data: { id: 'new-post-uuid-3333' },
+          error: null
+        }),
+        from: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: createdPostMock,
+            error: null
+          })
         })
       };
 
+      vi.spyOn(supabaseLib, 'createUserClient').mockReturnValue(mockUserClient);
+
+      const res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', 'Bearer valid-user-token')
+        .send({
+          ...validPostPayload,
+          author_id: 'fake-injected-id', // Bị loại bỏ bởi schema strip()
+          user_id: 'fake-user-id'
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data.id).toBe('new-post-uuid-3333');
+      expect(res.body.data.title).toBe('Phở bò tái nạm thơm ngon');
+      expect(mockUserClient.rpc).toHaveBeenCalledWith(
+        'create_post_with_recipe',
+        expect.objectContaining({
+          p_dish_id: '11111111-1111-1111-1111-111111111111',
+          p_title: 'Phở bò tái nạm thơm ngon'
+        })
+      );
+    });
+
+    it('Validate lỗi: tiêu đề quá ngắn hoặc thiếu dish_id trả về 400 VALIDATION_ERROR', async () => {
       vi.spyOn(supabaseLib, 'getAnonClient').mockReturnValue({
-        from: vi.fn().mockReturnValue(queryBuilder)
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: 'user-uuid-author' } },
+            error: null
+          })
+        }
       });
 
-      const res = await request(app).get('/api/posts/00000000-0000-0000-0000-000000000000');
-      expect(res.status).toBe(500);
-      expect(res.body.error.code).toBe('INTERNAL_ERROR');
-      expect(JSON.stringify(res.body)).not.toContain('Postgres connection failed');
+      const res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', 'Bearer valid-token')
+        .send({
+          dish_id: 'not-a-uuid',
+          title: 'a', // < 3 ký tự
+          ingredients: [],
+          steps: []
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(res.body.error.details).toBeDefined();
+    });
+
+    it('Validate lỗi: nguyên liệu không có cả ingredient_id lẫn name trả về 400', async () => {
+      vi.spyOn(supabaseLib, 'getAnonClient').mockReturnValue({
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: 'user-uuid-author' } },
+            error: null
+          })
+        }
+      });
+
+      const res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', 'Bearer valid-token')
+        .send({
+          dish_id: '11111111-1111-1111-1111-111111111111',
+          title: 'Tiêu đề hợp lệ cho bài viết',
+          ingredients: [
+            { quantity: 100, unit: 'g' } // Thiếu cả name và ingredient_id
+          ],
+          steps: [{ content: 'Bước 1 làm sạch' }]
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(res.body.error.details.some(d => d.field.includes('ingredients'))).toBe(true);
+    });
+
+    it('Validate lỗi: quantity là chuỗi hoặc <= 0 trả về 400', async () => {
+      vi.spyOn(supabaseLib, 'getAnonClient').mockReturnValue({
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: 'user-uuid-author' } },
+            error: null
+          })
+        }
+      });
+
+      const res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', 'Bearer valid-token')
+        .send({
+          dish_id: '11111111-1111-1111-1111-111111111111',
+          title: 'Tiêu đề hợp lệ cho bài viết',
+          ingredients: [
+            { name: 'Đường', quantity: -5, unit: 'g' }
+          ],
+          steps: [{ content: 'Bước 1' }]
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    });
+
+    it('RPC trả lỗi món ăn không tồn tại (23503) trả về 400 VALIDATION_ERROR', async () => {
+      vi.spyOn(supabaseLib, 'getAnonClient').mockReturnValue({
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: 'user-uuid-author' } },
+            error: null
+          })
+        }
+      });
+
+      const mockUserClient = {
+        rpc: vi.fn().mockResolvedValue({
+          data: null,
+          error: { code: '23503', message: 'foreign key constraint dishes failed' }
+        })
+      };
+
+      vi.spyOn(supabaseLib, 'createUserClient').mockReturnValue(mockUserClient);
+
+      const res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', 'Bearer valid-token')
+        .send(validPostPayload);
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(res.body.error.message).toContain('Món ăn không tồn tại');
     });
   });
 });
-

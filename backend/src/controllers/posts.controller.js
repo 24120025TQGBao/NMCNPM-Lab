@@ -1,5 +1,5 @@
 import * as postsService from '../services/posts.service.js';
-import { listPostsQuerySchema, postIdParamSchema } from '../schemas/posts.schema.js';
+import { listPostsQuerySchema, postIdParamSchema, createPostSchema } from '../schemas/posts.schema.js';
 
 export async function getPostsHandler(req, res, next) {
   try {
@@ -21,3 +21,19 @@ export async function getPostByIdHandler(req, res, next) {
   }
 }
 
+export async function createPostHandler(req, res, next) {
+  try {
+    const input = createPostSchema.parse(req.body);
+    const { userId, accessToken } = req.auth;
+
+    const newPost = await postsService.createPost({
+      userId,
+      accessToken,
+      input
+    });
+
+    return res.status(201).json({ data: newPost });
+  } catch (err) {
+    return next(err);
+  }
+}
