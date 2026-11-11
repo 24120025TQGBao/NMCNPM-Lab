@@ -24,13 +24,9 @@ export async function getPostByIdHandler(req, res, next) {
 export async function createPostHandler(req, res, next) {
   try {
     const input = createPostSchema.parse(req.body);
-    const { userId, accessToken } = req.auth;
+    const { accessToken } = req.auth;
 
-    const newPost = await postsService.createPost({
-      userId,
-      accessToken,
-      input
-    });
+    const newPost = await postsService.createPost({ accessToken, input });
 
     return res.status(201).json({ data: newPost });
   } catch (err) {

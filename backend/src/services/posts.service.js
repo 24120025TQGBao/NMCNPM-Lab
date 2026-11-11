@@ -130,130 +130,42 @@ export async function getPostById(id, client = null) {
   return mapPostDetail(data);
 }
 
-/**
- * Hàm trung gian lưu bài viết theo phương án transaction RPC của TV3 (DB09)
- * hoặc kế hoạch dự phòng bù trừ (compensating rollback)
- */
-export async function persistPost({ userClient, userId, input }) {
-  const { dish_id, title, ingredients, steps } = input;
+// Ánh xạ mã lỗi do hàm RPC create_post_with_recipe ném ra sang lỗi theo contract
+const RPC_ERRORS = {
+  ERR_UNAUTHORIZED: () => new AppError(401, 'UNAUTHORIZED', 'Bạn cần đăng nhập để thực hiện thao tác này'),
+  ERR_FORBIDDEN: () => new AppError(403, 'FORBIDDEN', 'Tài khoản không có quyền đăng bài'),
+  ERR_DISH_NOT_FOUND: () =>
+    new AppError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', [
+      { field: 'dish_id', message: 'Món ăn không tồn tại' }
+    ]),
+  ERR_INGREDIENT_NOT_FOUND: () =>
+    new AppError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', [
+      { field: 'ingredients', message: 'Có nguyên liệu (ingredient_id) không tồn tại' }
+    ]),
+  ERR_INGREDIENT_DUPLICATE: () =>
+    new AppError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', [
+      { field: 'ingredients', message: 'Nguyên liệu bị trùng trong cùng công thức' }
+    ])
+};
 
-  const stepsWithOrder = steps.map((step, index) => ({
-    order: index + 1,
-    content: step.content
-  }));
+export async function createPost({ accessToken, input }) {
+  const userClient = createUserClient(accessToken);
 
-  // Thử gọi hàm RPC Postgres transaction (TV3 DB09)
-  const { data: rpcData, error: rpcError } = await userClient.rpc('create_post_with_recipe', {
-    p_dish_id: dish_id,
-    p_title: title,
-    p_ingredients: ingredients,
-    p_steps: stepsWithOrder
+  // Toàn bộ việc lưu bài, công thức, nguyên liệu, bước chạy trong MỘT transaction của Postgres
+  const { data, error } = await userClient.rpc('create_post_with_recipe', {
+    p_dish_id: input.dish_id,
+    p_title: input.title,
+    p_content: input.content ?? null,
+    p_ingredients: input.ingredients,
+    p_steps: input.steps
   });
 
-  if (!rpcError && rpcData) {
-    const createdId = typeof rpcData === 'object' ? (rpcData.id || rpcData) : rpcData;
-    return createdId;
-  }
-
-  // Nếu RPC chưa có hoặc không tồn tại (PGRST202: function not found)
-  // Thực hiện kế hoạch dự phòng (ghi tuần tự có rollback bù trừ)
-  if (rpcError && (rpcError.code === 'PGRST202' || rpcError.message?.includes('function') || rpcError.code === '42883')) {
-    console.warn('[POSTS SERVICE WARNING] RPC create_post_with_recipe chưa khả dụng, chạy fallback bù trừ.');
-
-    // 1. Kiểm tra dish tồn tại
-    const { data: dishData, error: dishError } = await userClient
-      .from('dishes')
-      .select('id')
-      .eq('id', dish_id)
-      .maybeSingle();
-
-    if (dishError || !dishData) {
-      throw new AppError(400, 'VALIDATION_ERROR', 'Món ăn không tồn tại', [
-        { field: 'dish_id', message: 'Món ăn không tồn tại trong hệ thống' }
-      ]);
-    }
-
-    // 2. Tạo bản ghi bài viết (posts)
-    const { data: postData, error: postError } = await userClient
-      .from('posts')
-      .insert({
-        dish_id,
-        title,
-        author_id: userId
-      })
-      .select('id')
-      .single();
-
-    if (postError || !postData) {
-      console.error('[POSTS SERVICE ERROR - Fallback create post]', postError);
-      throw new AppError(500, 'INTERNAL_ERROR', 'Không thể tạo bài viết mới');
-    }
-
-    const postId = postData.id;
-
-    try {
-      // 3. Chuẩn bị và lưu recipe_ingredients
-      const ingredientsToInsert = ingredients.map(ing => ({
-        post_id: postId,
-        ingredient_id: ing.ingredient_id || null,
-        name: ing.name || null,
-        quantity: ing.quantity ?? null,
-        unit: ing.unit ?? null
-      }));
-
-      const { error: ingError } = await userClient
-        .from('recipe_ingredients')
-        .insert(ingredientsToInsert);
-
-      if (ingError) throw ingError;
-
-      // 4. Lưu recipe_steps
-      const stepsToInsert = stepsWithOrder.map(s => ({
-        post_id: postId,
-        step_order: s.order,
-        content: s.content
-      }));
-
-      const { error: stepError } = await userClient
-        .from('recipe_steps')
-        .insert(stepsToInsert);
-
-      if (stepError) throw stepError;
-
-      return postId;
-    } catch (fallbackError) {
-      // Rollback bù trừ: xóa bài viết đã tạo để tránh rác CSDL
-      console.error('[POSTS SERVICE ROLLBACK] Lỗi khi tạo chi tiết, tiến hành dọn dẹp:', fallbackError);
-      await userClient.from('posts').delete().eq('id', postId);
-      throw new AppError(500, 'INTERNAL_ERROR', 'Đã xảy ra lỗi hệ thống khi lưu nguyên liệu và bước nấu');
-    }
-  }
-
-  // Xử lý các mã lỗi cụ thể từ RPC của Supabase
-  if (rpcError) {
-    console.error('[POSTS SERVICE ERROR - RPC Error]', rpcError);
-    // Vi phạm khóa ngoại món ăn
-    if (rpcError.code === '23503' || rpcError.message?.toLowerCase().includes('dish')) {
-      throw new AppError(400, 'VALIDATION_ERROR', 'Món ăn không tồn tại', [
-        { field: 'dish_id', message: 'Món ăn không tồn tại trong hệ thống' }
-      ]);
-    }
-    // RLS Policy chặn
-    if (rpcError.code === '42501') {
-      throw new AppError(403, 'FORBIDDEN', 'Bạn không có quyền thực hiện thao tác này');
-    }
+  if (error) {
+    const key = Object.keys(RPC_ERRORS).find(k => error.message?.includes(k));
+    if (key) throw RPC_ERRORS[key]();
+    console.error('[POSTS SERVICE ERROR - createPost]', error);
     throw new AppError(500, 'INTERNAL_ERROR', 'Đã xảy ra lỗi hệ thống khi lưu bài viết');
   }
 
-  return rpcData?.id || rpcData;
-}
-
-export async function createPost({ userId, accessToken, input }) {
-  const userClient = createUserClient(accessToken);
-
-  const postId = await persistPost({ userClient, userId, input });
-
-  // Lấy lại chi tiết bài viết vừa tạo bằng đúng cấu trúc của GET /api/posts/:id
-  const postDetail = await getPostById(postId, userClient);
-  return postDetail;
+  return data;
 }

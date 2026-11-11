@@ -1,6 +1,13 @@
 import { ZodError } from 'zod';
 import { AppError } from '../utils/AppError.js';
 
+function formatPath(path) {
+  return path.reduce((acc, part) => {
+    if (typeof part === 'number') return `${acc}[${part}]`;
+    return acc ? `${acc}.${part}` : String(part);
+  }, '');
+}
+
 export function errorHandler(err, _req, res, _next) {
   // Lỗi JSON body không đúng cú pháp từ express.json()
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
@@ -15,7 +22,7 @@ export function errorHandler(err, _req, res, _next) {
   // Lỗi validation từ Zod
   if (err instanceof ZodError) {
     const details = err.issues.map(issue => ({
-      field: issue.path.join('.'),
+      field: formatPath(issue.path),
       message: issue.message
     }));
 
