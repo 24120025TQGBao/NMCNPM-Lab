@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { createClient } from '@supabase/supabase-js'
+import createDishesRouter from "./routes/dishes.routes.js"
 
 export function createApp(client) {
   const app = express()
@@ -13,12 +14,8 @@ export function createApp(client) {
     if (!client) return res.status(503).json({ error: 'Configure the backend Supabase environment variables first.' })
     next()
   })
-  app.get('/api/dishes', async (_req, res) => {
-    const { data, error } = await client.from('mon_an').select('ma_mon, ten_mon, mo_ta_ngan, hinh_anh')
-      .eq('trang_thai', 'ACTIVE').order('ten_mon').limit(100)
-    if (error) return res.status(502).json({ error: 'Could not load dishes. Check your database schema and backend configuration.' })
-    res.json(data)
-  })
+  app.use('/api/dishes', createDishesRouter(client));
+  
   app.get('/api/me', async (req, res) => {
     const token = req.headers.authorization?.match(/^Bearer\s+(\S+)$/i)?.[1]
     if (!token) return res.status(401).json({ error: 'Sign in to view your profile.' })
