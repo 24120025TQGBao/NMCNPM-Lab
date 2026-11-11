@@ -5,8 +5,8 @@ export const paginationQuerySchema = z.object({
     .string()
     .optional()
     .default('1')
-    .refine(val => /^\d+$/.test(val) && parseInt(val, 10) >= 1, {
-      message: 'Số trang page phải là số nguyên lớn hơn hoặc bằng 1'
+    .refine(val => /^\d+$/.test(val) && parseInt(val, 10) >= 1 && parseInt(val, 10) <= 1000000, {
+      message: 'Số trang page phải là số nguyên từ 1 đến 1000000'
     })
     .transform(val => parseInt(val, 10)),
   limit: z

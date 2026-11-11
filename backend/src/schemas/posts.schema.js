@@ -7,7 +7,7 @@ export const listPostsQuerySchema = paginationQuerySchema;
 export const postIdParamSchema = z.object({
   id: z
     .string()
-    .regex(/^[1-9]\d*$/, { message: 'Định danh bài viết (id) phải là số nguyên dương' })
+    .regex(/^[1-9]\d{0,14}$/, { message: 'Định danh bài viết (id) phải là số nguyên dương' })
     .transform(Number)
 });
 
