@@ -37,6 +37,12 @@ describe('Express Scaffolding & Middleware Tests (BE02)', () => {
         }
       });
     });
+
+    it('Origin không nằm trong CORS_ORIGINS phải trả về 403 FORBIDDEN', async () => {
+      const res = await request(app).get('/health').set('Origin', 'http://evil.example.com');
+      expect(res.status).toBe(403);
+      expect(res.body.error.code).toBe('FORBIDDEN');
+    });
   });
 
   describe('2. Xử lý lỗi tập trung & định dạng lỗi', () => {

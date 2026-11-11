@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const envSchema = z.object({
-  PORT: z.coerce.number().default(4000),
+  PORT: z.coerce.number().default(3000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   SUPABASE_URL: z.string().url('SUPABASE_URL phải là một URL hợp lệ'),
   SUPABASE_ANON_KEY: z.string().min(1, 'SUPABASE_ANON_KEY không được để trống'),

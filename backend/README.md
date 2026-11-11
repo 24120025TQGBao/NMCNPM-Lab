@@ -17,6 +17,19 @@ cp .env.example .env
 ```
 Điền các giá trị của Supabase URL và Supabase Anon Key.
 
+### Biến môi trường
+
+| Biến | Bắt buộc | Ý nghĩa |
+|---|---|---|
+| `PORT` | Không (mặc định 3000) | Cổng chạy backend |
+| `NODE_ENV` | Không | `development`, `production` hoặc `test` |
+| `SUPABASE_URL` | Có | URL dự án Supabase |
+| `SUPABASE_ANON_KEY` | Có | Khóa công khai, dùng xác minh token và truy vấn theo RLS |
+| `CORS_ORIGINS` | Không | Danh sách origin frontend được phép, cách nhau bằng dấu phẩy |
+| `SUPABASE_SERVICE_ROLE_KEY` | Chưa dùng | Khóa bỏ qua RLS. Chỉ dùng ở backend khi nhóm thống nhất. Không commit, không đưa vào frontend |
+
+Không commit file `.env` thật. Chỉ commit `.env.example`.
+
 ## 2. Các lệnh khả dụng (NPM Scripts)
 
 - **`npm run dev`**: Khởi động server ở chế độ phát triển (`node --watch`).
