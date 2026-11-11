@@ -1,5 +1,5 @@
 export async function api(path, token, signal) {
-  const response = await fetch(`${(import.meta.env.VITE_API_URL || '').replace(/\/$/, '')}/api${path}`, {
+  const response = await fetch(`${(import.meta.env?.VITE_API_URL || '').replace(/\/$/, '')}/api${path}`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {}, signal,
   })
   const body = await response.json().catch(() => null)

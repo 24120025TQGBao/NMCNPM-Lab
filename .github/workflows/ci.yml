@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Lint, Test & Build (Frontend & Backend)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            backend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        run: npm ci --prefix frontend
+
+      - name: Install Backend Dependencies
+        run: npm ci --prefix backend
+
+      - name: Lint Frontend and Backend (oxlint)
+        run: node frontend/node_modules/oxlint/bin/oxlint --config frontend/.oxlintrc.json frontend backend
+
+      - name: Lint Backend (ESLint if configured)
+        run: npm run --if-present lint --prefix backend
+
+      - name: Test Frontend
+        run: npm test --prefix frontend
+
+      - name: Test Backend
+        run: npm test --prefix backend
+
+      - name: Build Frontend
+        run: npm run build --prefix frontend
+
+      - name: Validate Backend Syntax (plain JavaScript)
+        run: |
+          node --check backend/index.js
+          node --check backend/src/app.js
+          node --check backend/src/server.js
