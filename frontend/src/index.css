@@ -1,1 +1,57 @@
-:root{font-family:system-ui,sans-serif;color:#292b24;background:#f8f6ef;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:wait;opacity:.6}a{color:inherit}button:focus-visible,a:focus-visible{outline:3px solid #9caa6b;outline-offset:4px}input:focus{outline:2px solid #6c7b43;outline-offset:2px}
+@import "tailwindcss";
+
+/* Design tokens: UI_UX_requirements_Citrus.md, mục 2 (bản đề xuất 07/11/2026, chờ xác nhận) */
+@theme {
+  --color-jungle-green: #04550f;
+  --color-lime-zest: #b7c83e;
+  --color-lemon-gold: #e3bd28;
+  --color-citrus-cream: #ffeee9;
+  --color-ink: #17351b;
+  --color-ink-muted: #52634f;
+  --color-surface: #fff9f6;
+  --color-border: #e8d8ce;
+
+  --color-ok-bg: #eef3d2;
+  --color-ok-fg: #04550f;
+  --color-warn-bg: #fff5cc;
+  --color-warn-fg: #5b4900;
+  --color-danger-bg: #f9dbd2;
+  --color-danger-fg: #8f2710;
+  --color-neutral-bg: #f1eae3;
+
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-sans: "Be Vietnam Pro", Arial, sans-serif;
+
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --shadow-card: 0 1px 2px rgba(20, 32, 31, 0.06);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-ink);
+    background: #fff;
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-serif);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-jungle-green);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
