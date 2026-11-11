@@ -1,50 +1,35 @@
-# API Contract - Dự án "Hôm nay ăn gì?" (Sprint 1 MVP)
+# API Contract - "Hôm nay ăn gì?" (Sprint 1)
 
-> **Trạng thái:** Bản chốt chính thức cho Sprint 1 (Hạn chót: 05/11/2026).  
-> **Áp dụng cho:** Frontend (TV2), Backend (TV1 + TV4), DevOps & QA (TV5).
-
----
-
-## 1. Khác biệt so với bản nháp ban đầu
-- **Tương thích tên trường cơ sở dữ liệu:** CSDL khởi tạo của nhóm đang dùng tiếng Việt (`mon_an`, `nguoi_dung`). Contract API vẫn giữ chuẩn `snake_case` tiếng Anh (`dish`, `author`, `ingredients`, `steps`) để Frontend code sạch sẽ, backend sẽ đảm nhiệm mapper chuyển đổi dữ liệu.
-- **Thống nhất endpoint kiểm tra sức khỏe:** Cung cấp `GET /health` (và alias `GET /api/health` để tương thích Vite proxy / hệ thống cũ).
-- **Thống nhất chuẩn phản hồi lỗi:** Tất cả lỗi thống nhất gói trong cấu trúc `{ "error": { "code": "...", "message": "...", "details": [...] } }`.
+> **Trạng thái:** Bản chốt Sprint 1, khớp schema Supabase thực tế (đối chiếu ngày 11/11/2026).
+> **Áp dụng cho:** Frontend (TV2), Backend (TV1, TV4), Database (TV3), QA/DevOps (TV5).
 
 ---
 
-## 2. Quy ước chung
+## 1. Quy ước chung
 
-- **Base URL Dev:** `http://localhost:4000` (hoặc proxy qua Frontend `http://localhost:5173/api`).
-- **Tất cả endpoint nghiệp vụ** đều nằm dưới tiền tố `/api`.
-- **Định dạng dữ liệu:** JSON, UTF-8. Header bắt buộc: `Content-Type: application/json`.
-- **Định dạng thời gian:** Chuẩn ISO 8601 UTC (ví dụ: `2026-11-06T09:30:00.000Z`).
-- **Định dạng định danh (ID):** Chuỗi UUID v4 chuẩn (ví dụ: `11111111-1111-1111-1111-111111111111`).
-- **Xác thực:** Gửi qua HTTP Header:  
-  `Authorization: Bearer <access_token>`  
-  *(Token do Supabase Auth cấp trực tiếp cho Frontend sau khi đăng nhập).*
+- **Base URL (dev):** `http://localhost:3000`. Frontend gọi qua Vite proxy `/api`.
+- Mọi endpoint nghiệp vụ nằm dưới tiền tố `/api`.
+- **Định dạng dữ liệu:** JSON, UTF-8, header `Content-Type: application/json`.
+- **Thời gian:** ISO 8601 UTC, ví dụ `2026-11-11T09:30:00.000Z`.
+- **ID:**
+  - `post.id`, `dish.id`, `ingredient_id` là **số nguyên** (khớp `bigint` trong DB), ví dụ `17`.
+  - `author.id` là **UUID** (khớp `nguoi_dung.ma_nd`).
+- **Xác thực:** header `Authorization: Bearer <access_token>` (token do Supabase Auth cấp).
+- **Tên trường JSON** dùng `snake_case` tiếng Anh. Backend chịu trách nhiệm ánh xạ sang cột DB (xem mục 5).
 
-### 2.1. Cấu trúc Response thành công
+### 1.1. Response thành công
 
-- **Đối tượng đơn lẻ:**
+Đối tượng đơn lẻ:
 ```json
-{
-  "data": { }
-}
+{ "data": { } }
 ```
 
-- **Danh sách có phân trang:**
+Danh sách có phân trang:
 ```json
-{
-  "data": [ ],
-  "meta": {
-    "page": 1,
-    "limit": 20,
-    "total": 37
-  }
-}
+{ "data": [ ], "meta": { "page": 1, "limit": 20, "total": 37 } }
 ```
 
-### 2.2. Cấu trúc Response lỗi (Thống nhất toàn hệ thống)
+### 1.2. Response lỗi
 
 ```json
 {
@@ -52,281 +37,218 @@
     "code": "VALIDATION_ERROR",
     "message": "Dữ liệu không hợp lệ",
     "details": [
-      {
-        "field": "ingredients[0].quantity",
-        "message": "Định lượng phải là số lớn hơn 0"
-      }
+      { "field": "ingredients[0].quantity", "message": "Định lượng phải là số lớn hơn 0" }
     ]
   }
 }
 ```
+Mảng `details` chỉ có khi `code` là `VALIDATION_ERROR`.
 
-*Lưu ý: Mảng `details` chỉ xuất hiện khi `code` là `VALIDATION_ERROR`.*
-
-#### Bảng mã lỗi chuẩn HTTP:
-
-| HTTP Status | Mã lỗi (`code`) | Ý nghĩa & Khi nào trả về |
+| HTTP | `code` | Khi nào trả về |
 |---|---|---|
-| **400** | `VALIDATION_ERROR` | Dữ liệu gửi lên sai/thiếu trường bắt buộc, sai kiểu dữ liệu, ID sai định dạng UUID. |
-| **401** | `UNAUTHORIZED` | Thiếu token, token không hợp lệ hoặc đã hết hạn. |
-| **403** | `FORBIDDEN` | Tài khoản bị vô hiệu hóa hoặc không có quyền truy cập tài nguyên. |
-| **404** | `NOT_FOUND` | Không tìm thấy bài viết, tài nguyên hoặc endpoint không tồn tại. |
-| **500** | `INTERNAL_ERROR` | Lỗi máy chủ nội bộ. Message chung chung, **không để lộ stack trace hay câu lệnh SQL**. |
+| 400 | `VALIDATION_ERROR` | Thiếu trường, sai kiểu, sai giá trị, ID không phải số nguyên dương, nguyên liệu trùng trong cùng công thức, JSON sai cú pháp. |
+| 401 | `UNAUTHORIZED` | Thiếu token, token sai hoặc hết hạn. |
+| 403 | `FORBIDDEN` | Tài khoản `LOCKED` hoặc chưa có profile hợp lệ. |
+| 404 | `NOT_FOUND` | Không tìm thấy tài nguyên hoặc endpoint không tồn tại. |
+| 500 | `INTERNAL_ERROR` | Lỗi máy chủ. Message chung chung, không lộ stack trace hay SQL. |
 
-### 2.3. Quy tắc phân trang (Pagination)
-- **Tham số Query:**
-  - `page`: Số trang (mặc định: `1`, tối thiểu: `1`).
-  - `limit`: Số bản ghi mỗi trang (mặc định: `20`, tối thiểu: `1`, **tối đa: `50`**).
-- Truyền sai kiểu hoặc vượt quá giới hạn sẽ trả lỗi `400 VALIDATION_ERROR`.
+### 1.3. Phân trang
 
----
-
-## 3. Chi tiết các Endpoints
-
-### 3.1. `GET /health` (hoặc `GET /api/health`)
-- **Mục đích:** Kiểm tra trạng thái hoạt động của backend service.
-- **Quyền:** Công khai (Public).
-- **Response (200 OK):**
-```json
-{
-  "status": "ok"
-}
-```
+- `page`: mặc định `1`, tối thiểu `1`.
+- `limit`: mặc định `20`, tối thiểu `1`, tối đa `50`.
+- Sai kiểu hoặc vượt giới hạn trả `400 VALIDATION_ERROR`.
 
 ---
 
-### 3.2. `POST /api/posts` (Tạo bài viết công thức)
-- **Mục đích:** Người dùng đã đăng nhập đăng bài công thức món ăn (Phương án A - cấu trúc).
-- **Phụ trách:** TV1 (BE03).
-- **Quyền:** Cần đăng nhập (`Authorization: Bearer <access_token>`).
-- **Lưu ý bảo mật:** Người đăng (`author_id`) **luôn được trích xuất từ token**, backend bỏ qua mọi trường `author_id`/`user_id` nếu client truyền trong body.
+## 2. Endpoints
 
-#### Request Body:
+### 2.1. `GET /api/health`
+- Quyền: công khai.
+- Response `200`: `{ "status": "ok" }`
+
+---
+
+### 2.2. `POST /api/posts` — Tạo bài viết công thức
+
+- Quyền: **cần đăng nhập**.
+- `author` luôn lấy từ token. Mọi trường `author_id`, `user_id` trong body bị bỏ qua.
+- Backend luôn ghi `loai_bai = 'RECIPE'` và `trang_thai = 'PUBLIC'`.
+- Một request tạo đồng thời `cong_thuc`, `ct_nguyen_lieu`, `buoc_cong_thuc`, `bai_dang` trong một transaction.
+
+#### Request body
 ```json
 {
-  "dish_id": "11111111-1111-1111-1111-111111111111",
+  "dish_id": 17,
   "title": "Phở bò nhà làm, nước dùng trong",
+  "content": "Công thức nấu phở bò nước trong, ngọt xương.",
   "ingredients": [
-    {
-      "ingredient_id": "22222222-2222-2222-2222-222222222222",
-      "quantity": 500,
-      "unit": "g"
-    },
-    {
-      "name": "hành tây",
-      "quantity": 1,
-      "unit": "củ"
-    },
-    {
-      "name": "muối",
-      "quantity": null,
-      "unit": null
-    }
+    { "ingredient_id": 100, "quantity": 500, "unit": "g", "role": "PRIMARY" },
+    { "name": "hành tây", "quantity": 1, "unit": "củ" },
+    { "name": "muối", "quantity": null, "unit": null }
   ],
   "steps": [
-    {
-      "content": "Chần xương với nước sôi 5 phút rồi rửa sạch."
-    },
-    {
-      "content": "Hầm xương 3 tiếng với hành, gừng nướng."
-    }
+    { "content": "Chần xương với nước sôi 5 phút rồi rửa sạch." },
+    { "content": "Hầm xương 3 tiếng với hành, gừng nướng." }
   ]
 }
 ```
 
-#### Quy tắc Validation:
-| Trường | Bắt buộc | Quy tắc xác thực |
-|---|---|---|
-| `dish_id` | Có | UUID hợp lệ. Món ăn phải tồn tại trong CSDL. |
-| `title` | Có | Chuỗi từ 3 đến 150 ký tự (sau khi trim khoảng trắng). |
-| `ingredients` | Có | Mảng từ 1 đến 50 phần tử. |
-| `ingredients[].ingredient_id` / `.name` | Có | **Phải có ít nhất 1 trong 2**. Nếu có cả hai, ưu tiên `ingredient_id`. `name` dài từ 1 đến 100 ký tự. |
-| `ingredients[].quantity` | Không | Số thực dương (`> 0`) hoặc `null` (nêm nếm tùy khẩu vị). Không nhận chuỗi. |
-| `ingredients[].unit` | Không | Chuỗi từ 1 đến 30 ký tự hoặc `null`. |
-| `steps` | Có | Mảng từ 1 đến 50 phần tử. |
-| `steps[].content` | Có | Chuỗi từ 1 đến 1000 ký tự. Thứ tự bước tự động đánh số 1, 2, 3... theo mảng. |
+#### Validation
 
-#### Response (201 Created):
-Trả về đối tượng bài viết vừa tạo hoàn chỉnh (cùng định dạng với `GET /api/posts/:id`) để Frontend hiển thị hoặc redirect:
-```json
-{
-  "data": {
-    "id": "33333333-3333-3333-3333-333333333333",
-    "title": "Phở bò nhà làm, nước dùng trong",
-    "created_at": "2026-11-06T09:30:00.000Z",
-    "dish": {
-      "id": "11111111-1111-1111-1111-111111111111",
-      "name": "Phở bò"
-    },
-    "author": {
-      "id": "44444444-4444-4444-4444-444444444444",
-      "display_name": "Minh"
-    },
-    "ingredients": [
-      {
-        "ingredient_id": "22222222-2222-2222-2222-222222222222",
-        "name": "thịt bò",
-        "quantity": 500,
-        "unit": "g"
-      },
-      {
-        "ingredient_id": "55555555-5555-5555-5555-555555555555",
-        "name": "muối",
-        "quantity": null,
-        "unit": null
-      }
-    ],
-    "steps": [
-      {
-        "order": 1,
-        "content": "Chần xương với nước sôi 5 phút rồi rửa sạch."
-      },
-      {
-        "order": 2,
-        "content": "Hầm xương 3 tiếng với hành, gừng nướng."
-      }
-    ]
-  }
-}
-```
-
----
-
-### 3.3. `GET /api/posts` (Bảng tin danh sách bài viết)
-- **Mục đích:** Xem danh sách bài viết công khai trên bảng tin, sắp xếp mới nhất trước.
-- **Phụ trách:** TV1 (BE04).
-- **Quyền:** Công khai (Public).
-- **Query Params:**
-  - `page`: Số trang (mặc định: `1`).
-  - `limit`: Số bài mỗi trang (mặc định: `20`, tối đa: `50`).
-
-#### Response (200 OK):
-```json
-{
-  "data": [
-    {
-      "id": "33333333-3333-3333-3333-333333333333",
-      "title": "Phở bò nhà làm, nước dùng trong",
-      "created_at": "2026-11-06T09:30:00.000Z",
-      "dish": {
-        "id": "11111111-1111-1111-1111-111111111111",
-        "name": "Phở bò"
-      },
-      "author": {
-        "id": "44444444-4444-4444-4444-444444444444",
-        "display_name": "Minh"
-      }
-    }
-  ],
-  "meta": {
-    "page": 1,
-    "limit": 20,
-    "total": 37
-  }
-}
-```
-*Lưu ý: Nếu không có bài viết nào, trả về `"data": []` kèm mã HTTP `200`, không trả về 404.*
-
----
-
-### 3.4. `GET /api/posts/:id` (Chi tiết bài viết)
-- **Mục đích:** Xem đầy đủ công thức, nguyên liệu và các bước thực hiện của một bài viết.
-- **Phụ trách:** TV1 (BE04).
-- **Quyền:** Công khai (Public).
-- **Path Params:**
-  - `id`: UUID của bài viết.
-
-#### Response (200 OK):
-```json
-{
-  "data": {
-    "id": "33333333-3333-3333-3333-333333333333",
-    "title": "Phở bò nhà làm, nước dùng trong",
-    "created_at": "2026-11-06T09:30:00.000Z",
-    "dish": {
-      "id": "11111111-1111-1111-1111-111111111111",
-      "name": "Phở bò"
-    },
-    "author": {
-      "id": "44444444-4444-4444-4444-444444444444",
-      "display_name": "Minh"
-    },
-    "ingredients": [
-      {
-        "ingredient_id": "22222222-2222-2222-2222-222222222222",
-        "name": "thịt bò",
-        "quantity": 500,
-        "unit": "g"
-      },
-      {
-        "ingredient_id": "55555555-5555-5555-5555-555555555555",
-        "name": "muối",
-        "quantity": null,
-        "unit": null
-      }
-    ],
-    "steps": [
-      {
-        "order": 1,
-        "content": "Chần xương với nước sôi 5 phút rồi rửa sạch."
-      },
-      {
-        "order": 2,
-        "content": "Hầm xương 3 tiếng với hành, gừng nướng."
-      }
-    ]
-  }
-}
-```
-- Lỗi `400 VALIDATION_ERROR`: `:id` không phải UUID hợp lệ.
-- Lỗi `404 NOT_FOUND`: Không tìm thấy bài viết tương ứng với `:id`.
-
----
-
-### 3.5. `GET /api/dishes` (Tra cứu danh mục món ăn)
-- **Mục đích:** Cung cấp danh sách món ăn mẫu để Frontend hiển thị gợi ý (autocomplete/select) khi tạo bài viết.
-- **Phụ trách:** TV4 (BE05).
-- **Quyền:** Công khai (Public).
-- **Query Params:**
-  - `search` (tùy chọn): Từ khóa tìm kiếm theo tên món ăn.
-  - `page` (tùy chọn): Trang hiện tại (mặc định: `1`).
-  - `limit` (tùy chọn): Giới hạn mỗi trang (mặc định: `20`, tối đa: `50`).
-
-#### Response (200 OK):
-```json
-{
-  "data": [
-    {
-      "id": "11111111-1111-1111-1111-111111111111",
-      "name": "Phở bò"
-    }
-  ],
-  "meta": {
-    "page": 1,
-    "limit": 20,
-    "total": 1
-  }
-}
-```
-
----
-
-## 4. Quy tắc quản lý & thay đổi Contract
-1. **Tính bất biến trong Sprint:** Contract này là cam kết giữa Frontend, Backend và QA. Bất kỳ sự thay đổi nào đối với tên trường, cấu trúc trả về hoặc mã lỗi đều **không được tự ý thay đổi**.
-2. **Quy trình thay đổi nếu bắt buộc:**
-   - Người đề xuất phải thông báo trước cho TV1 (PO/Backend Lead) và TV2 (Frontend Lead).
-   - Ghi lại lý do và cập nhật vào mục *Lịch sử thay đổi* ở cuối tài liệu này.
-   - Tạo thông báo chính thức cho toàn bộ thành viên nhóm.
-
----
-
-## 5. Danh sách câu hỏi còn mở (Cần xác nhận với TV3)
-
-| # | Câu hỏi | Người phụ trách | Đề xuất mặc định của Backend |
+| Trường | Bắt buộc | Quy tắc | Cột DB |
 |---|---|---|---|
-| 1 | Kiểu dữ liệu ID trong toàn bộ bảng là UUID v4 hay `BIGINT` tự tăng? | TV3 | Mặc định sử dụng **UUID v4** |
-| 2 | Khi người dùng gõ tay nguyên liệu chưa có trong danh mục: Hệ thống sẽ tự tạo mới hay lưu kèm cờ `is_verified: false`? | TV3 + TV4 | Tự động tạo nguyên liệu mới vào bảng nguyên liệu nếu chưa tồn tại |
-| 3 | Bài viết có cột trạng thái (`status` hoặc `is_public`) không? | TV3 | Mặc định **không có**, mọi bài viết được tạo thành công đều công khai ngay |
-| 4 | Định lượng nguyên liệu (`quantity`) có thể để trống (`null`) đối với gia vị nêm nếm không? | TV3 | **Cho phép `null`** |
-| 5 | Tên và chữ ký chính xác của hàm RPC Postgres (DB09) lưu bài viết trong 1 transaction là gì? | TV3 | Giả định: `create_post_with_recipe(dish_id, title, ingredients, steps)` |
+| `dish_id` | Có | Số nguyên dương, món phải tồn tại và `ACTIVE`. | `cong_thuc.ma_mon` |
+| `title` | Có | 3–150 ký tự sau khi trim. | `bai_dang.tieu_de`, `cong_thuc.ten_ct` |
+| `content` | Không | 1–2000 ký tự sau khi trim. Nếu không gửi, backend dùng `title`. | `bai_dang.noi_dung` |
+| `ingredients` | Có | Mảng 1–50 phần tử. | `ct_nguyen_lieu` |
+| `ingredients[].ingredient_id` / `.name` | Có ít nhất 1 trong 2 | Có cả hai thì ưu tiên `ingredient_id`. `name` 1–100 ký tự. Nguyên liệu không được trùng trong cùng công thức. | `ct_nguyen_lieu.ma_nl`, `nguyen_lieu.ten_nl` |
+| `ingredients[].quantity` | Không | Số `> 0` hoặc `null`. Không nhận chuỗi. | `ct_nguyen_lieu.so_luong` |
+| `ingredients[].unit` | Không | Chuỗi 1–30 ký tự hoặc `null`. | `ct_nguyen_lieu.don_vi` |
+| `ingredients[].role` | Không | `PRIMARY` hoặc `SECONDARY`. Mặc định `SECONDARY`. | `ct_nguyen_lieu.vai_tro_nl` |
+| `steps` | Có | Mảng 1–50 phần tử. | `buoc_cong_thuc` |
+| `steps[].content` | Có | 1–1000 ký tự sau khi trim. Thứ tự (`order`) do backend tự đánh số 1, 2, 3... theo thứ tự mảng. | `buoc_cong_thuc.noi_dung`, `stt` |
 
+**Xử lý nguyên liệu gõ tay (`name`):** backend so khớp `ten_nl` không phân biệt hoa thường sau khi trim. Có thì dùng nguyên liệu đó, chưa có thì tự tạo mới trong `nguyen_lieu`.
+
+#### Response `201 Created`
+Trả cùng cấu trúc với `GET /api/posts/:id`:
+```json
+{
+  "data": {
+    "id": 51,
+    "title": "Phở bò nhà làm, nước dùng trong",
+    "content": "Công thức nấu phở bò nước trong, ngọt xương.",
+    "created_at": "2026-11-11T09:30:00.000Z",
+    "dish": { "id": 17, "name": "Chả trứng" },
+    "author": { "id": "44444444-4444-4444-4444-444444444444", "display_name": "Minh" },
+    "ingredients": [
+      { "ingredient_id": 100, "name": "Gầu bò", "quantity": 500, "unit": "g", "role": "PRIMARY" },
+      { "ingredient_id": 210, "name": "hành tây", "quantity": 1, "unit": "củ", "role": "SECONDARY" },
+      { "ingredient_id": 211, "name": "muối", "quantity": null, "unit": null, "role": "SECONDARY" }
+    ],
+    "steps": [
+      { "order": 1, "content": "Chần xương với nước sôi 5 phút rồi rửa sạch." },
+      { "order": 2, "content": "Hầm xương 3 tiếng với hành, gừng nướng." }
+    ]
+  }
+}
+```
+
+#### Lỗi
+- `400`: dữ liệu sai (xem bảng validation), `dish_id` không tồn tại, nguyên liệu trùng.
+- `401`: thiếu hoặc sai token.
+- `403`: tài khoản `LOCKED`.
+- `500`: lỗi máy chủ.
+
+---
+
+### 2.3. `GET /api/posts` — Danh sách bài viết
+
+- Quyền: công khai.
+- Chỉ trả bài có `loai_bai = 'RECIPE'` và `trang_thai = 'PUBLIC'`, sắp xếp mới nhất trước (`tao_luc` giảm dần).
+- Query: `page`, `limit` (xem mục 1.3).
+
+#### Response `200`
+```json
+{
+  "data": [
+    {
+      "id": 51,
+      "title": "Phở bò nhà làm, nước dùng trong",
+      "created_at": "2026-11-11T09:30:00.000Z",
+      "dish": { "id": 17, "name": "Chả trứng" },
+      "author": { "id": "44444444-4444-4444-4444-444444444444", "display_name": "Minh" }
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 37 }
+}
+```
+Không có bài nào thì trả `"data": []` với mã `200`.
+
+Lỗi: `400` (page/limit sai), `500`.
+
+---
+
+### 2.4. `GET /api/posts/:id` — Chi tiết bài viết
+
+- Quyền: công khai.
+- `:id` là số nguyên dương.
+- Chỉ trả bài `RECIPE` + `PUBLIC`. Bài ở trạng thái khác hoặc loại `REVIEW` trả `404`.
+
+#### Response `200`
+Cấu trúc giống response `201` của `POST /api/posts` (mục 2.2).
+
+Lỗi:
+- `400`: `:id` không phải số nguyên dương.
+- `404`: không tìm thấy bài viết.
+- `500`: lỗi máy chủ.
+
+---
+
+### 2.5. `GET /api/dishes` — Tra cứu món ăn (TV4)
+
+- Quyền: công khai.
+- Chỉ trả món có `trang_thai = 'ACTIVE'`, sắp xếp theo `name` tăng dần.
+
+#### Query
+| Tham số | Mô tả |
+|---|---|
+| `search` | Tùy chọn. Tìm theo tên món, không phân biệt hoa thường. |
+| `ingredients` | Tùy chọn (P1, API-02). Danh sách `ingredient_id` cách nhau bằng dấu phẩy, ví dụ `ingredients=1,5,9`. Trả các món có công thức chứa **tất cả** nguyên liệu đó. Kết hợp được với `search`. Giá trị không phải số nguyên dương trả `400`. Tối đa 20 ID. |
+| `page`, `limit` | Xem mục 1.3. |
+
+#### Response `200`
+```json
+{
+  "data": [
+    {
+      "id": 17,
+      "name": "Chả trứng",
+      "description": "Mô tả ngắn hoặc null",
+      "image_url": null
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 1 }
+}
+```
+
+Lỗi: `400`, `500`.
+
+---
+
+## 3. Quy tắc thay đổi contract
+
+1. Contract không được tự ý thay đổi tên trường, cấu trúc response hoặc mã lỗi.
+2. Muốn thay đổi: báo trước cho TV1 (PO/Backend Lead) và TV2 (Frontend Lead), ghi lý do vào mục "Lịch sử thay đổi", rồi thông báo cho cả nhóm.
+
+---
+
+## 4. Lịch sử thay đổi
+
+| Ngày | Phiên bản | Người đổi | Nội dung |
+|---|---|---|---|
+| 11/11/2026 | 1.0 | TV1 | Chốt bản Sprint 1 theo schema Supabase thực tế (ID bigint, bảng `bai_dang`/`cong_thuc`, thêm `content`, `role`, tham số `ingredients`). |
+
+---
+
+## 5. Ánh xạ JSON ↔ Database
+
+| JSON | Bảng.cột DB |
+|---|---|
+| `dish.id`, `dish.name`, `description`, `image_url` | `mon_an.ma_mon`, `ten_mon`, `mo_ta_ngan`, `hinh_anh` |
+| `author.id`, `author.display_name` | `nguoi_dung.ma_nd`, `ten_hien_thi` |
+| `post.id`, `title`, `content`, `created_at` | `bai_dang.ma_bai`, `tieu_de`, `noi_dung`, `tao_luc` |
+| `post.dish` | `bai_dang.ma_ct` → `cong_thuc.ma_mon` → `mon_an` |
+| `ingredients[]` | `ct_nguyen_lieu` (`so_luong`, `don_vi`, `vai_tro_nl`) + `nguyen_lieu` (`ma_nl`, `ten_nl`) |
+| `steps[]` | `buoc_cong_thuc` (`stt` → `order`, `noi_dung` → `content`) |
+
+Không trả email, số điện thoại hoặc dữ liệu nhạy cảm của người dùng qua API công khai.
+
+---
+
+## 6. Việc còn mở
+
+| # | Nội dung | Người phụ trách |
+|---|---|---|
+| 1 | Viết hàm RPC Postgres tạo bài trong một transaction (DB chưa có). | TV1 soạn SQL, TV3 chạy |
+| 2 | Xác nhận RLS cho phép backend đọc/ghi `bai_dang`, `cong_thuc`, `ct_nguyen_lieu`, `buoc_cong_thuc`, `nguyen_lieu`. | TV3 |

@@ -1,29 +1,31 @@
-# Ghi chú Ánh xạ Schema Cơ sở Dữ liệu (Sprint 1)
+# Ghi chú schema Supabase (đối chiếu 11/11/2026)
 
-Tài liệu này ghi lại thông tin đối chiếu schema thực tế trong repo và các giả định/thống nhất với TV3 (Database).
+Nguồn: kết quả truy vấn `information_schema` và `pg_constraint` trên Supabase do TV3 thiết lập.
 
-## 1. Schema hiện diện trong mã nguồn khởi tạo (`backend/src/app.js`, `supabase/seed.sql`, `README.md`)
+## 1. Bảng dùng trong Sprint 1
 
-Hiện tại trong mã nguồn ban đầu của dự án, cơ sở dữ liệu đang dùng quy ước đặt tên tiếng Việt không dấu (snake_case) cho một số bảng đã có:
-
-| Bảng thực tế đã thấy | Khóa chính | Các cột đã dùng | Ý nghĩa |
+| Bảng | Khóa chính | Cột chính | Ghi chú |
 |---|---|---|---|
-| `public.mon_an` | `ma_mon` (UUID / text) | `ten_mon`, `mo_ta_ngan`, `hinh_anh`, `trang_thai` ('ACTIVE') | Danh mục món ăn |
-| `public.nguoi_dung` | `ma_nd` (trùng `auth.users.id`) | `ten_hien_thi`, `anh_dai_dien`, `vai_tro`, `trang_thai` ('ACTIVE') | Profile người dùng công khai |
+| `mon_an` | `ma_mon` (bigint) | `ten_mon`, `mo_ta_ngan`, `hinh_anh`, `trang_thai` | `trang_thai`: ACTIVE, HIDDEN, DELETED |
+| `nguoi_dung` | `ma_nd` (uuid, trùng `auth.users.id`) | `ten_hien_thi`, `anh_dai_dien`, `vai_tro`, `trang_thai` | `trang_thai`: ACTIVE, LOCKED. `vai_tro`: USER, ADMIN |
+| `bai_dang` | `ma_bai` (bigint) | `ma_tac_gia`, `loai_bai`, `ma_ct`, `tieu_de`, `noi_dung`, `trang_thai`, `tao_luc` | `loai_bai`: RECIPE, REVIEW. `trang_thai`: DRAFT (mặc định), PUBLIC, HIDDEN, DELETED. Bài RECIPE bắt buộc có `ma_ct`, không có `ma_quan`, `ma_mon_da_dung`, `gia_da_tra` |
+| `cong_thuc` | `ma_ct` (bigint) | `ma_mon`, `ma_nguoi_tao`, `ten_ct`, `thoi_gian_phut`, `trang_thai_thanh_phan` | `trang_thai_thanh_phan`: COMPLETE, INCOMPLETE (mặc định) |
+| `ct_nguyen_lieu` | (`ma_ct`, `ma_nl`) | `so_luong`, `don_vi`, `vai_tro_nl`, `ghi_chu` | `so_luong` > 0 hoặc null. `vai_tro_nl`: PRIMARY, SECONDARY (mặc định) |
+| `buoc_cong_thuc` | (`ma_ct`, `stt`) | `noi_dung` | `stt` > 0, `noi_dung` không rỗng |
+| `nguyen_lieu` | `ma_nl` (bigint) | `ten_nl` (UNIQUE) | Không có cờ xác minh |
 
-## 2. Bảng đối chiếu mô hình khái niệm (Spec) vs Schema
+## 2. Ánh xạ JSON ↔ DB
 
-Theo đặc tả `00_CONTEXT.md` và `01_BE01_API_CONTRACT.md`, API của backend sẽ giao tiếp với frontend bằng các trường JSON chuẩn tiếng Anh (`snake_case`). Backend (tầng `posts.service.js`) sẽ chịu trách nhiệm chuyển đổi (mapping) giữa cột database và JSON trả về frontend:
+Xem mục 5 của `docs/api.md`.
 
-| Khái niệm (API JSON) | Bảng DB dự kiến (TV3) | Cột DB tương ứng | Ghi chú chuyển đổi (Mapping) |
-|---|---|---|---|
-| **Dish (`dish`)** | `mon_an` (hoặc `dishes`) | `ma_mon` (hoặc `id`), `ten_mon` (hoặc `name`) | `ma_mon` -> `dish.id`, `ten_mon` -> `dish.name` |
-| **Author (`author`)** | `nguoi_dung` (hoặc `profiles`) | `ma_nd` (hoặc `id`), `ten_hien_thi` (hoặc `display_name`) | `ma_nd` -> `author.id`, `ten_hien_thi` -> `author.display_name` |
-| **Post (`post`)** | `bai_viet` (hoặc `posts`) | `id` / `ma_bai_viet`, `tieu_de` / `title`, `ngay_tao` / `created_at` | Giữ chuẩn JSON `id`, `title`, `created_at` |
-| **Ingredients (`ingredients`)** | `nguyen_lieu` & `cong_thuc_nguyen_lieu` (hoặc `recipe_ingredients`) | `id` / `ma_nl`, `ten` / `name`, `dinh_luong` / `quantity`, `don_vi` / `unit` | Giữ chuẩn JSON `ingredient_id`, `name`, `quantity`, `unit` |
-| **Steps (`steps`)** | `buoc_nau` (hoặc `recipe_steps`) | `thu_tu` / `step_order`, `noi_dung` / `content` | `step_order` / `thu_tu` -> `order`, `content` -> `content` |
+## 3. Quyết định chốt (11/11/2026)
 
-## 3. Khóa ngoại và ràng buộc bảo mật (RLS)
-- **RLS**: Người dùng chỉ đọc dữ liệu công khai (`ACTIVE`) qua `getAnonClient()`. Thao tác tạo bài ghi qua `createUserClient(token)` hoặc qua RPC transaction do TV3 cấp (`DB09`).
-- **Bảo mật danh tính**: Tuyệt đối không trả email, số điện thoại từ `auth.users` hay `nguoi_dung` ra API công khai.
+- ID trong API là số nguyên (bigint). Riêng `author.id` là UUID.
+- Tạo bài: backend ghi `loai_bai = 'RECIPE'`, `trang_thai = 'PUBLIC'`. `bai_dang.noi_dung` lấy từ `content`, không có thì lấy `title`.
+- Nguyên liệu gõ tay: so khớp `ten_nl` không phân biệt hoa thường, chưa có thì tạo mới.
+- Hiện DB chưa có hàm RPC tạo bài (chỉ có `create_user_profile`). Cần bổ sung để lưu trong một transaction.
 
+## 4. Bảo mật
+
+- Không trả email, số điện thoại hoặc dữ liệu nhạy cảm của người dùng ra API công khai.
+- `SUPABASE_SERVICE_ROLE_KEY` chỉ nằm ở backend, không đưa vào biến `VITE_`.
