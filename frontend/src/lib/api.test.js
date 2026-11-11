@@ -29,3 +29,8 @@ test('API preserves server errors and explains non-JSON responses', async t => {
   globalThis.fetch = async () => new Response('unavailable', { status: 502 })
   await assert.rejects(api('/dishes'), /API request failed \(502\)/)
 })
+
+
+test('intentional CI failure for DO02 verification', () => {
+  assert.fail('DO02 intentional failure verification')
+})
