@@ -5,13 +5,16 @@ import { env } from './config/env.js';
 import { apiRouter } from './routes/index.js';
 import { notFoundHandler } from './middleware/notFound.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { requestLogger } from './middleware/requestLogger.js';
+import { AppError } from './utils/AppError.js';
 
 export function createApp() {
   const app = express();
 
   // Bảo mật HTTP Headers
   app.use(helmet());
-
+  app.use(requestLogger);
+  
   // Cấu hình CORS
   app.use(
     cors({
@@ -21,7 +24,7 @@ export function createApp() {
         if (env.corsOriginsList.includes(origin)) {
           return callback(null, true);
         }
-        return callback(new Error('CORS_NOT_ALLOWED'));
+        return callback(new AppError(403, 'FORBIDDEN', 'Origin không được phép truy cập API'));
       },
       allowedHeaders: ['Authorization', 'Content-Type'],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
