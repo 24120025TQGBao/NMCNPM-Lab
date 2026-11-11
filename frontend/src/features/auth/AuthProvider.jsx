@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { api } from '../../lib/api'
+import { me } from '../../lib/api'
 import { AuthContext } from './AuthContext'
 
 // status: 'loading' | 'guest' | 'member' | 'blocked'
@@ -28,9 +28,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!userId) return
     const controller = new AbortController()
-    // Đọc token mới nhất từ Supabase thay vì giữ bản sao.
-    supabase.auth.getSession()
-      .then(({ data }) => api('/me', data.session?.access_token, controller.signal))
+    // me.get đọc token mới nhất từ Supabase thay vì giữ bản sao.
+    me.get({ signal: controller.signal })
       .then((profile) => setProfileState({ userId, profile, error: null }))
       .catch((error) => {
         if (controller.signal.aborted) return

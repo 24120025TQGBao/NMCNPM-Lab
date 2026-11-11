@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api } from '../../lib/api'
+import { dishes as dishesApi } from '../../lib/api'
 import { Alert } from '../../components/ui/Alert'
 import { Button } from '../../components/ui/Button'
 import { EmptyState } from '../../components/ui/EmptyState'
@@ -16,8 +16,8 @@ export default function DishListPage() {
 
   useEffect(() => {
     const controller = new AbortController()
-    api('/dishes', null, controller.signal)
-      .then(setDishes)
+    dishesApi.list({ signal: controller.signal })
+      .then((result) => setDishes(result.data))
       .catch((err) => { if (!controller.signal.aborted) setError(err.message) })
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
@@ -43,9 +43,9 @@ export default function DishListPage() {
     content = (
       <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {dishes.map((dish) => (
-          <li key={dish.ma_mon} className="rounded-card border border-border bg-white p-5">
-            <h2 className="font-serif text-2xl leading-[30px] font-semibold">{dish.ten_mon}</h2>
-            <p className="mt-2 text-ink-muted">{dish.mo_ta_ngan || vi.dishes.noDescription}</p>
+          <li key={dish.id} className="rounded-card border border-border bg-white p-5">
+            <h2 className="font-serif text-2xl leading-[30px] font-semibold">{dish.name}</h2>
+            <p className="mt-2 text-ink-muted">{dish.description || vi.dishes.noDescription}</p>
           </li>
         ))}
       </ul>

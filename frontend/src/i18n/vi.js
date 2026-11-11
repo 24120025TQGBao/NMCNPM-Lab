@@ -112,5 +112,13 @@ export const vi = {
     api: (status) => `Không tải được dữ liệu (mã lỗi ${status}). Thử lại sau ít phút.`,
     notJson: 'Máy chủ không trả về dữ liệu hợp lệ. Kiểm tra VITE_API_URL và đảm bảo backend đang chạy.',
     generic: 'Đã có lỗi xảy ra. Thử lại sau ít phút.',
+    network: 'Không kết nối được tới máy chủ. Kiểm tra mạng và thử lại.',
+    unauthorized: 'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.',
+    forbidden: 'Bạn không có quyền thực hiện thao tác này.',
+    notFound: 'Không tìm thấy nội dung này.',
+    validation: 'Dữ liệu chưa hợp lệ. Kiểm tra lại các ô được đánh dấu.',
+    conflict: 'Thao tác này đã được thực hiện trước đó.',
+    server: 'Máy chủ đang gặp sự cố. Thử lại sau ít phút.',
+    mockUnavailable: 'Chức năng này đang dùng dữ liệu mẫu nhưng bộ giả lập chưa sẵn sàng.',
   },
 }
