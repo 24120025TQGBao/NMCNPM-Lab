@@ -26,7 +26,7 @@ cp .env.example .env
 | `SUPABASE_URL` | Có | URL dự án Supabase |
 | `SUPABASE_ANON_KEY` | Có | Khóa công khai, dùng xác minh token và truy vấn theo RLS |
 | `CORS_ORIGINS` | Không | Danh sách origin frontend được phép, cách nhau bằng dấu phẩy |
-| `SUPABASE_SERVICE_ROLE_KEY` | Chưa dùng | Khóa bỏ qua RLS. Chỉ dùng ở backend khi nhóm thống nhất. Không commit, không đưa vào frontend |
+| `SUPABASE_SERVICE_ROLE_KEY` | Có để dùng `/api/dishes` | Khóa bỏ qua RLS, chỉ dùng phía backend cho RPC tìm món. Không commit, không đưa vào frontend |
 
 Không commit file `.env` thật. Chỉ commit `.env.example`.
 
@@ -34,7 +34,7 @@ Không commit file `.env` thật. Chỉ commit `.env.example`.
 
 - **`npm run dev`**: Khởi động server ở chế độ phát triển (`node --watch`).
 - **`npm start`**: Chạy server cho môi trường production.
-- **`npm test`**: Chạy toàn bộ unit test với `vitest`.
+- **`npm test`**: Chạy các test backend bằng Vitest và test dishes bằng Node test runner.
 - **`npm run lint`**: Kiểm tra định dạng code với `eslint`.
 
 ## 3. Cấu trúc thư mục

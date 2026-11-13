@@ -2,13 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { env } from './config/env.js';
-import { apiRouter } from './routes/index.js';
+import { createApiRouter } from './routes/index.js';
 import { notFoundHandler } from './middleware/notFound.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { AppError } from './utils/AppError.js';
 
-export function createApp() {
+export function createApp({ dishesClient } = {}) {
   const app = express();
 
   // Bảo mật HTTP Headers
@@ -45,7 +45,7 @@ export function createApp() {
   });
 
   // Gắn router nghiệp vụ
-  app.use('/api', apiRouter);
+  app.use('/api', createApiRouter({ dishesClient }));
 
   // Xử lý 404 cho route không tồn tại
   app.use(notFoundHandler);

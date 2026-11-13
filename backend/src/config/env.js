@@ -8,6 +8,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   SUPABASE_URL: z.string().url('SUPABASE_URL phải là một URL hợp lệ'),
   SUPABASE_ANON_KEY: z.string().min(1, 'SUPABASE_ANON_KEY không được để trống'),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
   CORS_ORIGINS: z.string().default('http://localhost:5173')
 });
 
@@ -18,6 +19,7 @@ const parseResult = envSchema.safeParse({
   NODE_ENV: process.env.NODE_ENV,
   SUPABASE_URL: process.env.SUPABASE_URL || (isTest ? 'https://example.supabase.co' : undefined),
   SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || (isTest ? 'test-anon-key' : undefined),
+  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || undefined,
   CORS_ORIGINS: process.env.CORS_ORIGINS || (isTest ? 'http://localhost:5173' : undefined)
 });
 

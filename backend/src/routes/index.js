@@ -1,9 +1,15 @@
 import { Router } from 'express';
 import { postsRouter } from './posts.routes.js';
-import { dishesRouter } from './dishes.routes.js';
+import { createDishesRouter } from './dishes.routes.js';
 
-export const apiRouter = Router();
+export function createApiRouter({ dishesClient } = {}) {
+  const apiRouter = Router();
 
-apiRouter.use('/posts', postsRouter);
-apiRouter.use('/dishes', dishesRouter);
+  apiRouter.use('/posts', postsRouter);
+  apiRouter.use('/dishes', createDishesRouter(dishesClient));
+
+  return apiRouter;
+}
+
+export const apiRouter = createApiRouter();
 

@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { env } from '../config/env.js';
 
 let anonClientInstance = null;
+let serviceRoleClientInstance = null;
 
 export function getAnonClient() {
   if (!anonClientInstance) {
@@ -27,5 +28,22 @@ export function createUserClient(accessToken) {
       }
     }
   });
+}
+
+export function getServiceRoleClient() {
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for the dishes search RPC');
+  }
+
+  if (!serviceRoleClientInstance) {
+    serviceRoleClientInstance = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    });
+  }
+
+  return serviceRoleClientInstance;
 }
 
