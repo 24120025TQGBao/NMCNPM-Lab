@@ -6,6 +6,7 @@ export default function createDishesRouter(client) {
   const controller = createDishesController(client)
 
   router.get('/', controller.getDishes)
+  router.get('/search', controller.searchByName)
 
   return router
 }
