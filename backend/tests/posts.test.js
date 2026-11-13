@@ -242,3 +242,192 @@ describe('POST /api/posts (BE03)', () => {
     });
   });
 });
+
+const listResult = {
+  total: 2,
+  data: [
+    {
+      id: 52,
+      title: 'Cá kho tộ',
+      created_at: '2026-11-11T10:00:00.000Z',
+      dish: { id: 18, name: 'Cá kho' },
+      author: { id: 'user-uuid-5678', display_name: 'Lan' }
+    },
+    {
+      id: 51,
+      title: 'Phở bò nhà làm, nước dùng trong',
+      created_at: '2026-11-11T09:30:00.000Z',
+      dish: { id: 17, name: 'Chả trứng' },
+      author: { id: 'user-uuid-1234', display_name: 'Minh' }
+    }
+  ]
+};
+
+describe('GET /api/posts và GET /api/posts/:id (BE04)', () => {
+  let app;
+
+  // Đọc công khai: chỉ dùng anon client, không cần token
+  function mockPublicRpc(result) {
+    const rpc = vi.fn().mockResolvedValue(result);
+    vi.spyOn(supabaseLib, 'getAnonClient').mockReturnValue({ rpc });
+    const userClientSpy = vi.spyOn(supabaseLib, 'createUserClient');
+    return { rpc, userClientSpy };
+  }
+
+  const fields = res => res.body.error.details.map(d => d.field);
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    app = createApp();
+  });
+
+  describe('GET /api/posts', () => {
+    it('Có dữ liệu: trả 200 kèm data + meta, gọi RPC với tham số mặc định, không cần token', async () => {
+      const { rpc, userClientSpy } = mockPublicRpc({ data: listResult, error: null });
+
+      const res = await request(app).get('/api/posts');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({
+        data: listResult.data,
+        meta: { page: 1, limit: 20, total: 2 }
+      });
+      expect(res.body.data.map(p => p.id)).toEqual([52, 51]);
+      expect(rpc).toHaveBeenCalledWith('get_public_posts', { p_page: 1, p_limit: 20 });
+      expect(userClientSpy).not.toHaveBeenCalled();
+    });
+
+    it('Danh sách rỗng: trả 200, data = [] và total = 0', async () => {
+      mockPublicRpc({ data: { total: 0, data: [] }, error: null });
+
+      const res = await request(app).get('/api/posts');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ data: [], meta: { page: 1, limit: 20, total: 0 } });
+    });
+
+    it('Phân trang: truyền page và limit xuống RPC và phản ánh trong meta', async () => {
+      const { rpc } = mockPublicRpc({ data: { total: 37, data: [] }, error: null });
+
+      const res = await request(app).get('/api/posts?page=2&limit=5');
+
+      expect(res.status).toBe(200);
+      expect(res.body.meta).toEqual({ page: 2, limit: 5, total: 37 });
+      expect(rpc).toHaveBeenCalledWith('get_public_posts', { p_page: 2, p_limit: 5 });
+    });
+
+    it('Mỗi bài chỉ có các trường theo contract, không lộ email hay trường nội bộ', async () => {
+      mockPublicRpc({ data: listResult, error: null });
+
+      const res = await request(app).get('/api/posts');
+
+      for (const post of res.body.data) {
+        expect(Object.keys(post).sort()).toEqual(['author', 'created_at', 'dish', 'id', 'title']);
+        expect(Object.keys(post.author).sort()).toEqual(['display_name', 'id']);
+      }
+      expect(JSON.stringify(res.body)).not.toMatch(/email|trang_thai|ma_tac_gia|vai_tro/);
+    });
+
+    it.each([
+      ['page=0', 'page'],
+      ['page=-1', 'page'],
+      ['page=abc', 'page'],
+      ['page=1000001', 'page'],
+      ['limit=0', 'limit'],
+      ['limit=51', 'limit'],
+      ['limit=100', 'limit'],
+      ['limit=abc', 'limit']
+    ])('Tham số sai (%s) trả 400 VALIDATION_ERROR và không gọi DB', async (query, field) => {
+      const { rpc } = mockPublicRpc({ data: listResult, error: null });
+
+      const res = await request(app).get(`/api/posts?${query}`);
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(fields(res)).toContain(field);
+      expect(rpc).not.toHaveBeenCalled();
+    });
+
+    it('Lỗi RPC trả 500 INTERNAL_ERROR, không lộ chi tiết nội bộ', async () => {
+      mockPublicRpc({ data: null, error: { message: 'boom: secret sql detail' } });
+
+      const res = await request(app).get('/api/posts');
+
+      expect(res.status).toBe(500);
+      expect(res.body.error.code).toBe('INTERNAL_ERROR');
+      expect(JSON.stringify(res.body)).not.toContain('boom');
+    });
+  });
+
+  describe('GET /api/posts/:id', () => {
+    it('Tồn tại: trả 200 kèm chi tiết, gọi RPC với id dạng số, không cần token', async () => {
+      const { rpc, userClientSpy } = mockPublicRpc({ data: createdPost, error: null });
+
+      const res = await request(app).get('/api/posts/51');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ data: createdPost });
+      expect(rpc).toHaveBeenCalledWith('get_public_post', { p_id: 51 });
+      expect(userClientSpy).not.toHaveBeenCalled();
+    });
+
+    it('Có đủ content, nguyên liệu (kèm role) và các bước theo đúng thứ tự', async () => {
+      mockPublicRpc({ data: createdPost, error: null });
+
+      const res = await request(app).get('/api/posts/51');
+      const post = res.body.data;
+
+      expect(post.content).toBe('Công thức phở bò nước trong.');
+      expect(post.ingredients).toHaveLength(3);
+      expect(Object.keys(post.ingredients[0]).sort()).toEqual([
+        'ingredient_id',
+        'name',
+        'quantity',
+        'role',
+        'unit'
+      ]);
+      expect(post.steps.map(s => s.order)).toEqual([1, 2]);
+      expect(Object.keys(post.author).sort()).toEqual(['display_name', 'id']);
+      expect(JSON.stringify(res.body)).not.toMatch(/email|trang_thai|ma_tac_gia|vai_tro/);
+    });
+
+    it('Không tồn tại hoặc không công khai (RPC trả null): 404 NOT_FOUND', async () => {
+      mockPublicRpc({ data: null, error: null });
+
+      const res = await request(app).get('/api/posts/999999');
+
+      expect(res.status).toBe(404);
+      expect(res.body.error.code).toBe('NOT_FOUND');
+    });
+
+    it.each([
+      ['abc'],
+      ['0'],
+      ['-1'],
+      ['1.5'],
+      ['01'],
+      ['11111111-1111-1111-1111-111111111111'],
+      ['1000000000000000']
+    ])('id không hợp lệ (%s) trả 400 VALIDATION_ERROR và không gọi DB', async id => {
+      const { rpc } = mockPublicRpc({ data: createdPost, error: null });
+
+      const res = await request(app).get(`/api/posts/${id}`);
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(fields(res)).toContain('id');
+      expect(rpc).not.toHaveBeenCalled();
+    });
+
+    it('Lỗi RPC trả 500 INTERNAL_ERROR, không lộ chi tiết nội bộ', async () => {
+      mockPublicRpc({ data: null, error: { message: 'boom: secret sql detail' } });
+
+      const res = await request(app).get('/api/posts/51');
+
+      expect(res.status).toBe(500);
+      expect(res.body.error.code).toBe('INTERNAL_ERROR');
+      expect(JSON.stringify(res.body)).not.toContain('boom');
+    });
+  });
+});
