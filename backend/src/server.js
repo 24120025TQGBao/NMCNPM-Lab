@@ -1,3 +1,8 @@
-import app from './app.js'
-const port = process.env.PORT || 3000
-app.listen(port, () => console.log(`API running at http://localhost:${port}`))
+import { createApp } from './app.js';
+import { env } from './config/env.js';
+
+const app = createApp();
+
+app.listen(env.PORT, () => {
+  console.log(`[SERVER] Đang chạy tại http://localhost:${env.PORT} (Môi trường: ${env.NODE_ENV})`);
+});
