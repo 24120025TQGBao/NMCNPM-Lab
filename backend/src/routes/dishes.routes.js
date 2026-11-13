@@ -1,12 +1,22 @@
-import { Router } from 'express'
-import { createDishesController } from '../controllers/dishes.controller.js'
+import { Router } from 'express';
+import { createDishesController } from '../controllers/dishes.controller.js';
+import { getServiceRoleClient } from '../lib/supabase.js';
 
-export default function createDishesRouter(client) {
-  const router = Router()
-  const controller = createDishesController(client)
+const serviceRoleClient = {
+  rpc(name, args) {
+    return getServiceRoleClient().rpc(name, args);
+  }
+};
 
-  router.get('/', controller.getDishes)
-  router.get('/search', controller.searchByName)
+export function createDishesRouter(client = serviceRoleClient) {
+  const router = Router();
+  const controller = createDishesController(client);
 
-  return router
+  router.get('/', controller.getDishes);
+  router.get('/search', controller.searchByName);
+
+  return router;
 }
+
+export const dishesRouter = createDishesRouter();
+

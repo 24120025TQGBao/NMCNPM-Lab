@@ -1,9 +1,12 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { createApp } from './app.js'
+
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'test'
+
+const { createApp } = await import('./app.js')
 
 async function withServer(client, run) {
-  const server = createApp(client).listen(0, '127.0.0.1')
+  const server = createApp({ dishesClient: client }).listen(0, '127.0.0.1')
   await new Promise(resolve => server.once('listening', resolve))
   try { await run(`http://127.0.0.1:${server.address().port}`) }
   finally { await new Promise(resolve => server.close(resolve)) }

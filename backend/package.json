@@ -1,1 +1,25 @@
-{"name":"hom-nay-an-gi-api","private":true,"type":"module","scripts":{"dev":"node --watch src/server.js","start":"node src/server.js","test":"node --test"},"dependencies":{"@supabase/supabase-js":"^2.119.0","cors":"^2.8.6","dotenv":"^17.4.2","express":"^5.3.0"}}
+{
+  "name": "hom-nay-an-gi-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "lint": "eslint src/ tests/",
+    "test": "vitest run --exclude src/dishes.test.js && node --test src/dishes.test.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.3.0",
+    "helmet": "^8.0.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.21.0",
+    "supertest": "^7.0.0",
+    "vitest": "^3.0.7"
+  }
+}
