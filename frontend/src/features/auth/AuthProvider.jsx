@@ -1,31 +1,47 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { api } from '../../lib/api'
+import { me } from '../../lib/api'
 import { AuthContext } from './AuthContext'
 
-// Bản tối thiểu của FE01 để giữ chức năng đăng nhập hiện có.
-// FE02/FE03 sẽ bổ sung trạng thái blocked, RequireAuth, RequireRole và ánh xạ lỗi.
+// status: 'loading' | 'guest' | 'member' | 'blocked'
+// blocked: /api/me trả 403, phiên bị đăng xuất; giữ trạng thái này đến lần đăng nhập kế tiếp.
+// profileError: 'missing' (409) | 'failed' (lỗi khác) khi đã đăng nhập nhưng chưa lấy được hồ sơ.
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [initializing, setInitializing] = useState(Boolean(supabase))
-  const [profile, setProfile] = useState(null)
+  const [blocked, setBlocked] = useState(false)
+  // Kết quả /api/me gắn với user id để biết khi nào còn đang tải.
+  const [profileState, setProfileState] = useState({ userId: null, profile: null, error: null })
 
   useEffect(() => {
     if (!supabase) return
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, next) => {
-      setProfile(null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, next) => {
+      if (event === 'SIGNED_IN') setBlocked(false)
       setSession(next)
       setInitializing(false)
     })
     return () => subscription.unsubscribe()
   }, [])
 
+  const userId = session?.user?.id ?? null
+
   useEffect(() => {
-    if (!session) return
+    if (!userId) return
     const controller = new AbortController()
-    api('/me', session.access_token, controller.signal).then(setProfile).catch(() => {})
+    // me.get đọc token mới nhất từ Supabase thay vì giữ bản sao.
+    me.get({ signal: controller.signal })
+      .then((profile) => setProfileState({ userId, profile, error: null }))
+      .catch((error) => {
+        if (controller.signal.aborted) return
+        if (error.status === 403) {
+          setBlocked(true)
+          supabase?.auth.signOut().catch(() => {})
+          return
+        }
+        setProfileState({ userId, profile: null, error: error.status === 409 ? 'missing' : 'failed' })
+      })
     return () => controller.abort()
-  }, [session])
+  }, [userId])
 
   const signIn = useCallback(async ({ email, password }) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -38,6 +54,7 @@ export function AuthProvider({ children }) {
       options: { data: { display_name: displayName }, emailRedirectTo: window.location.origin },
     })
     if (error) throw error
+    // Không có session: cần xác nhận email (hoặc email đã tồn tại, Supabase không báo lỗi). Luôn hiện thông báo trung tính.
     return { needsEmailConfirmation: !data.session }
   }, [])
 
@@ -46,15 +63,33 @@ export function AuthProvider({ children }) {
     if (error) throw error
   }, [])
 
-  const value = useMemo(() => ({
-    configured: Boolean(supabase),
-    initializing,
-    session,
-    user: session?.user ?? null,
-    profile,
-    isAuthenticated: Boolean(session),
-    signIn, signUp, signOut,
-  }), [initializing, session, profile, signIn, signUp, signOut])
+  // Không tự lưu token: luôn đọc từ Supabase (đã tự làm mới khi hết hạn).
+  const getAccessToken = useCallback(async () => {
+    if (!supabase) return null
+    const { data } = await supabase.auth.getSession()
+    return data.session?.access_token ?? null
+  }, [])
+
+  const value = useMemo(() => {
+    const profileReady = profileState.userId === userId
+    const profile = session && profileReady ? profileState.profile : null
+    const profileError = session && profileReady ? profileState.error : null
+    let status = 'guest'
+    if (initializing) status = 'loading'
+    else if (blocked) status = 'blocked'
+    else if (session) status = profileReady ? 'member' : 'loading'
+    return {
+      configured: Boolean(supabase),
+      status,
+      initializing,
+      session,
+      user: session?.user ?? null,
+      profile,
+      profileError,
+      isAuthenticated: Boolean(session) && !blocked,
+      signIn, signUp, signOut, getAccessToken,
+    }
+  }, [initializing, blocked, session, userId, profileState, signIn, signUp, signOut, getAccessToken])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
