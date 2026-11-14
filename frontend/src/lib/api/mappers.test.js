@@ -52,7 +52,7 @@ describe('post mappers', () => {
       ingredients: [{ ingredient_id: 'i1', name: 'thịt bò', quantity: 500, unit: 'g' }, { name: 'muối', quantity: null, unit: null }],
       steps: [{ order: 2, content: 'b' }, { order: 1, content: 'a' }],
     })
-    expect(p.ingredients[0]).toEqual({ ingredientId: 'i1', name: 'thịt bò', quantity: 500, unit: 'g', toTaste: false })
+    expect(p.ingredients[0]).toEqual({ ingredientId: 'i1', name: 'thịt bò', quantity: 500, unit: 'g', toTaste: false, role: 'SECONDARY' })
     expect(p.ingredients[1]).toMatchObject({ name: 'muối', quantity: null, toTaste: true })
     expect(p.steps.map((s) => s.content)).toEqual(['a', 'b'])
     expect(p.ingredientCount).toBe(2)
@@ -72,6 +72,16 @@ describe('post mappers', () => {
 })
 
 describe('toCreatePostBody', () => {
+  it('sends dish_id and ingredient_id as integers even when the form gives strings', () => {
+    const body = toCreatePostBody({
+      dishId: '17', title: 'T',
+      ingredients: [{ ingredientId: '100', name: 'x', quantity: 1 }, { name: 'muối', toTaste: true }],
+      steps: ['a'],
+    })
+    expect(body.dish_id).toBe(17)
+    expect(body.ingredients[0].ingredient_id).toBe(100)
+  })
+
   it('builds a snake_case body, null quantity for toTaste, ingredient_id wins over name', () => {
     const body = toCreatePostBody({
       dishId: 'd1', title: 'T', content: 'C',
