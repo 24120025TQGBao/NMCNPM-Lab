@@ -19,7 +19,8 @@ Toàn bộ chỗ gọi API nằm trong `src/lib/api/`; chỉ `mappers.js` biết
 | `quantity: null` = Tùy khẩu vị | Đã khớp (G7) |
 | Vai trò admin `ADMIN` | Đã chốt (G8) |
 | Cổng dev 3000 | `api.md` v1.0 ghi 3000, khớp proxy Vite |
-| Đối chiếu code backend (FE06, 14/11/2026, đọc `origin/sprint1-integration`, **chưa chạy thử với backend thật**) | Khớp: phản hồi `{ data }` / `{ data, meta }`; lỗi `{ error: { code, message, details } }`; `limit` tối đa 50 (FE dùng 20); query lạ như `type`, `q` bị Zod bỏ qua nên `GET /api/posts` vẫn chạy; `:id` không phải số nguyên dương trả 400. Lệch đã xử lý ở FE: nguyên liệu trùng được backend báo ở trường `ingredients[i]` (không có `.name`) — Form đưa về ô tên nguyên liệu và tự kiểm tra trùng trước khi gửi; lỗi ở trường lạ hiện chung ở thông báo đầu form |
+| Đã chạy thật (GET, 14/11/2026) | `/api/health`, `/api/posts` (có `type`, `q` thừa vẫn 200), `/api/posts/:id` (400 với `abc`, 404 với id không có), `/api/dishes?search=` (72 món), POST không token trả 401, origin lạ trả 403. Dữ liệu thật của bài 1 qua `mappers.js` ra đúng model (nguyên liệu `quantity: null` thành `toTaste`, `created_at` dạng `+00:00` đọc được). DB hiện chỉ có 1 bài nên "Xem thêm" chưa thử được với dữ liệu thật |
+| Đối chiếu code backend (FE06, 14/11/2026, đọc `origin/sprint1-integration`, đã gọi thử các endpoint GET với backend thật, **chưa thử POST có đăng nhập**) | Khớp: phản hồi `{ data }` / `{ data, meta }`; lỗi `{ error: { code, message, details } }`; `limit` tối đa 50 (FE dùng 20); query lạ như `type`, `q` bị Zod bỏ qua nên `GET /api/posts` vẫn chạy; `:id` không phải số nguyên dương trả 400. Lệch đã xử lý ở FE: nguyên liệu trùng được backend báo ở trường `ingredients[i]` (không có `.name`) — Form đưa về ô tên nguyên liệu và tự kiểm tra trùng trước khi gửi; lỗi ở trường lạ hiện chung ở thông báo đầu form |
 
 ## 2. Việc đang mất hoặc lệch (cần TV1)
 
