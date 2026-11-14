@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { posts as postsApi } from '../../lib/api'
 import { formatDateTime } from '../../lib/format'
 import { Alert } from '../../components/ui/Alert'
@@ -18,6 +18,7 @@ function formatQuantity(ing) {
 
 export default function PostDetailPage() {
   const { id } = useParams()
+  const posted = useLocation().state?.posted === true
   const [state, setState] = useState({ status: 'loading', post: null, error: '' })
   const [reload, setReload] = useState(0)
 
@@ -66,6 +67,7 @@ export default function PostDetailPage() {
   const body = post.content.trim() && post.content.trim() !== post.title.trim() ? post.content.trim() : ''
   return (
     <article className="max-w-3xl">
+      {posted && <Alert tone="success" className="mb-4">{vi.createPost.posted}</Alert>}
       <Button to="/" variant="secondary" className="mb-6">{vi.post.backToFeed}</Button>
       <h1 className="font-serif text-[32px] leading-[38px] font-semibold break-words md:text-5xl md:leading-[56px]">{post.title}</h1>
       <div aria-hidden="true" className="mt-3 h-[5px] w-16 bg-lemon-gold" />
