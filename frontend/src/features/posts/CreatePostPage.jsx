@@ -9,7 +9,7 @@ import { TextArea } from '../../components/ui/TextArea'
 import { TextField } from '../../components/ui/TextField'
 import { ReloginDialog } from '../auth/ReloginDialog'
 import { DishPicker } from './DishPicker'
-import { toPostInput, validatePostForm } from './postFormValidation'
+import { routeServerErrors, toPostInput, validatePostForm } from './postFormValidation'
 import { vi } from '../../i18n/vi'
 
 const t = vi.createPost
@@ -93,10 +93,11 @@ export default function CreatePostPage() {
       if (err.status === 401) {
         setRelogin(true)
       } else if (err.status === 400) {
-        const fields = err.fields ?? {}
-        setErrors(fields)
-        setFormError(Object.keys(fields).length ? t.formInvalid : err.message)
-        setTimeout(() => focusFirstError(fields), 0)
+        const { errors: fieldErrs, general } = routeServerErrors(err.fields, form)
+        setErrors(fieldErrs)
+        const hasFields = Object.keys(fieldErrs).length > 0
+        setFormError([hasFields || general.length ? t.formInvalid : err.message, ...general].join(' '))
+        setTimeout(() => focusFirstError(fieldErrs), 0)
       } else {
         // 5xx, mất mạng, 403...: giữ nguyên toàn bộ dữ liệu.
         setFormError(err.message || t.submitFailed)

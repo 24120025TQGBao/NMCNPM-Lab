@@ -19,6 +19,7 @@ Toàn bộ chỗ gọi API nằm trong `src/lib/api/`; chỉ `mappers.js` biết
 | `quantity: null` = Tùy khẩu vị | Đã khớp (G7) |
 | Vai trò admin `ADMIN` | Đã chốt (G8) |
 | Cổng dev 3000 | `api.md` v1.0 ghi 3000, khớp proxy Vite |
+| Đối chiếu code backend (FE06, 14/11/2026, đọc `origin/sprint1-integration`, **chưa chạy thử với backend thật**) | Khớp: phản hồi `{ data }` / `{ data, meta }`; lỗi `{ error: { code, message, details } }`; `limit` tối đa 50 (FE dùng 20); query lạ như `type`, `q` bị Zod bỏ qua nên `GET /api/posts` vẫn chạy; `:id` không phải số nguyên dương trả 400. Lệch đã xử lý ở FE: nguyên liệu trùng được backend báo ở trường `ingredients[i]` (không có `.name`) — Form đưa về ô tên nguyên liệu và tự kiểm tra trùng trước khi gửi; lỗi ở trường lạ hiện chung ở thông báo đầu form |
 
 ## 2. Việc đang mất hoặc lệch (cần TV1)
 
@@ -81,3 +82,7 @@ Quy tắc kèm theo Frontend giả định:
 1. `GET /api/me` bị bỏ có chủ ý không? Nếu có, Frontend lấy `vai_tro` và `trang_thai` ở đâu? (mục 2 #1, cần trước FE08.)
 2. Có thể thêm `ingredient_count`, `step_count` (và nếu muốn, đoạn trích) vào `GET /api/posts` không? (mục 2 #2, không bắt buộc.)
 3. Sprint 2 sẽ có backend cho bình luận, cảm xúc, báo cáo, quản trị, bản nháp không, ai phụ trách? (mục 3, 4.)
+4. (FE06) Backend làm sạch `title`, `content`, `unit`, `steps[].content` bằng cách **bỏ thẻ HTML** (`<...>`) rồi mới đếm độ dài, nên giao diện có thể thấy lỗi "ít nhất 3 ký tự" với tiêu đề như `<b>`. Đây là hành vi có chủ ý hay không? Frontend không cần sửa.
+5. (FE06) CORS: backend trả 403 `FORBIDDEN` cho `Origin` không có trong `CORS_ORIGINS`. Khi triển khai (Vercel) phải thêm origin của frontend vào biến này. Trong dev, Vite proxy gửi `Origin: http://localhost:5173`, đã nằm trong mặc định.
+6. (FE06) `GET /api/dishes` cần `SUPABASE_SERVICE_ROLE_KEY` ở backend; thiếu thì 500 và ô chọn món báo không tải được danh sách.
+7. (FE06) `backend/.env` của máy TV2 thiếu `SUPABASE_ANON_KEY` nên backend không khởi động (`[ENV ERROR]`). Cần điền trước khi thử tích hợp.

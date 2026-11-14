@@ -151,6 +151,7 @@ export const vi = {
       ingredientNameRequired: 'Nhập tên nguyên liệu.',
       quantityPositive: 'Định lượng phải là số lớn hơn 0, hoặc chọn “Tùy khẩu vị”.',
       unitLength: 'Đơn vị tối đa 30 ký tự.',
+      ingredientDuplicate: 'Nguyên liệu này bị trùng trong cùng công thức.',
       stepsRequired: 'Thêm ít nhất 1 bước.',
       stepsTooMany: 'Tối đa 50 bước.',
       stepRequired: 'Nhập nội dung bước này.',

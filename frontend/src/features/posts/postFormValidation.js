@@ -21,7 +21,11 @@ export function validatePostForm(form) {
 
   if (form.ingredients.length < 1) errors.ingredients = t.ingredientsRequired
   else if (form.ingredients.length > 50) errors.ingredients = t.ingredientsTooMany
+  const seen = new Set()
   form.ingredients.forEach((row, i) => {
+    const key = row.name.trim().toLowerCase()
+    if (key && seen.has(key)) errors[`ingredients[${i}].name`] = t.ingredientDuplicate // backend từ chối trùng tên (không phân biệt hoa thường)
+    seen.add(key)
     if (!row.name.trim()) errors[`ingredients[${i}].name`] = t.ingredientNameRequired
     if (!row.toTaste) {
       const q = parseQuantity(row.quantity)
@@ -55,4 +59,24 @@ export function toPostInput(form) {
     })),
     steps: form.steps.map((row) => ({ content: row.content.trim() })),
   }
+}
+
+// Đưa lỗi 400 của máy chủ về đúng ô nhập. Backend báo nguyên liệu trùng ở `ingredients[i]` (không có `.name`),
+// và có thể trả trường mà form không có ô tương ứng: những lỗi đó vào `general` để vẫn hiện cho người dùng.
+export function routeServerErrors(fields, form) {
+  const errors = {}
+  const general = []
+  const ing = form.ingredients.length
+  const stp = form.steps.length
+  for (const [rawKey, message] of Object.entries(fields ?? {})) {
+    let key = rawKey
+    if (/^ingredients\[\d+\]$/.test(key)) key = `${key}.name`
+    const m = key.match(/^(ingredients|steps)\[(\d+)\]\.(\w+)$/)
+    const known = ['dish_id', 'title', 'content', 'ingredients', 'steps'].includes(key) ||
+      (m && Number(m[2]) < (m[1] === 'ingredients' ? ing : stp) &&
+        (m[1] === 'ingredients' ? ['name', 'quantity', 'unit'] : ['content']).includes(m[3]))
+    if (known) errors[key] ??= message
+    else general.push(message)
+  }
+  return { errors, general }
 }

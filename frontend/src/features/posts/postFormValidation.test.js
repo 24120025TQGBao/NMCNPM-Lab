@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseQuantity, toPostInput, validatePostForm } from './postFormValidation'
+import { parseQuantity, routeServerErrors, toPostInput, validatePostForm } from './postFormValidation'
 
 const valid = () => ({
   dishId: 3, title: 'Phở bò', content: '',
@@ -52,5 +52,30 @@ describe('parseQuantity / toPostInput', () => {
       ],
       steps: [{ content: 'Ninh xương' }],
     })
+  })
+})
+
+describe('duplicate ingredients and server error routing', () => {
+  it('flags a duplicate ingredient name (case-insensitive) on the later row', () => {
+    const f = valid()
+    f.ingredients.push({ name: ' XƯƠNG BÒ ', quantity: '1', unit: '', toTaste: false })
+    expect(validatePostForm(f)).toEqual({ 'ingredients[1].name': expect.any(String) })
+  })
+  it('maps backend "ingredients[i]" to the name input and keeps unknown fields as general messages', () => {
+    const f = valid()
+    f.ingredients.push({ name: 'Muối', quantity: '', unit: '', toTaste: true })
+    const { errors, general } = routeServerErrors({
+      'ingredients[1]': 'Nguyên liệu bị trùng trong cùng công thức',
+      ingredients: 'Có nguyên liệu (ingredient_id) không tồn tại',
+      'ingredients[7].name': 'x',
+      dish_id: 'Món ăn không tồn tại',
+      foo: 'Trường lạ',
+    }, f)
+    expect(errors).toEqual({
+      'ingredients[1].name': 'Nguyên liệu bị trùng trong cùng công thức',
+      ingredients: 'Có nguyên liệu (ingredient_id) không tồn tại',
+      dish_id: 'Món ăn không tồn tại',
+    })
+    expect(general).toEqual(['x', 'Trường lạ'])
   })
 })

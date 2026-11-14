@@ -33,7 +33,8 @@ function renderPage() {
 }
 
 async function fillValid(user) {
-  await user.selectOptions(await screen.findByLabelText('Món ăn'), 'Phở bò')
+  await screen.findByRole('option', { name: 'Phở bò' })
+  await user.selectOptions(screen.getByLabelText('Món ăn'), 'Phở bò')
   await user.type(screen.getByLabelText('Tiêu đề'), 'Phở bò nhà làm')
   await user.type(screen.getByLabelText('Tên nguyên liệu 1'), 'Xương bò')
   await user.type(screen.getByLabelText('Định lượng 1'), '1,5')
@@ -96,6 +97,23 @@ describe('CreatePostPage', () => {
     expect(screen.getByLabelText('Định lượng 1')).toHaveAttribute('aria-invalid', 'true')
     expect(screen.getByLabelText('Tiêu đề')).toHaveValue('Phở bò nhà làm')
     expect(screen.getByLabelText('Bước 1')).toHaveValue('Ninh xương')
+  })
+
+  it('shows the backend duplicate-ingredient error (path ingredients[1]) under that row', async () => {
+    const user = userEvent.setup()
+    posts.create.mockRejectedValue(new ApiError({
+      status: 400, code: 'VALIDATION_ERROR', message: 'sai',
+      fields: { 'ingredients[1]': 'Nguyên liệu bị trùng trong cùng công thức', foo: 'Trường lạ' },
+    }))
+    renderPage()
+    await fillValid(user)
+    await user.click(screen.getByRole('button', { name: 'Thêm nguyên liệu' }))
+    await user.type(screen.getByLabelText('Tên nguyên liệu 2'), 'Hành')
+    await user.type(screen.getByLabelText('Định lượng 2'), '1')
+    await user.click(screen.getByRole('button', { name: 'Đăng bài' }))
+    expect(await screen.findByText('Nguyên liệu bị trùng trong cùng công thức')).toBeInTheDocument()
+    expect(screen.getByLabelText('Tên nguyên liệu 2')).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByText(/Trường lạ/)).toBeInTheDocument()
   })
 
   it('keeps all data and shows an alert on server error', async () => {
