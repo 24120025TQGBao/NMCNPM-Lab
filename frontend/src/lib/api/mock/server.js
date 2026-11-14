@@ -55,7 +55,8 @@ const FAILURES = {
 
 const clone = (v) => structuredClone(v)
 const nowIso = () => new Date().toISOString()
-const newId = () => `00000000-0000-4000-8000-${String(state.nextId++).padStart(12, '0')}`
+const newId = () => state.nextId++ // id số nguyên như backend thật
+const isPositiveInt = (v) => Number.isSafeInteger(v) && v > 0
 const blank = (v) => typeof v !== 'string' || v.trim() === ''
 
 function delay(ms, signal) {
@@ -123,6 +124,11 @@ function postSummary(post, userId) {
   return out
 }
 
+// Đúng contract GET /api/posts: chỉ id, title, created_at, dish, author (không content, không số lượng).
+function contractListItem(post) {
+  return { id: post.id, title: post.title, created_at: post.created_at, dish: dishRef(post.dish_id), author: post.author }
+}
+
 function postDetail(post, userId) {
   return { ...postSummary(post, userId), ingredients: post.ingredients, steps: post.steps }
 }
@@ -153,7 +159,7 @@ function findVisiblePost(id, userId) {
 function validatePost(body) {
   const details = []
   const bad = (field, message) => details.push({ field, message })
-  if (blank(body?.dish_id)) bad('dish_id', 'Phải chọn món ăn')
+  if (!isPositiveInt(body?.dish_id)) bad('dish_id', 'Mã món ăn (dish_id) phải là số nguyên dương')
   const title = typeof body?.title === 'string' ? body.title.trim() : ''
   if (title.length < 3 || title.length > 150) bad('title', 'Tiêu đề bài viết phải có từ 3 đến 150 ký tự')
   if (body?.content != null && (typeof body.content !== 'string' || body.content.length > 2000)) bad('content', 'Nội dung bài viết không được vượt quá 2000 ký tự')
@@ -162,7 +168,8 @@ function validatePost(body) {
   else if (ingredients.length > 50) bad('ingredients', 'Bài viết không được có quá 50 nguyên liệu')
   else {
     ingredients.forEach((item, i) => {
-      if (blank(item?.name) && blank(item?.ingredient_id)) bad(`ingredients[${i}].name`, 'Nguyên liệu phải có ít nhất một trong hai: ingredient_id hoặc name')
+      if (item?.ingredient_id != null && !isPositiveInt(item.ingredient_id)) bad(`ingredients[${i}].ingredient_id`, 'Mã nguyên liệu phải là số nguyên dương')
+      if (blank(item?.name) && item?.ingredient_id == null) bad(`ingredients[${i}].name`, 'Nguyên liệu phải có ít nhất một trong hai: ingredient_id hoặc name')
       if (item?.quantity != null && !(typeof item.quantity === 'number' && item.quantity > 0)) bad(`ingredients[${i}].quantity`, 'Định lượng phải là số lớn hơn 0')
       if (item?.unit != null && (typeof item.unit !== 'string' || item.unit.length < 1 || item.unit.length > 30)) bad(`ingredients[${i}].unit`, 'Đơn vị phải có từ 1 đến 30 ký tự')
     })
@@ -182,11 +189,12 @@ function validatePost(body) {
 function postFields(body) {
   return {
     title: body.title.trim(),
-    content: typeof body.content === 'string' ? body.content.trim() : '',
+    content: typeof body.content === 'string' && body.content.trim() ? body.content.trim() : body.title.trim(),
     dish_id: body.dish_id,
     status: body.status === 'DRAFT' ? 'DRAFT' : 'PUBLISHED',
     ingredients: body.ingredients.map((i) => ({
-      ingredient_id: i.ingredient_id ?? null, name: (i.name ?? '').trim(), quantity: i.quantity ?? null, unit: i.unit ?? null,
+      ingredient_id: i.ingredient_id ?? newId(), name: (i.name ?? '').trim(), quantity: i.quantity ?? null, unit: i.unit ?? null,
+      role: i.role === 'PRIMARY' ? 'PRIMARY' : 'SECONDARY',
     })),
     steps: body.steps.map((s, idx) => ({ order: idx + 1, content: s.content.trim() })),
   }
@@ -216,7 +224,7 @@ const routes = [
       .filter((p) => !p.hidden && (p.status ?? 'PUBLISHED') === 'PUBLISHED' && p.type === type)
       .filter((p) => !q || p.title.toLowerCase().includes(q) || dishRef(p.dish_id).name.toLowerCase().includes(q))
       .sort((a, b) => b.created_at.localeCompare(a.created_at))
-    return paginate(items, query, (p) => postSummary(p, userId))
+    return paginate(items, query, (p) => (p.type === 'RECIPE' ? contractListItem(p) : postSummary(p, userId)))
   }],
   ['GET', '/posts/:id', ({ params, userId }) => {
     const post = findVisiblePost(params.id, userId)
@@ -315,6 +323,7 @@ const routes = [
     if (!session) return unauthorized()
     const targetType = body?.target_type
     if (targetType !== 'POST' && targetType !== 'COMMENT') return invalid('target_type', 'Loại nội dung phải là POST hoặc COMMENT')
+    if (!isPositiveInt(body?.target_id)) return invalid('target_id', 'target_id phải là số nguyên dương')
     if (blank(body?.reason)) return invalid('reason', 'Phải chọn lý do báo cáo')
     const exists = targetType === 'POST'
       ? state.posts.some((p) => p.id === body.target_id)
@@ -384,6 +393,11 @@ export async function handleMockRequest({ method, path, query, body, session, si
     const match = route.regex.exec(path)
     if (!match) continue
     const params = Object.fromEntries(route.keys.map((key, i) => [key, decodeURIComponent(match[i + 1])]))
+    // Contract: :id phải là số nguyên dương, ngược lại 400 VALIDATION_ERROR.
+    if ('id' in params) {
+      if (!/^[1-9]\d{0,14}$/.test(params.id)) return invalid('id', 'Định danh (id) phải là số nguyên dương')
+      params.id = Number(params.id)
+    }
     const result = route.handler({ params, query, body: body === undefined ? undefined : clone(body), session, userId: session?.userId ?? null })
     return { status: result.status, body: result.body === null ? null : clone(result.body) }
   }

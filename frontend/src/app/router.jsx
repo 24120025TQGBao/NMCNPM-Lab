@@ -7,6 +7,7 @@ import RegisterPage from '../features/auth/RegisterPage'
 import { RequireAuth } from '../features/auth/RequireAuth'
 import { RequireRole } from '../features/auth/RequireRole'
 import CommunityPage from '../features/community/CommunityPage'
+import PostDetailPage from '../features/posts/PostDetailPage'
 import DishListPage from '../features/dishes/DishListPage'
 import { ROLE_ADMIN } from '../lib/config'
 import { vi } from '../i18n/vi'
@@ -23,7 +24,7 @@ export const router = createBrowserRouter([
       { index: true, element: <CommunityPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
-      { path: 'posts/:id', element: wip(f.post) },
+      { path: 'posts/:id', element: <PostDetailPage /> },
       { path: 'dishes', element: <DishListPage /> },
       { path: 'dishes/:id', element: wip(f.dish) },
       { path: 'dishes/:id/recipes', element: wip(f.dishRecipes) },
