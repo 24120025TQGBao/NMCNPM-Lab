@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: 'true'
+      # All backend tests mock Supabase. Never use real credentials in this job.
+      SUPABASE_URL: https://example.supabase.co
+      SUPABASE_ANON_KEY: ci-anon-key-not-a-secret
+      SUPABASE_SERVICE_ROLE_KEY: ci-service-role-not-a-secret
+      CORS_ORIGINS: http://localhost:5173
+      VITE_USE_MOCK: 'false'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci --prefix backend
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Lint backend
+        run: npm run lint --prefix backend
+
+      - name: Lint frontend
+        run: npm run lint --prefix frontend
+
+      - name: Test backend
+        env:
+          NODE_ENV: test
+        run: npm test --prefix backend
+
+      - name: Test frontend
+        run: npm test --prefix frontend
+
+      - name: Build frontend
+        run: npm run build --prefix frontend
+
+      - name: Check backend entrypoint syntax
+        run: |
+          node --check backend/index.js
+          node --check backend/src/app.js
+          node --check backend/src/server.js

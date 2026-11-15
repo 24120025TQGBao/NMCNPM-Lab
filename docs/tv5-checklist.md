@@ -1,5 +1,7 @@
 # TV5 — Tiến độ và hướng dẫn thực hiện
 
+> Cập nhật retest 15/11/2026: xem [báo cáo và bằng chứng mới nhất](sprint1-retest-2026-11-15.md). Một số trạng thái bên dưới đã cũ. Đã bổ sung `.github/workflows/ci.yml`; xem [hướng dẫn CI](ci.md), chờ kết quả run GitHub. Người dùng đã xác nhận đăng ký công khai thành công và nhóm chưa có quy định Done/merge riêng.
+
 Đối chiếu ngày 11/11/2026 với kế hoạch phân công ngày 05/11/2026 và code local. Sprint 1 đã qua hạn 08/11; hiện thuộc lịch Sprint 2 đề xuất. Chưa có bằng chứng Jira/PR, CI online, staging hoặc Supabase thật để kết luận task Done. Nội dung tài liệu phân công được dùng làm yêu cầu đối chiếu, không tự động gửi thông báo hay cập nhật Jira.
 
 ## Tiến độ
@@ -10,8 +12,8 @@
 | DO02 | 06/11 | Đã bổ sung `.github/workflows/ci.yml`: lint FE/BE, test FE/BE, build FE, kiểm tra cú pháp entrypoint BE | Push/PR, link CI xanh và fail có chủ đích; cấu hình required check/review |
 | QA01 | 06/11 | Đã hoàn thành Test Plan và 23 Test Cases chi tiết trong [`qa01-test-cases.md`](qa01-test-cases.md) theo contract BE01 v1.0 | Sẵn sàng review / commit; chờ TV3 chốt policy email và TV1 merge BE |
 | DO03 (P1) | 07/11 | BE có `index.js` export Express; có hướng dẫn deploy bên dưới | Tạo hai project, cấu hình môi trường, smoke test và link staging |
-| QA02 | 08/11 sáng | Có test tự động cho health/profile và API client FE | Thiếu API posts, contract BE01, search/pagination món; chưa đối chiếu DB thật |
-| QA03 | 08/11 chiều | Có quy trình và mẫu report | Thiếu luồng đăng bài/feed; chưa chạy Chrome/Firefox/mobile |
+| QA02 | 08/11 sáng | Nhánh `sprint1-integration` có test backend mock cho profile, dishes, tạo bài, feed và detail; test/lint xanh | Chưa xác nhận RPC/grants và chưa chạy với Supabase staging thật |
+| QA03 | 08/11 chiều | Có quy trình và mẫu report | UI E2E còn chờ FE04/FE05/FE06; chưa chạy Chrome/Firefox/mobile |
 | QA04 | 14/11 | Có khung case Sprint 2 bên dưới | Chốt PO02/contract trước khi ghi kết quả |
 | DO04 | 16/11 | CI cơ sở đã chuẩn bị | Bổ sung suite tính năng Sprint 2 và kiểm tra staging sau merge |
 | QA05 | 20/11 | Chờ tính năng cộng đồng/quản trị | Test cả UI và gọi API trực tiếp theo ma trận vai trò |
@@ -74,13 +76,14 @@ Tiền điều kiện chung: ghi commit, URL, trình duyệt, tài khoản test;
 | D04 | BE05 hoàn thiện | GET `?page=0&limit=-1`, rồi `?page=abc` | 400 |
 | D05 | Nhiều món; BE05 hoàn thiện | GET page 1/2 với limit nhỏ | Đúng phân trang theo contract |
 
-Hiện có `/api/health`, `/api/dishes`, `/api/me`; **không có `/health` hay `/api/posts`**. `/api/dishes` hiện trả mảng tối đa 100 món ACTIVE, chưa xử lý search/page/limit. Đừng viết payload bài theo tên cột suy đoán: chờ `docs/api.md` và RPC DB09 từ TV1/TV3.
+Trên nhánh tích hợp hiện có `/health`, `/api/health`, `/api/me`, `/api/dishes` và `/api/posts`. Backend mock flow đã kiểm tra `profile → dishes → tạo bài → feed → chi tiết`; kết quả này không chứng minh kết nối Supabase hay transaction PostgreSQL thật. Dùng contract trong `docs/api.md`; không dùng sample ID như thể chắc chắn tồn tại trên staging.
 
 Smoke bằng PowerShell (server đã chạy):
 
 ```powershell
 curl.exe -i http://localhost:3000/api/health
-curl.exe -i http://localhost:3000/api/dishes
+curl.exe -i "http://localhost:3000/api/dishes?search=pho&page=1&limit=5"
+curl.exe -i "http://localhost:3000/api/posts?page=1&limit=5"
 curl.exe -i http://localhost:3000/api/me
 curl.exe -i -H "Authorization: Bearer invalid" http://localhost:3000/api/me
 curl.exe -i "http://localhost:3000/api/dishes?page=0&limit=-1"
@@ -94,9 +97,9 @@ Trong Postman: tạo environment local `baseUrl`, `accessToken`; không export g
 
 | ID | Bằng chứng code | Ảnh hưởng | Người phối hợp |
 |---|---|---|---|
-| G01 | `backend/src/app.js` chưa có posts; FE chưa có form/feed | Chặn Sprint Goal S1-02/S1-03, QA02/QA03 | TV1 + TV2 + TV3 |
-| G02 | Dishes route bỏ qua query; chưa có contract trong repo | BE05 chưa đáp ứng tìm kiếm/phân trang/400 | TV4 + TV1 |
-| G03 | Health chỉ ở `/api/health` | Lệch đường dẫn kế hoạch BE02 | TV1 chốt contract |
+| G01 | Backend API có profile/posts/dishes; FE04/FE05/FE06 chưa hoàn thiện | Chặn UI E2E, không chặn kiểm thử API trực tiếp | TV1 + TV2 |
+| G02 | RPC và grant SQL đã có trong repo nhưng chưa có bằng chứng chạy trên staging | Chặn kết luận API/DB thật; test mock không thay thế | TV3 + TV5 |
+| G03 | `/api/me` cần `SUPABASE_SERVICE_ROLE_KEY` và quyền SELECT trên `nguoi_dung` | Thiếu cấu hình/grant sẽ khiến profile trả 500 | TV3 + TV5 |
 | G04 | Chưa có AC và xác nhận policy DB06 trong repo | Chưa kết luận nghiệm thu auth/email | TV1 + TV3 |
 
 Đây là phát hiện từ code, chưa phải Bug đã tạo trên Jira. Mẫu Bug: tiêu đề, Story, commit/URL, tiền điều kiện, bước tái hiện, expected/actual, mức ưu tiên đề xuất, ảnh/log đã che token, assignee, kết quả retest. G01 là blocker P0 theo Sprint Goal; các ưu tiên khác cần PO xác nhận.

@@ -26,7 +26,7 @@ cp .env.example .env
 | `SUPABASE_URL` | Có | URL dự án Supabase |
 | `SUPABASE_ANON_KEY` | Có | Khóa công khai, dùng xác minh token và truy vấn theo RLS |
 | `CORS_ORIGINS` | Không | Danh sách origin frontend được phép, cách nhau bằng dấu phẩy |
-| `SUPABASE_SERVICE_ROLE_KEY` | Có để dùng `/api/dishes` | Khóa bỏ qua RLS, chỉ dùng phía backend cho RPC tìm món. Không commit, không đưa vào frontend |
+| `SUPABASE_SERVICE_ROLE_KEY` | Có để dùng `/api/dishes` và `/api/me` | Khóa bỏ qua RLS, chỉ dùng phía backend cho tìm món và đọc hồ sơ người dùng đã xác thực. Không commit, không đưa vào frontend |
 
 Không commit file `.env` thật. Chỉ commit `.env.example`.
 

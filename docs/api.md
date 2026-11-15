@@ -48,7 +48,8 @@ Mảng `details` chỉ có khi `code` là `VALIDATION_ERROR`.
 |---|---|---|
 | 400 | `VALIDATION_ERROR` | Thiếu trường, sai kiểu, sai giá trị, ID không phải số nguyên dương, nguyên liệu trùng trong cùng công thức, JSON sai cú pháp. |
 | 401 | `UNAUTHORIZED` | Thiếu token, token sai hoặc hết hạn. |
-| 403 | `FORBIDDEN` | Tài khoản `LOCKED` hoặc chưa có profile hợp lệ. |
+| 403 | `FORBIDDEN` | Tài khoản bị khóa hoặc không được phép truy cập. |
+| 409 | `PROFILE_NOT_FOUND` | Tài khoản đã xác thực nhưng chưa có hồ sơ trong `nguoi_dung`. |
 | 404 | `NOT_FOUND` | Không tìm thấy tài nguyên hoặc endpoint không tồn tại. |
 | 500 | `INTERNAL_ERROR` | Lỗi máy chủ. Message chung chung, không lộ stack trace hay SQL. |
 
@@ -216,6 +217,29 @@ Lỗi: `400`, `500`.
 
 ---
 
+### 2.6. `GET /api/me` — Hồ sơ người dùng hiện tại
+
+- Quyền: cần đăng nhập; backend lấy `ma_nd` từ access token đã xác thực, không nhận user ID từ query/body.
+- Response `200`: trả trực tiếp hồ sơ theo các cột DB để tương thích với Frontend hiện tại; không trả email hoặc dữ liệu nhạy cảm.
+
+```json
+{
+  "ma_nd": "44444444-4444-4444-4444-444444444444",
+  "ten_hien_thi": "Minh",
+  "anh_dai_dien": null,
+  "vai_tro": "USER",
+  "trang_thai": "ACTIVE"
+}
+```
+
+Lỗi:
+- `401 UNAUTHORIZED`: thiếu token, token sai hoặc hết hạn.
+- `403 FORBIDDEN`: hồ sơ không ở trạng thái `ACTIVE`.
+- `409 PROFILE_NOT_FOUND`: tài khoản đã xác thực nhưng chưa có hồ sơ.
+- `500 INTERNAL_ERROR`: lỗi khi đọc hồ sơ.
+
+---
+
 ## 3. Quy tắc thay đổi contract
 
 1. Contract không được tự ý thay đổi tên trường, cấu trúc response hoặc mã lỗi.
@@ -250,5 +274,5 @@ Không trả email, số điện thoại hoặc dữ liệu nhạy cảm của n
 
 | # | Nội dung | Người phụ trách |
 |---|---|---|
-| 1 | Viết hàm RPC Postgres tạo bài trong một transaction (DB chưa có). | TV1 soạn SQL, TV3 chạy |
-| 2 | Xác nhận RLS cho phép backend đọc/ghi `bai_dang`, `cong_thuc`, `ct_nguyen_lieu`, `buoc_cong_thuc`, `nguyen_lieu`. | TV3 |
+| 1 | Áp dụng và kiểm thử `create_post_with_recipe` trên staging; SQL đã có trong repo nhưng chưa xác nhận trạng thái DB. | TV3 |
+| 2 | Chạy `supabase/grant_service_role_profile_read.sql` trên staging; xác nhận quyền `service_role` đọc `nguoi_dung` và quyền RPC cho các luồng bài viết. | TV3 |

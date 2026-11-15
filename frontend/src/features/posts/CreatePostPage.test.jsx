@@ -33,6 +33,7 @@ function renderPage() {
 }
 
 async function fillValid(user) {
+  await screen.findByRole('option', { name: 'Phở bò' })
   await user.selectOptions(await screen.findByLabelText('Món ăn'), 'Phở bò')
   await user.type(screen.getByLabelText('Tiêu đề'), 'Phở bò nhà làm')
   await user.type(screen.getByLabelText('Tên nguyên liệu 1'), 'Xương bò')

@@ -1,0 +1,75 @@
+[
+  {
+    "label": "chromium-desktop",
+    "browserVersion": "159.0.8154.6",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "checks": [
+      "guest route guard",
+      "QA fixture via admin; public signup remains blocked",
+      "wrong password rejected",
+      "login and profile",
+      "create recipe with two ingredients and ordered steps",
+      "reload restores session and detail",
+      "feed contains created post",
+      "logout survives reload and route is guarded"
+    ],
+    "postId": 5,
+    "status": "PASS"
+  },
+  {
+    "label": "public-signup",
+    "status": "BLOCKED",
+    "httpStatus": 429,
+    "code": "over_email_send_rate_limit",
+    "reason": "Supabase Auth rate limit"
+  },
+  {
+    "label": "firefox-desktop",
+    "browserVersion": "159.0",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "checks": [
+      "guest route guard",
+      "wrong password rejected",
+      "login and profile",
+      "create recipe with two ingredients and ordered steps",
+      "reload restores session and detail",
+      "feed contains created post",
+      "logout survives reload and route is guarded"
+    ],
+    "postId": 6,
+    "status": "PASS"
+  },
+  {
+    "label": "chromium-mobile",
+    "browserVersion": "159.0.8154.6",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "checks": [
+      "guest route guard",
+      "wrong password rejected",
+      "login and profile",
+      "create recipe with two ingredients and ordered steps",
+      "reload restores session and detail",
+      "feed contains created post",
+      "logout survives reload and route is guarded"
+    ],
+    "postId": 7,
+    "status": "PASS"
+  },
+  {
+    "label": "database-rollback",
+    "checks": [
+      "ERR_INGREDIENT_NOT_FOUND after recipe and first new ingredient insertion; zero recipe/ingredient marker rows before and after; no public post"
+    ],
+    "status": "PASS",
+    "limitation": "service_role has no SELECT on bai_dang; post absence checked via public feed, recipe and ingredient absence checked directly in DB"
+  }
+]
