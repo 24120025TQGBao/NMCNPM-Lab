@@ -6,7 +6,7 @@ const bob = { authenticated: true, userId: 'user-bob', displayName: 'Bob' }
 const call = (method, path, extra = {}) => handleMockRequest({ method, path, ...extra })
 
 const validBody = {
-  dish_id: 'any-dish', title: 'Món thử nghiệm',
+  dish_id: 99, title: 'Món thử nghiệm',
   ingredients: [{ name: 'muối', quantity: null, unit: null }, { name: 'đường', quantity: 2, unit: 'muỗng' }],
   steps: [{ content: 'Bước một' }, { content: 'Bước hai' }],
 }
@@ -20,7 +20,10 @@ describe('mock server follows the real contract shape', () => {
     expect(body.meta).toMatchObject({ page: 1, limit: 50 })
     const dates = body.data.map((p) => p.created_at)
     expect(dates).toEqual([...dates].sort().reverse())
-    expect(body.data.every((p) => p.type === 'RECIPE')).toBe(true)
+    // Đúng contract GET /api/posts: chỉ có id, title, created_at, dish, author.
+    for (const item of body.data) expect(Object.keys(item).sort()).toEqual(['author', 'created_at', 'dish', 'id', 'title'])
+    expect(body.data.every((p) => Number.isInteger(p.id) && Number.isInteger(p.dish.id))).toBe(true)
+    expect(typeof body.data[0].author.id).toBe('string')
     expect(body.data.some((p) => p.title.includes('đã bị ẩn'))).toBe(false)
     expect(body.data[0]).toHaveProperty('dish.name')
     expect(body.data[0]).toHaveProperty('author.display_name')
@@ -36,10 +39,12 @@ describe('mock server follows the real contract shape', () => {
   })
 
   it('returns 404 NOT_FOUND for a hidden post and an unknown post', async () => {
-    const hidden = await call('GET', '/posts/00000000-0000-4000-8000-000000000008')
+    const hidden = await call('GET', '/posts/8')
     expect(hidden.status).toBe(404)
     expect(hidden.body.error.code).toBe('NOT_FOUND')
-    expect((await call('GET', '/posts/nope')).status).toBe(404)
+    expect((await call('GET', '/posts/999999')).status).toBe(404)
+    // Contract: id không phải số nguyên dương -> 400 VALIDATION_ERROR
+    expect((await call('GET', '/posts/nope')).status).toBe(400)
   })
 
   it('rejects bad pagination with VALIDATION_ERROR details', async () => {
@@ -63,11 +68,23 @@ describe('create post', () => {
   it('validates like api.md with field paths in details', async () => {
     const { status, body } = await call('POST', '/posts', {
       session: alice,
-      body: { dish_id: '', title: 'ab', ingredients: [{ name: 'x', quantity: -1 }, {}], steps: [{ content: '  ' }] },
+      body: { dish_id: 'x', title: 'ab', ingredients: [{ name: 'x', quantity: -1 }, {}], steps: [{ content: '  ' }] },
     })
     expect(status).toBe(400)
     const fields = body.error.details.map((d) => d.field)
     expect(fields).toEqual(expect.arrayContaining(['dish_id', 'title', 'ingredients[0].quantity', 'ingredients[1].name', 'steps[0].content']))
+  })
+
+  it('rejects string ids like the real backend (dish_id must be an integer)', async () => {
+    const { status, body } = await call('POST', '/posts', { session: alice, body: { ...validBody, dish_id: '17' } })
+    expect(status).toBe(400)
+    expect(body.error.details.map((d) => d.field)).toContain('dish_id')
+  })
+
+  it('uses the title as content when content is omitted and returns roles on ingredients', async () => {
+    const { body } = await call('POST', '/posts', { session: alice, body: validBody })
+    expect(body.data.content).toBe(validBody.title)
+    expect(body.data.ingredients.every((i) => i.role === 'PRIMARY' || i.role === 'SECONDARY')).toBe(true)
   })
 
   it('creates a post that shows first in the feed with ordered steps and null quantity kept', async () => {
@@ -104,7 +121,7 @@ describe('create post', () => {
 })
 
 describe('reactions, comments, reports', () => {
-  const postId = '00000000-0000-4000-8000-000000000001'
+  const postId = 1
 
   it('sets, switches and clears a reaction with updated counts', async () => {
     const before = (await call('GET', `/posts/${postId}`)).body.data
@@ -141,7 +158,7 @@ describe('reactions, comments, reports', () => {
   })
 
   it('hiding content resolves its reports and removes the post from feed and detail, but admin still sees an excerpt', async () => {
-    const target = '00000000-0000-4000-8000-000000000007'
+    const target = 7
     const hidden = await call('POST', `/admin/content/posts/${target}/hide`, { session: alice, body: { reason: '' } })
     expect(hidden.status).toBe(400)
     const done = await call('POST', `/admin/content/posts/${target}/hide`, { session: alice, body: { reason: 'Sai công thức' } })
@@ -157,15 +174,16 @@ describe('reactions, comments, reports', () => {
 
 describe('recipes and failure simulation', () => {
   it('lists recipes per dish, empty for a dish without recipes, 404 for unknown dish', async () => {
-    const pho = await call('GET', '/dishes/00000000-0000-4000-8000-000000000101/recipes')
+    const pho = await call('GET', '/dishes/101/recipes')
     expect(pho.body.data).toHaveLength(2)
-    const bunThit = await call('GET', '/dishes/00000000-0000-4000-8000-000000000105/recipes')
+    const bunThit = await call('GET', '/dishes/105/recipes')
     expect(bunThit).toMatchObject({ status: 200, body: { data: [] } })
-    expect((await call('GET', '/dishes/unknown/recipes')).status).toBe(404)
+    expect((await call('GET', '/dishes/999/recipes')).status).toBe(404)
+    expect((await call('GET', '/dishes/unknown/recipes')).status).toBe(400)
   })
 
   it('flags an incomplete recipe', async () => {
-    const r = await call('GET', '/recipes/00000000-0000-4000-8000-000000000505')
+    const r = await call('GET', '/recipes/505')
     expect(r.body.data).toMatchObject({ incomplete: true, steps: [] })
   })
 
@@ -178,8 +196,8 @@ describe('recipes and failure simulation', () => {
   })
 
   it('returns data that callers cannot use to mutate stored state', async () => {
-    const first = await call('GET', '/posts/00000000-0000-4000-8000-000000000001')
+    const first = await call('GET', '/posts/1')
     first.body.data.title = 'bị sửa'
-    expect((await call('GET', '/posts/00000000-0000-4000-8000-000000000001')).body.data.title).not.toBe('bị sửa')
+    expect((await call('GET', '/posts/1')).body.data.title).not.toBe('bị sửa')
   })
 })

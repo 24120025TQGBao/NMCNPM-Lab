@@ -1,6 +1,6 @@
 // Nơi DUY NHẤT biết tên trường của API và tên cột DB. Component chỉ dùng model camelCase trả về từ đây.
 // Mọi hàm chịu được trường thiếu (contract có thể thay đổi): trả null hoặc giá trị mặc định thay vì ném lỗi.
-// ID giữ nguyên như API trả (contract ghi UUID, code backend hiện tại dùng số): không ép kiểu.
+// ID: post/dish/ingredient là số nguyên, author.id là UUID (api.md v1.0). Mapper giữ nguyên giá trị API trả, không ép kiểu khi đọc.
 
 const str = (v) => (typeof v === 'string' ? v : null)
 const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null)
@@ -47,6 +47,7 @@ export function mapIngredient(raw) {
     quantity,
     unit: str(raw?.unit),
     toTaste: quantity === null,
+    role: raw?.role === 'PRIMARY' ? 'PRIMARY' : 'SECONDARY', // api.md v1.0
   }
 }
 
@@ -160,14 +161,17 @@ export function mapPage(body, mapItem) {
 
 export const unwrap = (body) => body?.data ?? null
 
+// api.md v1.0: dish_id và ingredient_id là SỐ NGUYÊN, backend từ chối chuỗi ("17"). Ô chọn trả chuỗi nên ép ở đây.
+const toIntegerId = (v) => (typeof v === 'string' && /^\d+$/.test(v) ? Number(v) : v)
+
 // Dữ liệu gửi lên: model giao diện -> body contract (snake_case).
 export function toCreatePostBody(input) {
   const body = {
-    dish_id: input.dishId,
+    dish_id: toIntegerId(input.dishId),
     title: input.title,
     ingredients: (input.ingredients ?? []).map((i) => {
       const row = { quantity: i.toTaste ? null : i.quantity ?? null, unit: i.unit || null }
-      if (i.ingredientId) row.ingredient_id = i.ingredientId
+      if (i.ingredientId) row.ingredient_id = toIntegerId(i.ingredientId)
       else row.name = i.name
       return row
     }),

@@ -54,14 +54,14 @@ describe('VITE_USE_MOCK gate (DEV is true under Vitest)', () => {
   it('errors from the mock go through the same ApiError normalization', async () => {
     vi.stubEnv('VITE_USE_MOCK', 'true')
     const { posts } = await load()
-    const err = await posts.get('does-not-exist').catch((e) => e)
+    const err = await posts.get(999999).catch((e) => e)
     expect(err).toMatchObject({ status: 404, code: 'NOT_FOUND' })
   })
 
   it('maps validation details from the mock to fields', async () => {
     vi.stubEnv('VITE_USE_MOCK', 'true')
     const { posts } = await load()
-    const err = await posts.create({ dishId: 'd', title: 'x', ingredients: [], steps: [] }).catch((e) => e)
+    const err = await posts.create({ dishId: 1, title: 'x', ingredients: [], steps: [] }).catch((e) => e)
     expect(err.status).toBe(400)
     expect(Object.keys(err.fields)).toEqual(expect.arrayContaining(['title', 'ingredients', 'steps']))
   })
