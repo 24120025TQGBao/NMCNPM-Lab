@@ -48,6 +48,19 @@ describe('AuthForm', () => {
     expect(await screen.findByText(text.auth.checkEmailTitle)).toBeInTheDocument()
   })
 
+  it('QĐ 5.1: shows duplicate-email rejection and stays on the registration form', async () => {
+    const signUp = vi.fn().mockRejectedValue({ code: 'user_already_exists' })
+    setup('register', { signUp })
+    const user = userEvent.setup()
+    await user.type(screen.getByLabelText(text.auth.displayName), 'QA')
+    await user.type(screen.getByLabelText(text.auth.email), 'qa@example.test')
+    await user.type(screen.getByLabelText(text.auth.password), 'x'.repeat(12))
+    await user.click(screen.getByRole('button', { name: text.auth.submitRegister }))
+    expect(await screen.findByText(text.auth.errors.emailTaken)).toBeInTheDocument()
+    expect(screen.queryByText(text.auth.checkEmailTitle)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: text.auth.submitRegister })).toBeEnabled()
+  })
+
   it('shows blocked notice on login page', () => {
     setup('login', { status: 'blocked' }, '/login')
     expect(screen.getByText(text.auth.blocked)).toBeInTheDocument()

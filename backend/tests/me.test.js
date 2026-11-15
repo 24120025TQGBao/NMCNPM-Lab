@@ -80,6 +80,29 @@ describe('GET /api/me', () => {
     expect(response.body.error.code).toBe('PROFILE_NOT_FOUND');
   });
 
+  it('QĐ 5.3: ignores a different user ID supplied in query parameters', async () => {
+    mockAuth();
+    const { client, query } = createProfileClient({ data: PROFILE, error: null });
+    const response = await request(createApp({ profileClient: client }))
+      .get('/api/me?user_id=another-user&ma_nd=another-user')
+      .set('Authorization', 'Bearer valid-token');
+    expect(response.status).toBe(200);
+    expect(response.body.ma_nd).toBe(USER_ID);
+    expect(query.eq.mock.calls).toEqual([['ma_nd', USER_ID]]);
+  });
+
+  it.each(['Basic credentials', 'Bearer', 'Bearer invalid-token'])('rejects invalid authorization %s without reading private profiles', async authorization => {
+    vi.spyOn(supabaseLib, 'getAnonClient').mockReturnValue({
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: { message: 'expired' } }) }
+    });
+    const { client } = createProfileClient({ data: PROFILE, error: null });
+    const response = await request(createApp({ profileClient: client }))
+      .get('/api/me').set('Authorization', authorization);
+    expect(response.status).toBe(401);
+    expect(response.body.error.code).toBe('UNAUTHORIZED');
+    expect(client.from).not.toHaveBeenCalled();
+  });
+
   it('returns 403 for a locked profile', async () => {
     mockAuth();
     const { client } = createProfileClient({

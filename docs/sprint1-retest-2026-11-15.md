@@ -2,7 +2,7 @@
 
 ## Kết luận sau lần chạy E2E bổ sung
 
-**Cập nhật theo xác nhận mới của người dùng:** đăng ký công khai đã được người dùng test thành công; rate limit quan sát trong lần chạy tự động không còn là blocker hiện hành. Luồng sau đăng nhập đạt trên ba môi trường và rollback có bằng chứng DB thật. Đã bổ sung workflow `.github/workflows/ci.yml`; còn chờ run GitHub Actions xanh trên commit tích hợp để xác nhận CI online. Người dùng cho biết nhóm chưa có Definition of Done/quy định merge riêng, vì vậy không tự áp thêm yêu cầu coverage, số approval hay staging làm điều kiện bắt buộc.
+**Cập nhật:** đăng ký công khai đã được người dùng test thành công; rate limit quan sát trong lần chạy tự động không còn là blocker hiện hành. Luồng sau đăng nhập đạt trên ba môi trường và rollback có bằng chứng DB thật. Workflow CI ban đầu đã [chạy xanh trên GitHub](https://github.com/24120025TQGBao/NMCNPM-Lab/actions/runs/43702608241). Sau đó người dùng cung cấp proposal có quy định nghiệp vụ và tiêu chí hoàn thành tại mục 4.5.2. Xem [đối chiếu nghiệp vụ và các test mới](sprint1-business-rule-tests.md): đã tăng từ 196 lên 238 test pass local; không tự áp ngưỡng coverage/số approval mà proposal chưa quy định. Môi trường thử nghiệm và review vẫn thuộc điều kiện hoàn thành trong proposal, không được suy ra chỉ từ CI xanh.
 
 Kết quả mới nhất ở [results.json](qa-evidence-2026-11-15/results.json); bộ chạy tái lập ở [sprint1-browser-qa.cjs](sprint1-browser-qa.cjs). Các mục phía dưới ghi lại lần kiểm tra trước; mục kết luận này và phần E2E bổ sung cuối tài liệu là trạng thái hiện hành.
 

@@ -19,7 +19,8 @@ jobs:
     timeout-minutes: 15
     env:
       CI: 'true'
-      # All backend tests mock Supabase. Never use real credentials in this job.
+      # API tests mock Supabase; SQL tests use isolated PostgreSQL (PGlite).
+      # Never use real credentials in this job.
       SUPABASE_URL: https://example.supabase.co
       SUPABASE_ANON_KEY: ci-anon-key-not-a-secret
       SUPABASE_SERVICE_ROLE_KEY: ci-service-role-not-a-secret
@@ -53,7 +54,7 @@ jobs:
       - name: Lint frontend
         run: npm run lint --prefix frontend
 
-      - name: Test backend
+      - name: Test backend API and PostgreSQL business rules
         env:
           NODE_ENV: test
         run: npm test --prefix backend

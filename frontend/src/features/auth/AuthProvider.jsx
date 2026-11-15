@@ -17,6 +17,7 @@ export function AuthProvider({ children }) {
     if (!supabase) return
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, next) => {
       if (event === 'SIGNED_IN') setBlocked(false)
+      if (!next) setProfileState({ userId: null, profile: null, error: null })
       setSession(next)
       setInitializing(false)
     })
@@ -30,7 +31,9 @@ export function AuthProvider({ children }) {
     const controller = new AbortController()
     // me.get đọc token mới nhất từ Supabase thay vì giữ bản sao.
     me.get({ signal: controller.signal })
-      .then((profile) => setProfileState({ userId, profile, error: null }))
+      .then((profile) => {
+        if (!controller.signal.aborted) setProfileState({ userId, profile, error: null })
+      })
       .catch((error) => {
         if (controller.signal.aborted) return
         if (error.status === 403) {
