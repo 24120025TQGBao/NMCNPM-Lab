@@ -1,0 +1,82 @@
+# Giả định API của Frontend (gửi TV1 đối chiếu)
+
+Tài liệu này liệt kê những chỗ Frontend **đang giả định** hoặc thấy **lệch** so với contract chính thức (`docs/api.md` v1.0 của TV1, đối chiếu với `origin/sprint1-integration` ngày 14/11/2026). Không mục nào ở mục 3 và 4 được coi là đã chốt. Khi một endpoint được backend merge và khớp, đánh dấu "đã khớp".
+
+Quy ước Frontend đang theo (khớp contract v1.0):
+- `post.id`, `dish.id`, `ingredient_id`, `comment.id`, `report.id` là **số nguyên**; chỉ `author.id` là **UUID**. Backend từ chối chuỗi cho `dish_id`/`ingredient_id` (ví dụ `"17"`), nên Frontend ép về số khi gửi (`mappers.js`).
+- Thời gian ISO 8601 UTC, `snake_case`, thành công `{ data }` / `{ data: [...], meta: { page, limit, total } }`, lỗi `{ error: { code, message, details?: [{ field, message }] } }`.
+
+Toàn bộ chỗ gọi API nằm trong `src/lib/api/`; chỉ `mappers.js` biết tên trường. Nếu contract đổi, chỉ sửa `mappers.js` và service tương ứng.
+
+## 1. Đã khớp contract v1.0 (không còn là giả định)
+
+| Chủ đề | Trạng thái |
+|---|---|
+| Kiểu ID | **Đã khớp.** Số nguyên (post, dish, ingredient), UUID cho `author.id`. Trước đây `api.md` ghi UUID, bản v1.0 đã sửa |
+| `content` của bài | **Đã khớp.** Tùy chọn khi tạo (1–2000 ký tự), không gửi thì backend dùng `title`. Response chi tiết có `content` |
+| `GET /api/dishes` | **Đã khớp.** Có `search`, `page`, `limit`, trả `{ data: [{ id, name, description, image_url }], meta }` (BE05 đã merge). `dishes.list` đọc được cả dạng cũ (mảng thuần) |
+| `GET /api/me` | **Đã khớp trong tích hợp hiện tại.** Backend trả hồ sơ người dùng đã xác thực, gồm `ma_nd`, `ten_hien_thi`, `anh_dai_dien`, `vai_tro`, `trang_thai`; email và dữ liệu nhạy cảm không được trả về |
+| `GET /api/posts`, `GET /api/posts/:id`, `POST /api/posts` | **Đã khớp** với `api.md` v1.0 (BE03, BE04 đã merge). Nguyên liệu có thêm `role` (`PRIMARY` \| `SECONDARY`), Frontend đọc `role` |
+| `quantity: null` = Tùy khẩu vị | Đã khớp (G7) |
+| Vai trò admin `ADMIN` | Đã chốt (G8) |
+| Cổng dev 3000 | `api.md` v1.0 ghi 3000, khớp proxy Vite |
+
+## 2. Việc đang mất hoặc lệch (cần TV1)
+
+| # | Vấn đề | Frontend đang làm |
+|---|---|---|
+| 1 | `GET /api/posts` chỉ trả `id`, `title`, `created_at`, `dish`, `author` | Card bảng tin chỉ hiện các trường này. Không có `content`, số nguyên liệu, số bước, số cảm xúc/bình luận. Nếu TV1 thêm `ingredient_count`, `step_count`, `content`, mapper đã đọc sẵn nên card tự hiện, không phải sửa giao diện |
+| 2 | Khi người đăng không nhập nội dung, backend lưu `content = title` | Giao diện ẩn đoạn trích khi `content` giống `title` |
+| 3 | Backend chỉ trả bài `RECIPE` + `PUBLIC` | Bài đánh giá quán, bản nháp, bài bị ẩn chưa có API (xem mục 3) |
+| 4 | `GET /api/dishes` mặc định trả 20 món | `DishListPage` chưa phân trang, DB có hơn 20 món thì chỉ thấy 20 (FE09 sẽ làm) |
+
+## 3. Chỗ contract thật khác kế hoạch ban đầu (Frontend giả định, qua mock)
+
+Bài đăng công khai chưa có các trường dưới đây. Đây là phần Sprint 2, chưa có task backend nên vẫn là giả định:
+
+| Thiếu trong contract | Frontend giả định | Dùng cho |
+|---|---|---|
+| `type` (công thức / đánh giá quán) | `type`: `RECIPE` \| `REVIEW`; `GET /api/posts?type=` (mặc định `RECIPE`). Thiếu `type` thì coi là `RECIPE` | FE07 hai tab |
+| `status` (nháp) | `status`: `DRAFT` \| `PUBLISHED`; `POST /api/posts` nhận `status` | FE07 P1 (G5) |
+| Tìm theo từ khóa | `GET /api/posts?q=` | FE07 |
+| Số cảm xúc, bình luận | `like_count`, `dislike_count`, `comment_count`, `my_reaction` ở chi tiết bài | FE07 |
+| Bài đánh giá quán | `restaurant: { name, address, price_range }` khi `type = REVIEW` | FE07 `ReviewPostCard` |
+
+## 4. Endpoint chưa có trong contract (Frontend giả định, chạy qua mock)
+
+Tất cả gọi qua `request(..., { mockable: true })`: khi `VITE_USE_MOCK=true` (chỉ dev) dùng bộ giả lập `src/lib/api/mock/`, ngược lại gọi backend thật. Phần này thuộc Sprint 2, chưa đụng tới.
+
+| Phương thức, đường dẫn | Đăng nhập | Body / query | Response thành công | Lỗi Frontend xử lý | Service |
+|---|---|---|---|---|---|
+| `GET /api/dishes/:id` | Không | | `{ data: { id, name, description, image_url } }` | 400, 404 | `dishes.get` |
+| `GET /api/dishes/:id/recipes` | Không | `page`, `limit` | `{ data: [{ id, dish_id, name, prep_time_minutes, ingredient_count, incomplete }], meta }`. Món chưa có công thức: `data: []` | 404 nếu món không tồn tại | `recipes.listByDish` |
+| `GET /api/recipes/:id` | Không | | `{ data: { id, dish_id, name, prep_time_minutes, incomplete, ingredients[], steps[{ order, content }] } }` | 404 | `recipes.get` |
+| `PATCH /api/posts/:id` | Có, chỉ tác giả | Như `POST /api/posts` | `{ data: <bài chi tiết> }` | 400, 403, 404 | `posts.update` |
+| `DELETE /api/posts/:id` | Có, chỉ tác giả | | `204` | 403, 404 | `posts.remove` |
+| `GET /api/me/drafts` | Có | `page`, `limit` | `{ data: [<bài tóm tắt>], meta }` | 401 | `posts.listDrafts` |
+| `PUT /api/posts/:id/reaction` | Có | `{ value: "like" \| "dislike" \| null }` | `{ data: { my_reaction, like_count, dislike_count } }` | 400, 401, 404 | `reactions.set` |
+| `GET /api/posts/:id/comments` | Không | `page`, `limit` | `{ data: [{ id, post_id, author{id,display_name}, content, created_at, edited_at }], meta }` | 404 | `comments.list` |
+| `POST /api/posts/:id/comments` | Có | `{ content }` (1–1000 ký tự) | `201 { data: <bình luận> }` | 400, 401, 404 | `comments.create` |
+| `PATCH /api/comments/:id` | Có, chỉ tác giả | `{ content }` | `{ data: <bình luận> }` | 400, 403, 404 | `comments.update` |
+| `DELETE /api/comments/:id` | Có, chỉ tác giả | | `204` | 403, 404 | `comments.remove` |
+| `POST /api/reports` | Có | `{ target_type: "POST" \| "COMMENT", target_id (số nguyên), reason }` | `201 { data: { target_type, target_id } }` | 400, 404, **409** nếu đã báo cáo | `reports.create` |
+| `GET /api/admin/reports` | Quản trị viên | `status` (`PENDING` \| `RESOLVED`), `page`, `limit` | `{ data: [{ id, target_type, target_id, excerpt, reason, report_count, created_at, status, resolution }], meta }` | 401, 403 | `admin.listReports` |
+| `POST /api/admin/content/:type/:id/hide` | Quản trị viên | `type` = `posts` \| `comments`; `{ reason }` | `{ data: <báo cáo đã xử lý> }` | 400, 403, 404 | `admin.hideContent` |
+
+Quy tắc kèm theo Frontend giả định:
+- Nội dung bị ẩn hoặc xóa: `GET /api/posts/:id` trả **404** ("Bài viết không còn khả dụng") và bài không xuất hiện ở danh sách.
+- Bản nháp chỉ chủ bài thấy; người khác nhận 404.
+- Backend tự kiểm tra quyền tác giả, quản trị viên (NFR03). Báo cáo trùng trả 409 (`CONFLICT`).
+
+## 5. Hành vi của bộ giả lập cần biết (không phải yêu cầu với backend)
+
+- Chỉ nạp khi `import.meta.env.DEV` và `VITE_USE_MOCK === 'true'`. Dữ liệu nằm trong bộ nhớ, mất khi tải lại trang.
+- **Mock theo contract v1.0:** ID là số nguyên (`author.id` là UUID); `:id` không phải số nguyên dương trả 400; `dish_id` là chuỗi bị 400; `GET /api/posts` chỉ trả `id`, `title`, `created_at`, `dish`, `author` cho bài công thức; không gửi `content` thì lấy `title`.
+- `GET /api/dishes` và `GET /api/me` **không bao giờ** đi qua mock. Vì vậy `dish_id` mà form tạo bài gửi lên mock là ID món thật; mock chấp nhận ID lạ và hiện tên món "Món ăn" nếu không khớp 5 món mẫu.
+- Mọi người đã đăng nhập đều được mock coi là quản trị viên ở `/api/admin/*`. Thử lỗi bằng `__citrusMock.failNext(400|401|403|404|409|500)` trong console. Độ trễ mặc định 300 ms.
+- Dữ liệu mẫu: 7 bài công thức hiển thị và 1 bài bị ẩn, 4 bài đánh giá quán, 4 bình luận (1 đã sửa), cảm xúc, 3 báo cáo, 5 công thức theo món (1 thiếu bước, 1 món chưa có công thức).
+
+## 6. Câu hỏi cho TV1
+
+1. Có thể thêm `ingredient_count`, `step_count` (và nếu muốn, đoạn trích) vào `GET /api/posts` không? (mục 2 #1, không bắt buộc.)
+2. Sprint 2 sẽ có backend cho bình luận, cảm xúc, báo cáo, quản trị, bản nháp không, ai phụ trách? (mục 3, 4.)

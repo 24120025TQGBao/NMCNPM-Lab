@@ -63,6 +63,18 @@ describe('POST /api/posts (BE03)', () => {
   });
 
   describe('Xác thực', () => {
+    it('QĐ 3.2: invalid or expired token cannot create a post or invoke the write RPC', async () => {
+      vi.spyOn(supabaseLib, 'getAnonClient').mockReturnValue({
+        auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: { message: 'expired' } }) }
+      });
+      const { spy, rpc } = mockRpc({ data: createdPost, error: null });
+      const res = await send(validBody(), { Authorization: 'Bearer expired-token' });
+      expect(res.status).toBe(401);
+      expect(res.body.error.code).toBe('UNAUTHORIZED');
+      expect(spy).not.toHaveBeenCalled();
+      expect(rpc).not.toHaveBeenCalled();
+    });
+
     it('Không có token trả 401 UNAUTHORIZED và không gọi DB', async () => {
       const { spy } = mockRpc({ data: createdPost, error: null });
       const res = await send(validBody(), {});
@@ -117,6 +129,33 @@ describe('POST /api/posts (BE03)', () => {
   });
 
   describe('Validation trả 400 theo từng trường', () => {
+    it.each([
+      ['title', { title: ' \t\n ' }],
+      ['content', { content: ' \t\n ' }],
+      ['ingredients', { ingredients: [] }],
+      ['ingredients[0].name', { ingredients: [{ name: ' \t\n ' }] }],
+      ['steps', { steps: [] }],
+      ['steps[0].content', { steps: [{ content: ' \t\n ' }] }]
+    ])('QĐ 3.2/1.5: rejects empty/whitespace %s before writing', async (field, override) => {
+      mockAuth();
+      const { rpc } = mockRpc({ data: createdPost, error: null });
+      const res = await send({ ...validBody(), ...override });
+      expect(res.status).toBe(400);
+      expect(fields(res)).toContain(field);
+      expect(rpc).not.toHaveBeenCalled();
+    });
+
+    it('accepts omitted content and nullable quantities for the documented title/to-taste fallback', async () => {
+      mockAuth();
+      const { rpc } = mockRpc({ data: createdPost, error: null });
+      const body = validBody();
+      delete body.content;
+      const res = await send(body);
+      expect(res.status).toBe(201);
+      expect(rpc.mock.calls[0][1].p_content).toBeNull();
+      expect(rpc.mock.calls[0][1].p_ingredients[2].quantity).toBeNull();
+    });
+
     it('Body rỗng thiếu các trường bắt buộc', async () => {
       mockAuth();
       const { rpc } = mockRpc({ data: null, error: null });

@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import UserMenu from './UserMenu'
+import { Alert } from '../components/ui/Alert'
+import { useAuth } from '../features/auth/useAuth'
 import { vi } from '../i18n/vi'
 
 const links = [
@@ -20,6 +22,7 @@ function navClass({ isActive }) {
 export default function AppLayout() {
   const [menuState, setMenuState] = useState({ open: false, path: '' })
   const location = useLocation()
+  const { profileError } = useAuth()
   // Menu tự đóng khi đổi trang.
   const menuOpen = menuState.open && menuState.path === location.pathname
   const closeMenu = () => setMenuState({ open: false, path: '' })
@@ -60,6 +63,11 @@ export default function AppLayout() {
         )}
       </header>
       <main id="main" className="mx-auto w-full max-w-[1240px] flex-1 px-5 py-10 md:px-10">
+        {profileError && (
+          <Alert tone="warning" className="mb-6">
+            {profileError === 'missing' ? vi.auth.missingProfile : vi.auth.profileLoadFailed}
+          </Alert>
+        )}
         <Outlet />
       </main>
       <footer className="bg-jungle-green text-white">

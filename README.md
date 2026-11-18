@@ -68,6 +68,8 @@ Optionally run `supabase/seed.sql` in the Supabase SQL Editor to add five sample
 
 ## Verify
 
+GitHub Actions runs lint, frontend/backend tests, the frontend build, and backend syntax checks on pushes and pull requests. See [CI setup and validation](docs/ci.md); no Supabase secrets are required for these mocked tests.
+
 1. Open http://localhost:3000/api/health. `databaseConfigured` should be `true`; this confirms configuration is present, not that the database is reachable.
 2. Register, follow the confirmation email if enabled, and sign in. Your display name and account status should appear.
 3. Refresh the page to verify session restoration, then sign out.
