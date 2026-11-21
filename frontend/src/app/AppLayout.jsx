@@ -7,6 +7,8 @@ import { useAuth } from '../features/auth/useAuth'
 import { vi } from '../i18n/vi'
 
 const links = [
+  { to: '/goi-y', label: 'Gợi ý' },
+  { to: '/search', label: 'Tìm món' },
   { to: '/dishes', label: vi.nav.suggest },
   { to: '/by-ingredient', label: vi.nav.byIngredient },
   { to: '/restaurants', label: vi.nav.restaurants },
