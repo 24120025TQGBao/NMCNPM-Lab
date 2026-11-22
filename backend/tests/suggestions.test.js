@@ -6,10 +6,13 @@ import { createApp } from '../src/app.js';
 // có lọc eq/in thật trên dữ liệu mẫu và chỉ trả đúng các cột được select.
 function createFakeClient(tables, { failTable } = {}) {
   const requested = [];
+  const queries = [];
 
   const client = {
     from: vi.fn(table => {
       const filters = [];
+      const recorded = { table, filters: [] };
+      queries.push(recorded);
       let columns = null;
       const builder = {
         select(cols) {
@@ -17,10 +20,12 @@ function createFakeClient(tables, { failTable } = {}) {
           return builder;
         },
         eq(column, value) {
+          recorded.filters.push({ op: 'eq', column, value });
           filters.push(row => row[column] === value);
           return builder;
         },
         in(column, values) {
+          recorded.filters.push({ op: 'in', column, value: values });
           filters.push(row => values.includes(row[column]));
           return builder;
         },
@@ -42,7 +47,7 @@ function createFakeClient(tables, { failTable } = {}) {
     })
   };
 
-  return { client, requested };
+  return { client, requested, queries };
 }
 
 function dish(id, extra = {}) {
@@ -50,7 +55,7 @@ function dish(id, extra = {}) {
     ma_mon: id,
     ten_mon: `Món ${id}`,
     mo_ta_ngan: `Mô tả ${id}`,
-    hinh_anh: null,
+    hinh_anh: `https://img.example/${id}.jpg`,
     trang_thai: 'ACTIVE',
     vung_mien: null,
     ...extra
@@ -64,12 +69,19 @@ const TABLES = {
     dish(2),
     dish(4, { trang_thai: 'HIDDEN' }),
     dish(5, { trang_thai: 'DELETED' }),
-    dish(6, { vung_mien: 'NAM' })
+    dish(6, { vung_mien: 'NAM' }),
+    // ACTIVE nhưng không đủ điều kiện gợi ý (thiếu ảnh hoặc mô tả): phải bị loại ở mọi truy vấn
+    dish(7, { hinh_anh: null }),
+    dish(8, { mo_ta_ngan: '   ' }),
+    dish(9, { hinh_anh: '' }),
+    dish(10, { mo_ta_ngan: null, vung_mien: 'NAM' })
   ],
   tag: [
-    { ma_tag: 10, slug: 'TROI_MUA', ten_tag: 'Trời mưa' },
-    { ma_tag: 11, slug: 'LUOI_NAU', ten_tag: 'Lười nấu' },
-    { ma_tag: 12, slug: 'AN_NHE', ten_tag: 'Ăn nhẹ' }
+    { ma_tag: 10, slug: 'troi-mua', ten_tag: 'Trời mưa' },
+    { ma_tag: 11, slug: 'luoi-nau', ten_tag: 'Lười nấu' },
+    { ma_tag: 12, slug: 'an-nhe', ten_tag: 'Ăn nhẹ' },
+    { ma_tag: 13, slug: 'nau-cho-4', ten_tag: 'Nấu cho 4 người' },
+    { ma_tag: 14, slug: 'bua-sang', ten_tag: 'Bữa sáng' }
   ],
   mon_an_tag: [
     { ma_mon: 1, ma_tag: 10 },
@@ -80,7 +92,16 @@ const TABLES = {
     { ma_mon: 3, ma_tag: 12 },
     { ma_mon: 4, ma_tag: 10 },
     { ma_mon: 4, ma_tag: 11 },
-    { ma_mon: 6, ma_tag: 12 }
+    { ma_mon: 6, ma_tag: 12 },
+    { ma_mon: 1, ma_tag: 14 },
+    { ma_mon: 2, ma_tag: 13 },
+    // Món không đủ điều kiện gợi ý nhưng có đủ tag: vẫn phải bị loại
+    { ma_mon: 7, ma_tag: 10 },
+    { ma_mon: 7, ma_tag: 11 },
+    { ma_mon: 8, ma_tag: 10 },
+    { ma_mon: 8, ma_tag: 11 },
+    { ma_mon: 9, ma_tag: 10 },
+    { ma_mon: 10, ma_tag: 12 }
   ],
   cong_thuc: [
     { ma_ct: 1, ma_mon: 1, thoi_gian_phut: 45, trang_thai: 'ACTIVE' },
@@ -117,10 +138,10 @@ describe('GET /api/suggestions', () => {
         id: 1,
         name: 'Món 1',
         short_description: 'Mô tả 1',
-        image_url: null,
+        image_url: 'https://img.example/1.jpg',
         cook_time_minutes: 30,
         flavor: null,
-        tags: ['LUOI_NAU', 'TROI_MUA'],
+        tags: ['BUA_SANG', 'LUOI_NAU', 'TROI_MUA'],
         region: 'BAC'
       });
     });
@@ -143,10 +164,10 @@ describe('GET /api/suggestions', () => {
           id: 2,
           name: 'Món 2',
           short_description: 'Mô tả 2',
-          image_url: null,
+          image_url: 'https://img.example/2.jpg',
           cook_time_minutes: null,
           flavor: null,
-          tags: ['TROI_MUA'],
+          tags: ['NAU_CHO_4', 'TROI_MUA'],
           region: null
         }
       ]);
@@ -252,7 +273,7 @@ describe('GET /api/suggestions', () => {
     });
 
     it('returns [] when one of the chips has no row in the tag table', async () => {
-      const { app } = appWith({ ...TABLES, tag: TABLES.tag.filter(row => row.slug !== 'AN_NHE') });
+      const { app } = appWith({ ...TABLES, tag: TABLES.tag.filter(row => row.slug !== 'an-nhe') });
 
       const response = await request(app).get('/api/suggestions?the=TROI_MUA,AN_NHE');
 
@@ -266,6 +287,109 @@ describe('GET /api/suggestions', () => {
 
       expect(ids(response)).toEqual([1]);
       expect(response.body.data[0].tags).toEqual([]);
+    });
+  });
+
+  describe('tag code <-> slug mapping (Q15)', () => {
+    it('looks tags up by kebab-case slug, never by the upper-case API code', async () => {
+      const { app, queries } = appWith();
+
+      await request(app).get('/api/suggestions?the=TROI_MUA,NAU_CHO_4,LUOI_NAU');
+
+      const tagLookup = queries.find(query => query.table === 'tag');
+      expect(tagLookup.filters).toEqual([
+        { op: 'in', column: 'slug', value: ['troi-mua', 'nau-cho-4', 'luoi-nau'] }
+      ]);
+    });
+
+    it('filters correctly with a chip whose slug contains digits', async () => {
+      const { app } = appWith();
+
+      const response = await request(app).get('/api/suggestions?the=NAU_CHO_4&limit=10');
+
+      expect(ids(response)).toEqual([2]);
+    });
+
+    it('does not match tags stored with upper-case slugs (they would violate the DB CHECK)', async () => {
+      const upperCaseTags = TABLES.tag.map(row => ({ ...row, slug: row.slug.toUpperCase().replaceAll('-', '_') }));
+      const { app } = appWith({ ...TABLES, tag: upperCaseTags });
+
+      const response = await request(app).get('/api/suggestions?the=TROI_MUA');
+
+      expect(response.body).toEqual({ data: [] });
+    });
+
+    it('returns tags[] as upper-case API codes, including tags that are not chips', async () => {
+      const { app } = appWith();
+
+      const response = await request(app).get('/api/suggestions?exclude=2,3,6&limit=1');
+
+      expect(response.body.data[0].tags).toEqual(['BUA_SANG', 'LUOI_NAU', 'TROI_MUA']);
+      expect(response.body.data[0].tags.every(code => /^[A-Z0-9]+(_[A-Z0-9]+)*$/.test(code))).toBe(true);
+    });
+
+    it('uses the same code in tags[] that the client sends in the, so a round trip is consistent', async () => {
+      const { app } = appWith();
+
+      const first = await request(app).get('/api/suggestions?the=TROI_MUA,LUOI_NAU');
+      // `tags[]` có thể chứa mã ngoài 5 chip (ví dụ BUA_SANG); chỉ chip mới gửi lại được qua `the`.
+      const code = first.body.data[0].tags.find(tag => ['TROI_MUA', 'LUOI_NAU'].includes(tag));
+      const second = await request(app).get(`/api/suggestions?the=${code}&limit=10`);
+
+      expect(ids(second)).toContain(first.body.data[0].id);
+    });
+  });
+
+  describe('eligible dishes only (Q16): non-blank image and description', () => {
+    it('never returns an ACTIVE dish with a missing, empty or blank image or description', async () => {
+      const { app } = appWith();
+
+      const response = await request(app).get('/api/suggestions?limit=10');
+
+      expect(ids(response)).toEqual([1, 2, 3, 6]);
+      expect(response.body.data.every(item => item.image_url && item.short_description.trim())).toBe(true);
+    });
+
+    it('applies to chips: ineligible dishes with all the tags are not returned', async () => {
+      const { app } = appWith();
+
+      const response = await request(app).get('/api/suggestions?the=TROI_MUA,LUOI_NAU&limit=10');
+
+      expect(ids(response)).toEqual([1, 3]);
+    });
+
+    it('applies to region and to random picks', async () => {
+      const { app } = appWith();
+
+      const region = await request(app).get('/api/suggestions?vung_mien=NAM&limit=10');
+      expect(ids(region)).toEqual([3, 6]);
+
+      for (let run = 0; run < 25; run += 1) {
+        const response = await request(app).get('/api/suggestions?random=true&limit=10');
+        expect(ids(response).every(id => [1, 2, 3, 6].includes(id))).toBe(true);
+        expect(ids(response)).toHaveLength(4);
+      }
+    });
+
+    it('returns [] when the only remaining dishes are ineligible', async () => {
+      const { app } = appWith();
+
+      const response = await request(app).get('/api/suggestions?exclude=1,2,3,6&limit=10');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ data: [] });
+    });
+
+    it('treats an image or description made only of whitespace or tabs as blank', async () => {
+      const tables = {
+        ...TABLES,
+        mon_an: [dish(1, { hinh_anh: ' \t\n' }), dish(2, { mo_ta_ngan: '\n' }), dish(3)]
+      };
+      const { app } = appWith(tables);
+
+      const response = await request(app).get('/api/suggestions?limit=10');
+
+      expect(ids(response)).toEqual([3]);
     });
   });
 
