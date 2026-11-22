@@ -49,12 +49,13 @@ export default function IngredientMatchTab() {
     <div className="w-full space-y-6">
       {/* Khối chọn nguyên liệu */}
       <div className="rounded-2xl border border-border bg-white p-5 sm:p-6 shadow-sm space-y-4">
-        <label className="block text-sm font-semibold text-foreground">
+        <label htmlFor="ingredient-input" className="block text-sm font-semibold text-foreground">
           Bạn đang có những nguyên liệu gì?
         </label>
 
         <IngredientPicker
           onSelectIngredient={handleSelectIngredient}
+          onSubmit={handleSearch}
           disabled={loading}
           error={inputError}
         />
@@ -111,8 +112,7 @@ export default function IngredientMatchTab() {
       {/* Vùng hiển thị kết quả */}
       <div aria-live="polite" className="pt-2">
         {loading && (
-          <div className="space-y-4 animate-pulse">
-            <div className="h-6 w-32 bg-paper rounded" />
+          <div className="space-y-4 animate-pulse motion-reduce:animate-none">            <div className="h-6 w-32 bg-paper rounded" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="h-28 rounded-xl bg-paper" />

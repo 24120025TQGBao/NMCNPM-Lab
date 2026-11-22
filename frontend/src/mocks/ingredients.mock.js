@@ -43,8 +43,27 @@ export const MOCK_INGREDIENTS = [
   { id: 18, ten: 'Hành tây', la_gia_vi_co_ban: false },
 ]
 
-export async function fetchMockIngredients({ search = '', limit = 8 } = {}) {
-  await new Promise((r) => setTimeout(r, 200))
+// Độ trễ giả có thể bị hủy bằng AbortSignal, giống fetch thật
+function delay(ms, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException('Aborted', 'AbortError'))
+      return
+    }
+    const onAbort = () => {
+      clearTimeout(timer)
+      reject(new DOMException('Aborted', 'AbortError'))
+    }
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort)
+      resolve()
+    }, ms)
+    signal?.addEventListener('abort', onAbort, { once: true })
+  })
+}
+
+export async function fetchMockIngredients({ search = '', limit = 8, signal } = {}) {
+  await delay(200, signal)
 
   if (mockMode === 'error') {
     const error = new Error('Lỗi tìm kiếm nguyên liệu (Mock error)')

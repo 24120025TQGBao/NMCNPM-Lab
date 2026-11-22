@@ -14,8 +14,7 @@ export default function DishSuggestionCard({ dish, isSkipped, onCook, titleRef }
 
   return (
     <article
-      className={`w-full max-w-xl mx-auto rounded-2xl border bg-white shadow-sm overflow-hidden transition-all duration-300 ${
-        isSkipped ? 'opacity-60 border-dashed border-border' : 'border-border'
+      className={`w-full max-w-xl mx-auto rounded-2xl border bg-white shadow-sm overflow-hidden transition-all duration-300 motion-reduce:transition-none ${        isSkipped ? 'opacity-60 border-dashed border-border' : 'border-border'
       }`}
     >
       {/* Ảnh món lớn tỷ lệ 4:3 */}

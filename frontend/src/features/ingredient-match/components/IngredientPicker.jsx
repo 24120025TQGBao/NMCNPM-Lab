@@ -2,8 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Search, Loader2 } from 'lucide-react'
 import { useIngredientSearch } from '../useIngredientSearch'
 
-export default function IngredientPicker({ onSelectIngredient, disabled, error }) {
-  const { query, setQuery, suggestions, loading, hasSearched, clearSuggestions } =
+export default function IngredientPicker({ onSelectIngredient, onSubmit, disabled, error, inputId = 'ingredient-input' }) {  const { query, setQuery, suggestions, loading, hasSearched, clearSuggestions } =
     useIngredientSearch()
 
   const [activeIndex, setActiveIndex] = useState(-1)
@@ -40,6 +39,20 @@ export default function IngredientPicker({ onSelectIngredient, disabled, error }
   }
 
   const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (isOpen) {
+        // QĐ 4.1: chỉ nguyên liệu chọn từ danh sách gợi ý mới được thêm
+        if (activeIndex >= 0 && activeIndex < suggestions.length) {
+          handleSelect(suggestions[activeIndex])
+        }
+      } else {
+        // Ô nhập đang trống: coi như người dùng muốn tìm món
+        onSubmit?.()
+      }
+      return
+    }
+
     if (!isOpen) return
 
     if (e.key === 'ArrowDown') {
@@ -48,29 +61,35 @@ export default function IngredientPicker({ onSelectIngredient, disabled, error }
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setActiveIndex((prev) => (prev > 0 ? prev - 1 : -1))
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
-      if (activeIndex >= 0 && activeIndex < suggestions.length) {
-        handleSelect(suggestions[activeIndex])
-      }
-      // QĐ 4.1: Chỉ nguyên liệu có trong từ điển mới thêm được! Enter khi không chọn từ list thì không thêm gì.
     } else if (e.key === 'Escape') {
       setIsOpen(false)
       setActiveIndex(-1)
     }
   }
 
+  const activeOptionId =
+  isOpen && activeIndex >= 0 && suggestions[activeIndex]
+    ? `ingredient-option-${suggestions[activeIndex].id}`
+    : undefined
+
   return (
     <div ref={containerRef} className="relative w-full">
       <div className="relative">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted">
           {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin text-jungle-green" />
-          ) : (
+            <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none text-jungle-green" aria-hidden="true" />          ) : (
             <Search className="h-4 w-4" />
           )}
         </div>
         <input
+          id={inputId}
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={isOpen}
+          aria-controls="ingredient-suggestions"
+          aria-activedescendant={activeOptionId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'ingredient-input-error' : undefined}
           type="text"
           value={query}
           disabled={disabled}
@@ -86,25 +105,27 @@ export default function IngredientPicker({ onSelectIngredient, disabled, error }
           className={`w-full rounded-control border py-2.5 pl-10 pr-4 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-lemon-gold ${
             error ? 'border-rose-400 bg-rose-50/20' : 'border-border bg-white'
           } disabled:bg-paper disabled:text-muted`}
-          aria-autocomplete="list"
-          aria-controls="ingredient-suggestions"
-          aria-expanded={isOpen}
         />
       </div>
 
-      {error && <p className="mt-1.5 text-xs text-rose-600">{error}</p>}
-
+      {error && (
+        <p id="ingredient-input-error" role="alert" className="mt-1.5 text-xs text-rose-600">
+          {error}
+        </p>
+      )}
       {/* Dropdown danh sách gợi ý */}
       {isOpen && (
         <ul
           id="ingredient-suggestions"
           role="listbox"
+          aria-label="Gợi ý nguyên liệu"
           className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-control border border-border bg-white py-1 shadow-lg focus:outline-none"
         >
           {suggestions.length > 0 ? (
             suggestions.map((item, idx) => (
               <li
                 key={item.id}
+                id={`ingredient-option-${item.id}`}
                 role="option"
                 aria-selected={idx === activeIndex}
                 onClick={() => handleSelect(item)}

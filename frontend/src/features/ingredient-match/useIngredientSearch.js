@@ -1,14 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { searchIngredients } from '../../api/ingredientsApi'
+
+const DEBOUNCE_MS = 250 // NFR-03
 
 export function useIngredientSearch() {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
-
-  const abortControllerRef = useRef(null)
-  const debounceTimerRef = useRef(null)
 
   const clearSuggestions = useCallback(() => {
     setSuggestions([])
@@ -22,51 +21,38 @@ export function useIngredientSearch() {
       setSuggestions([])
       setHasSearched(false)
       setLoading(false)
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-      }
       return
     }
 
     setLoading(true)
 
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
+    // Mỗi lần query đổi có một controller riêng; cleanup hủy ngay request cũ (NFR-04)
+    const controller = new AbortController()
 
-    debounceTimerRef.current = setTimeout(async () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-      }
-      const controller = new AbortController()
-      abortControllerRef.current = controller
-
+    const timer = setTimeout(async () => {
       try {
         const results = await searchIngredients({
           search: trimmed,
           limit: 8,
           signal: controller.signal,
         })
+        if (controller.signal.aborted) return
         setSuggestions(results || [])
         setHasSearched(true)
       } catch (err) {
-        if (err?.name !== 'AbortError') {
-          setSuggestions([])
-          setHasSearched(true)
-        }
+        if (controller.signal.aborted || err?.name === 'AbortError') return
+        setSuggestions([])
+        setHasSearched(true)
       } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false)
-        }
+        if (!controller.signal.aborted) setLoading(false)
       }
-    }, 250) // Debounce 250ms (NFR-03)
+    }, DEBOUNCE_MS)
 
     return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
-      }
+      clearTimeout(timer)
+      controller.abort()
     }
-  }, [query, clearSuggestions])
+  }, [query])
 
   return {
     query,

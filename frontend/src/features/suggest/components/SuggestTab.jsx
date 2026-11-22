@@ -25,6 +25,7 @@ export default function SuggestTab() {
     randomDish,
     retry,
     restart,
+    reviewHistory,
   } = useDishSuggestions()
 
   const titleRef = useRef(null)
@@ -55,14 +56,13 @@ export default function SuggestTab() {
       <div className="min-h-[460px] flex flex-col justify-center py-2" aria-live="polite">
         {loading && <SuggestSkeleton />}
 
-        {!loading && error && <SuggestError message={error} onRetry={retry} />}
-
+        {!loading && error && <SuggestError onRetry={retry} />}
         {!loading && !error && isExhausted && (
           <SuggestEmpty
             isFirstTime={isFirstTimeExhausted}
             onClearChips={clearChips}
             onRestart={restart}
-            onViewPrevious={() => previousDish()}
+            onViewPrevious={reviewHistory}
             hasPrevious={history.length > 0}
           />
         )}

@@ -3,8 +3,7 @@ import { Button } from '../../../components/ui/Button'
 
 export function SuggestSkeleton() {
   return (
-    <div className="w-full max-w-xl mx-auto animate-pulse rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
-      <div className="aspect-[4/3] w-full bg-paper" />
+    <div className="w-full max-w-xl mx-auto animate-pulse motion-reduce:animate-none rounded-2xl border border-border bg-white shadow-sm overflow-hidden">      <div className="aspect-[4/3] w-full bg-paper" />
       <div className="p-6 space-y-4">
         <div className="h-6 w-3/4 rounded bg-paper" />
         <div className="h-4 w-full rounded bg-paper" />
@@ -28,8 +27,7 @@ export function SuggestError({ message, onRetry }) {
       <p className="font-medium text-rose-900 mb-1">
         {message || 'Không tải được gợi ý. Vui lòng thử lại.'}
       </p>
-      <p className="text-sm text-rose-700 mb-5">Vui lòng thử lại để tiếp tục nhận gợi ý.</p>
-      <Button variant="secondary" onClick={onRetry}>
+      <p className="text-sm text-rose-700 mb-5">Hoàn cảnh bạn chọn và các món đã xem vẫn được giữ nguyên.</p>      <Button variant="secondary" onClick={onRetry}>
         <RotateCcw className="mr-2 h-4 w-4" />
         Thử lại
       </Button>

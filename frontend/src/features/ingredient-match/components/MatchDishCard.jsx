@@ -16,8 +16,7 @@ export default function MatchDishCard({ dish }) {
   return (
     <Link
       to={`/dishes/${dish.id}`}
-      className="group flex flex-col sm:flex-row items-start gap-4 rounded-xl border border-border bg-white p-4 shadow-sm transition-all hover:border-lemon-gold hover:shadow-md no-underline text-foreground"
-    >
+      className="group flex flex-col sm:flex-row items-start gap-4 rounded-xl border border-border bg-white p-4 shadow-sm transition-all motion-reduce:transition-none hover:border-lemon-gold hover:shadow-md no-underline text-foreground"    >
       {/* Ảnh nhỏ */}
       <div className="relative h-28 w-full sm:w-28 flex-shrink-0 overflow-hidden rounded-lg bg-paper">
         {dish.imageUrl && !imageError ? (
@@ -26,8 +25,7 @@ export default function MatchDishCard({ dish }) {
             alt={dish.name}
             loading="lazy"
             onError={() => setImageError(true)}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"          />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-muted">
             <ImageOff className="h-6 w-6 stroke-[1.5]" />
@@ -59,8 +57,7 @@ export default function MatchDishCard({ dish }) {
             className="h-2 w-full overflow-hidden rounded-full bg-border"
           >
             <div
-              className={`h-full transition-all duration-500 rounded-full ${
-                percentage >= 80
+              className={`h-full transition-all duration-500 motion-reduce:transition-none rounded-full ${                percentage >= 80
                   ? 'bg-emerald-500'
                   : percentage >= 50
                     ? 'bg-lemon-gold'

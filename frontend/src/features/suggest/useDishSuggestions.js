@@ -13,18 +13,21 @@ export function useDishSuggestions() {
   // Ref để kiểm soát request mới nhất, tránh race condition (NFR-04)
   const requestIdRef = useRef(0)
 
-  // Fetch món mới từ backend hoặc mock
+  // Lấy món mới từ backend hoặc mock.
+  // freshSession = true: phiên mới (đổi chip, vùng miền, xóa chọn, bắt đầu lại).
+  // Khi đó KHÔNG dùng history cũ từ closure để exclude (QĐ 1.1, FR-15).
   const fetchNewDish = useCallback(
-    async ({ random = false, _isInitial = false, customChips, customRegion } = {}) => {
+    async ({ random = false, customChips, customRegion, freshSession = false } = {}) => {
       const currentChips = customChips !== undefined ? customChips : chips
       const currentRegion = customRegion !== undefined ? customRegion : region
+      const baseHistory = freshSession ? [] : history
 
       setLoading(true)
       setError(null)
       const currentReqId = ++requestIdRef.current
 
       try {
-        const exclude = history.map((d) => d.id)
+        const exclude = baseHistory.map((d) => d.id)
         const dishes = await getSuggestions({
           exclude,
           the: currentChips,
@@ -39,8 +42,8 @@ export function useDishSuggestions() {
           setIsExhausted(true)
         } else {
           const newDish = dishes[0]
-          // Phòng thủ: nếu món trả về đã có trong history thì coi như hết món (FR-13)
-          if (history.some((d) => d.id === newDish.id)) {
+          // Phòng thủ: nếu món trả về đã có trong phiên hiện tại thì coi như hết món (FR-13)
+          if (baseHistory.some((d) => d.id === newDish.id)) {
             setIsExhausted(true)
           } else {
             setIsExhausted(false)
@@ -60,14 +63,14 @@ export function useDishSuggestions() {
     [chips, region, history, dispatch]
   )
 
-  // Vào tab lần đầu nếu chưa có history thì tự gọi (FR-10, Bước 2)
+  // Vào tab lần đầu nếu chưa có history thì tự gọi (FR-10)
   useEffect(() => {
     if (history.length === 0 && !isExhausted && !loading && !error) {
-      fetchNewDish({ isInitial: true })
+      fetchNewDish()
     }
   }, [history.length, isExhausted, loading, error, fetchNewDish])
 
-  // Chuyển món tiếp theo hoặc gọi món mới (FR-12, FR-14)
+  // Gợi ý khác / Bỏ qua (FR-12, FR-14)
   const nextDish = useCallback(
     (isSkip = false) => {
       if (loading) return
@@ -77,10 +80,9 @@ export function useDishSuggestions() {
       }
 
       if (index < history.length - 1) {
-        // Đã có trong lịch sử: chỉ tiến tới thẻ sau mà KHÔNG gọi API (FR-14)
+        // Đã có trong lịch sử: chỉ tiến tới thẻ sau, KHÔNG gọi API (FR-14)
         dispatch({ type: 'SET_SUGGEST_INDEX', payload: index + 1 })
       } else {
-        // Đang ở cuối lịch sử: gọi API lấy món mới
         fetchNewDish()
       }
     },
@@ -94,7 +96,7 @@ export function useDishSuggestions() {
     dispatch({ type: 'SET_SUGGEST_INDEX', payload: index - 1 })
   }, [index, loading, dispatch])
 
-  // Đổi chip hoàn cảnh (FR-15: coi là phiên mới, xóa history)
+  // Đổi chip hoàn cảnh: phiên mới (FR-15, QĐ 1.1)
   const toggleChip = useCallback(
     (chipId) => {
       const nextChips = chips.includes(chipId)
@@ -103,47 +105,51 @@ export function useDishSuggestions() {
 
       setIsExhausted(false)
       dispatch({ type: 'SET_SUGGEST_CHIPS', payload: nextChips })
-      // Bắt đầu phiên mới ngay
-      fetchNewDish({ customChips: nextChips })
+      fetchNewDish({ customChips: nextChips, freshSession: true })
     },
     [chips, dispatch, fetchNewDish]
   )
 
-  // Chọn vùng miền (P1: FR-20)
+  // Chọn vùng miền (P1: FR-20): phiên mới
   const selectRegion = useCallback(
     (r) => {
       setIsExhausted(false)
       dispatch({ type: 'SET_SUGGEST_REGION', payload: r })
-      fetchNewDish({ customRegion: r })
+      fetchNewDish({ customRegion: r, freshSession: true })
     },
     [dispatch, fetchNewDish]
   )
 
-  // Xóa toàn bộ chip
+  // Xóa toàn bộ chip: phiên mới
   const clearChips = useCallback(() => {
     setIsExhausted(false)
     dispatch({ type: 'SET_SUGGEST_CHIPS', payload: [] })
     dispatch({ type: 'SET_SUGGEST_REGION', payload: null })
-    fetchNewDish({ customChips: [], customRegion: null })
+    fetchNewDish({ customChips: [], customRegion: null, freshSession: true })
   }, [dispatch, fetchNewDish])
 
-  // "Hôm nay ăn gì?" - Chọn ngẫu nhiên (FR-16)
+  // "Hôm nay ăn gì?": chọn ngẫu nhiên, vẫn giữ exclude của phiên hiện tại (FR-16)
   const randomDish = useCallback(() => {
     if (loading) return
     fetchNewDish({ random: true })
   }, [loading, fetchNewDish])
 
-  // Thử lại khi có lỗi
+  // Thử lại khi có lỗi: giữ nguyên trạng thái phiên
   const retry = useCallback(() => {
     fetchNewDish()
   }, [fetchNewDish])
 
-  // Bắt đầu lại (xóa lịch sử phiên)
+  // Bắt đầu lại: xóa lịch sử và lấy món đầu tiên của phiên mới
   const restart = useCallback(() => {
     setIsExhausted(false)
     dispatch({ type: 'RESET_SUGGEST_HISTORY' })
-    fetchNewDish()
+    fetchNewDish({ freshSession: true })
   }, [dispatch, fetchNewDish])
+
+  // "Xem lại các món trước" khi đã hết món: hiện lại thẻ đang xem, không gọi API
+  const reviewHistory = useCallback(() => {
+    setIsExhausted(false)
+  }, [])
 
   const currentDish = index >= 0 && index < history.length ? history[index] : null
   const isCurrentSkipped = currentDish ? skippedIds.includes(currentDish.id) : false
@@ -166,5 +172,6 @@ export function useDishSuggestions() {
     randomDish,
     retry,
     restart,
+    reviewHistory,
   }
 }

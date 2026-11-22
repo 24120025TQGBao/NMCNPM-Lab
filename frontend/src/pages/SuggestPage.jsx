@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef , useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Sparkles, UtensilsCrossed } from 'lucide-react'
 import SuggestTab from '../features/suggest/components/SuggestTab'
@@ -8,6 +8,12 @@ export default function SuggestPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const activeTab = searchParams.get('tab') === 'nguyen-lieu' ? 'nguyen-lieu' : 'goi-y'
   const tabListRef = useRef(null)
+
+  // Chỉ mount tab đã từng được mở, tránh gọi API ở tab chưa xem
+  const [visited, setVisited] = useState(() => new Set([activeTab]))
+  if (!visited.has(activeTab)) {
+    setVisited(new Set(visited).add(activeTab))
+  }
 
   const handleSelectTab = (tab) => {
     // replace=true để đổi query string không tạo history push liên tục
@@ -29,7 +35,7 @@ export default function SuggestPage() {
         <div
           ref={tabListRef}
           role="tablist"
-          aria-label="Phương thức gợi ý"
+          aria-label="Chọn cách gợi ý món"
           onKeyDown={handleKeyDown}
           className="flex gap-2 sm:gap-6"
         >
@@ -48,8 +54,7 @@ export default function SuggestPage() {
             }`}
           >
             <Sparkles className="h-5 w-5 text-lemon-gold" aria-hidden="true" />
-            <span>Gợi ý món</span>
-          </button>
+            <span>Khám phá</span>          </button>
 
           <button
             type="button"
@@ -66,7 +71,7 @@ export default function SuggestPage() {
             }`}
           >
             <UtensilsCrossed className="h-5 w-5 text-jungle-green" aria-hidden="true" />
-            <span>Theo nguyên liệu</span>
+            <span>Nguyên liệu</span>
           </button>
         </div>
       </div>
@@ -80,7 +85,7 @@ export default function SuggestPage() {
         hidden={activeTab !== 'goi-y'}
         className={activeTab === 'goi-y' ? 'block' : 'hidden'}
       >
-        <SuggestTab />
+        {visited.has('goi-y') && <SuggestTab />}
       </div>
 
       <div
@@ -90,7 +95,7 @@ export default function SuggestPage() {
         hidden={activeTab !== 'nguyen-lieu'}
         className={activeTab === 'nguyen-lieu' ? 'block' : 'hidden'}
       >
-        <IngredientMatchTab />
+        {visited.has('nguyen-lieu') && <IngredientMatchTab />}
       </div>
     </div>
   )

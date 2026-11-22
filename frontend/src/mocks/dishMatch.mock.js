@@ -111,7 +111,29 @@ export const MOCK_MATCH_DISHES = [
   },
 ]
 
-export async function fetchMockDishMatch({ ingredients = '', _pantry = true } = {}) {
+// Mô phỏng backend khi tắt "tủ bếp cơ bản": muối bị coi là thiếu thêm một thứ.
+const SALT = { id: 8, ten: 'Muối', role: 'SECONDARY' }
+
+function withoutPantry(dishes) {
+  return dishes
+    .map((d) => {
+      if (!d.so_tong || d.so_co === 0 || d.nguyen_lieu_thieu.some((m) => m.id === SALT.id)) {
+        return d
+      }
+      const soCo = d.so_co - 1
+      const missing = [...d.nguyen_lieu_thieu, SALT]
+      return {
+        ...d,
+        so_co: soCo,
+        ty_le_khop: Number((soCo / d.so_tong).toFixed(2)),
+        nguyen_lieu_thieu: missing,
+        muc_san_sang: missing.length <= 2 ? 'THIEU_1_2' : 'CAN_DI_CHO',
+      }
+    })
+    .sort((a, b) => b.ty_le_khop - a.ty_le_khop) // backend trả về giảm dần theo tỷ lệ khớp
+}
+
+export async function fetchMockDishMatch({ ingredients = '', pantry = true } = {}) {
   await new Promise((r) => setTimeout(r, 400))
 
   if (mockMode === 'error') {
@@ -136,5 +158,5 @@ export async function fetchMockDishMatch({ ingredients = '', _pantry = true } = 
   }
 
   // Giả lập kết quả trả về theo contract đã xếp ty_le_khop giảm dần
-  return { data: structuredClone(MOCK_MATCH_DISHES) }
-}
+  const data = structuredClone(MOCK_MATCH_DISHES)
+  return { data: pantry ? data : withoutPantry(data) }}

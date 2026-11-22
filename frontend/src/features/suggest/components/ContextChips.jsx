@@ -1,4 +1,5 @@
 import { CONTEXT_CHIPS, REGIONS } from '../constants'
+import { Check } from 'lucide-react'
 
 export default function ContextChips({
   selectedChips,
@@ -13,9 +14,9 @@ export default function ContextChips({
   return (
     <div className="mb-6 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <label className="text-sm font-medium text-foreground">
+        <span className="text-sm font-medium text-foreground">
           Chọn hoàn cảnh (có thể chọn nhiều):
-        </label>
+        </span>
         {hasFilter && (
           <button
             type="button"
@@ -28,7 +29,7 @@ export default function ContextChips({
         )}
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div role="group" aria-labelledby="context-chips-label" className="flex flex-wrap gap-2">
         {CONTEXT_CHIPS.map((chip) => {
           const isSelected = selectedChips.includes(chip.id)
           return (
@@ -36,6 +37,7 @@ export default function ContextChips({
               key={chip.id}
               type="button"
               disabled={disabled}
+              aria-pressed={isSelected}
               onClick={() => onToggleChip(chip.id)}
               className={`inline-flex items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
                 isSelected
@@ -43,6 +45,7 @@ export default function ContextChips({
                   : 'bg-paper text-muted hover:bg-border/60 hover:text-foreground'
               } disabled:cursor-not-allowed disabled:opacity-50`}
             >
+              {isSelected && <Check className="mr-1 h-3.5 w-3.5" aria-hidden="true" />}
               {chip.label}
             </button>
           )
@@ -50,8 +53,8 @@ export default function ContextChips({
       </div>
 
       {/* P1: Vùng miền (Chọn một) */}
-      <div className="flex flex-wrap items-center gap-2 pt-1">
-        <span className="text-xs text-muted">Vùng miền:</span>
+      <div role="group" aria-labelledby="region-chips-label" className="flex flex-wrap items-center gap-2 pt-1">
+        <span id="region-chips-label" className="text-xs text-muted">Vùng miền:</span>
         {REGIONS.map((r) => {
           const isSelected = selectedRegion === r.id
           return (
