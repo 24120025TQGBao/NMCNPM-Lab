@@ -74,8 +74,8 @@ Người dùng nhập nguyên liệu đang có và xem món nấu được, kèm
 | S2-02.6 | Người dùng gõ một chữ không chọn gợi ý nào | Bấm Enter | **Không thêm gì** (không tạo chip, không gửi tìm kiếm), vì chỉ nguyên liệu hợp lệ mới được tính (QĐ 4.1) |
 | S2-02.7 | Công tắc **Tủ bếp cơ bản** (muối, đường, dầu ăn, nước mắm, tiêu) | Mở tab lần đầu | Công tắc **bật mặc định**: các nguyên liệu cơ bản được tính là đã có khi đối sánh |
 | S2-02.8 | Như trên | Tắt công tắc | Các nguyên liệu cơ bản được tính như mọi nguyên liệu khác: thiếu thì ghi vào danh sách thiếu |
-| S2-02.9 | Đã có ít nhất 1 nguyên liệu | Tìm món | Kết quả chia thành **4 nhóm** theo thứ tự: **Nấu ngay / Thiếu 1–2 thứ / Cần đi chợ / Chưa đầy đủ dữ liệu** (QĐ 4.4). API trả `readiness` 3 giá trị (`READY`, `MISSING_1_2`, `NEED_SHOPPING`) cùng cờ `is_incomplete`; nhóm thứ tư do giao diện suy ra từ cờ này. Quy tắc xếp nhóm (món không `is_incomplete`): không thiếu gì → Nấu ngay; tổng thiếu 1 hoặc 2 → Thiếu 1–2 thứ; còn lại → Cần đi chợ. Ngưỡng này **`[tạm thời]`, chốt theo RPC DB12** |
-| S2-02.10 | Một món có `is_incomplete = true` | Xem kết quả | Món vào nhóm **Chưa đầy đủ dữ liệu** bất kể `readiness`, và không được trình bày như đã đủ nguyên liệu (QĐ 4.4). Nhóm không có món nào thì không hiển thị |
+| S2-02.9 | Đã có ít nhất 1 nguyên liệu | Tìm món | Kết quả chia thành **4 nhóm** theo thứ tự: **Nấu ngay / Thiếu 1–2 thứ / Cần đi chợ / Chưa đủ dữ liệu để kết luận** (QĐ 4.4). API trả `readiness` 3 giá trị (`READY`, `MISSING_1_2`, `NEED_SHOPPING`) cùng cờ `is_incomplete`; nhóm thứ tư do giao diện suy ra từ cờ này. Quy tắc xếp nhóm (món không `is_incomplete`): không thiếu gì → Nấu ngay; tổng thiếu 1 hoặc 2 → Thiếu 1–2 thứ; còn lại → Cần đi chợ. Ngưỡng này **`[tạm thời]`, chốt theo RPC DB12** |
+| S2-02.10 | Một món có `is_incomplete = true` | Xem kết quả | Món vào nhóm **Chưa đủ dữ liệu để kết luận** bất kể `readiness`, và không được trình bày như đã đủ nguyên liệu (QĐ 4.4). Nhóm không có món nào thì không hiển thị |
 | S2-02.11 | Có kết quả | Duyệt từng nhóm | Thứ tự món trong mỗi nhóm đúng như API trả về (API xếp theo % khớp giảm dần); frontend không sắp xếp lại và không tính lại % |
 | S2-02.12 | Có kết quả | Xem một món | Hiện thanh tiến độ và **"X% khớp"** lấy từ `match_ratio` (có trọng số theo vai trò chính/phụ, QĐ 4.2). Cạnh đó hiện dòng **"Có a/b nguyên liệu"** là số đếm, cùng chip nguyên liệu thiếu, ví dụ "Có 5/7 nguyên liệu, thiếu: hành lá, nước mắm". Hai con số có thể không tương ứng nhau (ví dụ 5/7 nhưng không phải 71%); đó là thiết kế |
 | S2-02.13 | Không món nào phù hợp | Tìm món | API trả 200 + `[]`; giao diện hiện thông báo rỗng, không phải lỗi |
@@ -157,12 +157,12 @@ Mỗi task Jira gắn với một PR riêng vào `main`. Không có `.env` hay s
 6. Tủ bếp cơ bản mặc định bật (S2-02.7).
 7. Món một công thức vẫn qua danh sách công thức (S2-04.3).
 8. Nội dung các QĐ đã đối chiếu `report.md` (mục 2).
+9. Tên nhóm thứ tư là "Chưa đủ dữ liệu để kết luận", theo `groupMatchResults.js` của Hương.
 
 **Còn mở:**
 
 - **Ngưỡng nhóm mức khớp** `[tạm thời]`: chốt theo RPC DB12 của TV3 (S2-02.9). Nếu RPC khác quy tắc trên thì sửa AC và contract theo RPC.
 - **Hạn Sprint 2:** chưa có ngày.
-- **Tên hiển thị nhóm thứ tư:** AC dùng "Chưa đầy đủ dữ liệu"; `groupMatchResults.js` trên nhánh của Hương đang dùng "Chưa đủ dữ liệu để kết luận". Cần thống nhất một tên.
 - **Dataset ≥30 món** (DoD e) phụ thuộc DB14 và DA04; chưa có bằng chứng đã nạp.
 
 ---
