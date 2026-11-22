@@ -1,6 +1,6 @@
 # Snapshot schema Supabase — 22/11/2026
 
-> **Đây là snapshot đọc trực tiếp từ Supabase, không phải migration.** Không dùng file này để tạo hay chạy lại schema. Nguồn sự thật để tạo schema vẫn là SQL của TV3 trong `supabase/` (hiện chưa có SQL của DB10–DB12).
+> **Đây là snapshot đọc trực tiếp từ Supabase, không phải migration. Migration DB10–DB12 của TV3 trên nhánh `origin/db` (commit `23b78ef`) là nguồn chính thức và được ưu tiên hơn file này; mục 6 đối chiếu hai bên.** Không dùng file này để tạo hay chạy lại schema. Nguồn sự thật để tạo schema vẫn là SQL của TV3 trong `supabase/` (hiện chưa có SQL của DB10–DB12).
 > **Mục đích:** có căn cứ để điền ánh xạ DB ở mục 7.9 của `docs/api.md` (BE07, Sprint 2).
 
 ## 1. Cách lấy và giới hạn
@@ -173,3 +173,32 @@ Chỉ dùng `GET` và gọi RPC đọc; không ghi gì vào Supabase. Đây là 
 - **Không có** `hinh_anh` (ảnh món), `have_count`, `total_count`.
 - Trong dòng mẫu thứ hai, `Dầu ăn` (`ma_nl` 5) và `Nước mắm` (`ma_nl` 13) vẫn nằm trong `missing_ingredients` dù `p_include_pantry = true`. Nguyên nhân tại `Dầu ăn`: `nguyen_lieu.la_gia_vi_co_ban = false` (xem 5.1). `Nước mắm` chưa kiểm tra.
 - Công thức trọng số cụ thể (giá trị trọng số từng vai trò) và ngưỡng `readiness` **không suy ra được** từ ba dòng mẫu; giữ nguyên là chưa biết.
+
+## 6. Đối chiếu với migration trên `origin/db` (commit `23b78ef`)
+
+Migration đã đọc: `202611210001_discovery_metadata.sql` (DB10), `202611210002_ingredient_dictionary.sql` (DB11), `202611220001_dish_matching.sql` (DB12), cùng `202611110001`–`004` (nền). Phần dưới là những điểm migration cho biết thêm hoặc **khác** với snapshot và các giả định trước đó.
+
+### 6.1. Khác biệt cần sửa
+
+| Nội dung | Snapshot / giả định trước | Migration |
+|---|---|---|
+| `tag.slug` | Giả định là mã chip viết hoa (`TROI_MUA`) | `CHECK slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'` và `UNIQUE`: **chữ thường, kebab-case** (`troi-mua`). Mã API phải ánh xạ sang slug |
+| `readiness` của RPC | Chỉ quan sát `NEED_SHOPPING` | Bốn giá trị: `INCOMPLETE`, `COOK_NOW`, `MISSING_1_2`, `NEED_SHOPPING` (không có `READY`) |
+| `is_incomplete` | Giả định bằng `trang_thai_thanh_phan = 'INCOMPLETE'` | Rộng hơn: món không có công thức `ACTIVE`; công thức khác `COMPLETE`; không có nguyên liệu; thiếu `thoi_gian_phut`; không có bước; hoặc có nguyên liệu thiếu (định lượng + đơn vị) mà cũng không có ghi chú |
+| `p_include_pantry` | Không rõ mặc định | `DEFAULT false` (contract mặc định `true`, nên backend luôn phải truyền) |
+| `p_limit` | Không rõ | Mặc định 100, hợp lệ 1–500; `p_offset` ≥ 0 |
+| ID nguyên liệu sai | Giả định chỉ lỗi khi mọi ID sai | RPC từ chối **mọi** ID null hoặc không tồn tại, và quá 1000 ID, bằng `ERRCODE 22023` |
+| Kết quả `match_dishes` | Không rõ có lọc | Trả **mọi** món `ACTIVE`, kể cả khớp 0% và món chưa có công thức `ACTIVE` (khi đó `ma_ct`, `ten_ct` rỗng và `match_percent` là `null`). Thứ tự: đủ dữ liệu trước, rồi `match_percent` giảm dần, rồi ít thiếu hơn, rồi `ma_mon` |
+| `search_ingredients` | Thứ tự "theo tên" | So khớp **tiền tố** trên tên chuẩn hóa của tên chuẩn và đồng nghĩa. Thứ tự: khớp chính xác trước, rồi `ten_nl`, rồi `ma_nl`. `p_limit` bị kẹp trong 1–100 (rỗng thì 20); `p_search` rỗng khớp mọi nguyên liệu |
+| Chuẩn hóa không dấu | Nghi là `unaccent` | Hàm `normalize_ingredient_name` dùng bảng thay chữ cố định; `nguyen_lieu.ten_khong_dau` là cột sinh (`GENERATED ALWAYS ... STORED`) |
+| `cong_thuc.trang_thai` | Tập giá trị không biết | `CHECK IN ('ACTIVE','HIDDEN','DELETED')`; RLS cho đọc `ACTIVE` (hoặc chủ công thức, quản trị viên); **không** kiểm tra trạng thái bài đăng |
+| Quyền `service_role` | `tag`, `mon_an_tag`, `nguyen_lieu_dong_nghia` đọc được | Khớp: migration cấp `ALL` cho `tag`, `mon_an_tag` và `SELECT` cho `nguyen_lieu_dong_nghia`. **Không** có `GRANT SELECT` cho `service_role` trên `han_che_nguyen_lieu`, `thuoc_tinh_mon` và view `thong_tin_cong_thuc` |
+
+### 6.2. Điều migration cho biết thêm
+
+- **`search_dishes`** (migration `202611110004`) đã định nghĩa món "đủ điều kiện gợi ý": `ACTIVE`, có `hinh_anh` và `mo_ta_ngan` không rỗng. `max_minutes` nghĩa là có ít nhất một công thức `ACTIVE` với `thoi_gian_phut` ≤ giá trị đó. RPC này không lọc theo tag hay vùng miền, và tìm tên bằng `position(lower(...))` (không bỏ dấu).
+- **View `thong_tin_cong_thuc`** có cột `du_thong_tin_huong_dan` = công thức `COMPLETE` **và** có `thoi_gian_phut` **và** có ít nhất một bước.
+- **Trọng số 2:1** và các ngưỡng `readiness` (thiếu 0 → `COOK_NOW`, ≤ 2 → `MISSING_1_2`, còn lại → `NEED_SHOPPING`) xác nhận bằng SQL.
+- **RPC cho `suggest-next`:** không có trong migration nào.
+- **Nguồn `flavor`:** vẫn chưa có. `thuoc_tinh_mon` (`nhom_tt`, `gia_tri`) là ứng viên; fixture test của TV3 dùng nhóm `TASTE` và `TYPE` với giá trị thử, không phải dữ liệu thật.
+- `match_recipes` (migration `004`) là RPC cũ với cột trả về khác (`match_score`, ...), không dùng cho Sprint 2.

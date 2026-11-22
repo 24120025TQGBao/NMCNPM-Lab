@@ -254,6 +254,7 @@ Lỗi:
 | 11/11/2026 | 1.0 | TV1 | Chốt bản Sprint 1 theo schema Supabase thực tế (ID bigint, bảng `bai_dang`/`cong_thuc`, thêm `content`, `role`, tham số `ingredients`). |
 | 22/11/2026 | 2.0 | TV1 | Thêm endpoint Sprint 2 (mục 7). Bản nháp, chờ TV2/TV3/TV4 xác nhận. Mục 1–2 giữ nguyên. |
 | 22/11/2026 | 2.0 (nháp) | TV1 | PO chốt: `servings` nullable và hiện luôn `null`; quy tắc `cook_time_minutes` của món; công thức công khai (đề xuất, chờ TV3); BE12 `suggest-next` và FE11 dời Sprint 3. Bổ sung cột trả về của `search_ingredients`, `match_dishes` quan sát từ Supabase. |
+| 22/11/2026 | 2.0 (nháp) | TV1 | Đối chiếu với migration DB10–DB12 trên nhánh `origin/db` (`23b78ef`): chốt trọng số 2:1 và ngưỡng `readiness`; quy tắc BE10 ánh xạ `COOK_NOW`/`INCOMPLETE`, luôn truyền `p_include_pantry`, lỗi `22023` → 400; BE12 trở lại P1 (làm từ `match_dishes`); mã tag API ↔ `tag.slug` kebab-case. |
 
 ---
 
@@ -284,9 +285,9 @@ Không trả email, số điện thoại hoặc dữ liệu nhạy cảm của n
 ## 7. Sprint 2 — Gợi ý, đối sánh nguyên liệu, tìm món, công thức (v2.0, bản nháp)
 
 > Mục 7 được thêm sau mục 1–6 để không đổi số mục của bản v1.0 (các tài liệu khác đang tham chiếu "mục 5"). Mục 1–2 không đổi và vẫn áp dụng.
-> **Nguồn schema:** `docs/schema-notes.md` (11/11/2026), SQL trong `supabase/`, và [snapshot đọc từ Supabase ngày 22/11/2026](schema-snapshot-2026-11-22.md) (đọc từ OpenAPI của Supabase, không phải migration). Snapshot cho biết tên bảng, cột, tham số RPC nhưng **không** cho biết cột trả về của RPC, công thức, ràng buộc hay dữ liệu.
-> Chỗ ghi `TODO(DB10)`, `TODO(DB11)`, `TODO(DB12)` là phần các nguồn trên chưa trả lời được; không suy đoán tên bảng, cột, RPC.
-> Quy tắc xếp mức sẵn sàng nếu khác RPC DB12 thì **RPC thắng**, mục này sẽ sửa theo RPC.
+> **Nguồn schema (ưu tiên từ trên xuống):** migration DB10–DB12 trong `supabase/migrations/` trên nhánh `origin/db` (commit `23b78ef`, TV3), rồi `docs/schema-notes.md` và SQL khác trong `supabase/`, rồi [snapshot đọc từ Supabase ngày 22/11/2026](schema-snapshot-2026-11-22.md) (không phải migration; đối chiếu với migration ở mục 6 của snapshot).
+> Chỗ ghi `TODO` là phần các nguồn trên chưa trả lời được; không suy đoán tên bảng, cột, RPC.
+> Quy tắc xếp mức sẵn sàng đã đối chiếu với SQL của RPC `match_dishes` và khớp (mục 7.3). Nếu migration đổi thì mục này sửa theo migration.
 
 ### 7.0. Quy ước chung Sprint 2
 
@@ -296,8 +297,8 @@ Không trả email, số điện thoại hoặc dữ liệu nhạy cảm của n
 - **Tham số dạng CSV** (`exclude`, `the`, `ingredients`): các phần tử cách nhau bằng dấu phẩy, không có khoảng trắng. Chuỗi rỗng (`exclude=`) coi như không gửi, **không** trả 400. Phần tử rỗng ở giữa (`1,,2`) trả 400.
 - **Danh sách ID** trong CSV: số nguyên dương, loại trùng trước khi xử lý.
 - **Mã (code):** chữ in hoa, số và `_` (ví dụ `TROI_MUA`, `MAN`, `BAC`). Mã không nằm trong tập cho phép trả 400.
-- **Mã tag hoàn cảnh** (chip tab Gợi ý, theo tag DB10): `TROI_MUA`, `LUOI_NAU`, `CUOI_THANG`, `NAU_CHO_4`, `AN_NHE`. Đây là giá trị cột `tag.slug` (snapshot 22/11/2026); tập `slug` thực tế trong bảng chưa đọc được `TODO(DB10)`.
-- **Mã khẩu vị:** `MAN`, `CAY`, `NGOT`, `CHUA`, `THANH` (theo frontend). `TODO(DB10)`: snapshot không có cột khẩu vị ở `mon_an`, chưa biết lưu ở đâu (xem 7.9).
+- **Mã tag hoàn cảnh** (chip tab Gợi ý): `TROI_MUA`, `LUOI_NAU`, `CUOI_THANG`, `NAU_CHO_4`, `AN_NHE`. Trong DB, `tag.slug` bắt buộc dạng chữ thường kebab-case (`CHECK slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`), nên mã API **không** phải slug. **Quy tắc ánh xạ (đề xuất, chờ TV3/DA04 xác nhận, Q15):** mã API = slug in hoa, `-` thành `_` (`troi-mua` ↔ `TROI_MUA`, `nau-cho-4` ↔ `NAU_CHO_4`); backend đổi hai chiều, cả `the` (vào) lẫn `tags[]` (ra). Slug thực tế trong bảng `tag` chưa có (bảng đang rỗng).
+- **Mã khẩu vị:** `MAN`, `CAY`, `NGOT`, `CHUA`, `THANH` (theo frontend). `mon_an` không có cột khẩu vị, chưa biết lưu ở đâu nên `flavor` hiện luôn `null` (xem 7.9).
 - **Mã vùng miền:** DB (`mon_an.vung_mien`) lưu `BAC`, `TRUNG`, `NAM`, `KHAC`; `NULL` nghĩa là chưa phân loại. Bộ lọc `vung_mien` nhận cả bốn mã; frontend hiện chỉ có chip `BAC`/`TRUNG`/`NAM`.
 - Endpoint trả danh sách **không phân trang** (`suggestions`, `ingredients`, `dishes/match`) dùng envelope `{ "data": [ ] }`, không có `meta`. `GET /api/dishes` và `GET /api/dishes/:id/recipes` giữ phân trang mục 1.3.
 - **Thứ tự đăng ký route (backend):** `GET /api/dishes/match` phải đăng ký trước các route có `:id` cùng tiền tố, nếu không `match` bị hiểu là ID và trả 400.
@@ -308,7 +309,7 @@ Không trả email, số điện thoại hoặc dữ liệu nhạy cảm của n
 - `cook_time_minutes` của món = `thoi_gian_phut` của **công thức đại diện**: công thức `ACTIVE` mà `match_dishes` chọn; nếu không có thì `MIN(thoi_gian_phut)` của các công thức `ACTIVE`; món không có công thức (hoặc không công thức nào có thời gian) thì `null`. Với các endpoint không có đầu vào nguyên liệu (`suggestions`, `dishes`, `dishes/:id`) dùng quy tắc `MIN`.
 - `flavor`: **hiện luôn `null`** cho đến khi chốt nguồn dữ liệu (xem 7.9). Bộ lọc `flavor` ở 7.4 chưa hoạt động cho đến lúc đó.
 - Công thức công khai (**đề xuất, chờ TV3 xác nhận ở buổi họp**, Q3): `cong_thuc.trang_thai = 'ACTIVE'` và, nếu có bài đăng gắn với công thức (`bai_dang.ma_ct`), bài đó phải có `trang_thai = 'PUBLIC'`.
-- BE12 `GET /api/ingredients/suggest-next` và FE11 **dời Sprint 3** (chưa có RPC).
+- BE12 `GET /api/ingredients/suggest-next`: **không dời Sprint 3 nữa, vẫn P1**; làm từ một lần gọi `match_dishes` (7.8). FE11 vẫn P1, tùy TV5.
 
 Bảng endpoint:
 
@@ -321,7 +322,7 @@ Bảng endpoint:
 | `GET /api/dishes/:id` (7.5) | P0 | BE09 |
 | `GET /api/dishes/:id/recipes` (7.6) | P0 | BE09 |
 | `GET /api/recipes/:id` (7.7) | P0 | BE09 |
-| `GET /api/ingredients/suggest-next` (7.8) | **Dời Sprint 3** (chưa có RPC) | BE12 |
+| `GET /api/ingredients/suggest-next` (7.8) | P1 | BE12 |
 
 ---
 
@@ -330,6 +331,7 @@ Bảng endpoint:
 - Không bắt buộc nhập nguyên liệu hay sở thích.
 - Chỉ lấy món `ACTIVE`. Lọc theo **tất cả** mã trong `the` (điều kiện AND). **Không bao giờ tự bỏ hay nới điều kiện** khi hết món (QĐ 1.2).
 - Loại các món có ID trong `exclude` (QĐ 1.1).
+- Chỉ gợi ý món có **ảnh và mô tả không rỗng**, theo tiêu chí "đủ điều kiện gợi ý" của DB (`search_dishes`, `audit.sql`); xin xác nhận ở Q16.
 - `random=true`: chọn ngẫu nhiên trong tập món thỏa điều kiện (vẫn áp dụng `the`, `vung_mien`, `exclude`). Ngược lại sắp xếp ổn định theo `id` tăng dần.
 - Mỗi lần gọi trả tối đa `limit` món khác nhau.
 
@@ -369,7 +371,7 @@ Bảng endpoint:
 | `image_url` | string \| null | |
 | `cook_time_minutes` | integer \| null | Quy tắc `MIN` thời gian các công thức `ACTIVE` của món (xem quyết định PO ở 7.0); `null` nếu không có. |
 | `flavor` | string \| null | Một mã khẩu vị. **Hiện luôn `null`** (chưa chốt nguồn, xem 7.9). |
-| `tags` | string[] | Danh sách `tag.slug` của món (qua `mon_an_tag`); mảng rỗng nếu không có. |
+| `tags` | string[] | Mã tag của món (qua `mon_an_tag`), đổi từ `tag.slug` sang mã API theo quy tắc ở 7.0 (`troi-mua` → `TROI_MUA`); mảng rỗng nếu không có. |
 | `region` | string \| null | `BAC`/`TRUNG`/`NAM`/`KHAC`; `null` = chưa phân loại. Nguồn `mon_an.vung_mien`. |
 
 Hết món thỏa điều kiện: **`200` + `"data": []`**.
@@ -380,10 +382,10 @@ Lỗi: `400` (tham số sai), `500`.
 
 ### 7.2. `GET /api/ingredients` — Tìm nguyên liệu (autocomplete)
 
-- Tìm **không phân biệt hoa thường, không phân biệt dấu** (`ca chua` → `Cà chua`) và **qua từ đồng nghĩa** (`hành xanh` → `Hành lá`). Dùng RPC `search_ingredients(p_search, p_limit)` của DB11 (cùng cột `ten_khong_dau` và bảng `nguyen_lieu_dong_nghia`), không tự bỏ dấu trong Node. RPC chỉ trả `ma_nl` và `ten_nl` (quan sát 22/11/2026), **không** có cờ gia vị: backend lấy `is_basic_pantry` bằng truy vấn thứ hai `nguyen_lieu.la_gia_vi_co_ban` theo các `ma_nl` trả về. RPC không từ chối chuỗi rỗng (trả nguyên liệu bất kỳ), nên backend tự kiểm tra `search` không rỗng trước khi gọi.
+- Tìm **không phân biệt hoa thường, không phân biệt dấu** (`ca chua` → `Cà chua`) và **qua từ đồng nghĩa** (`hành xanh` → `Hành lá`). Dùng RPC `search_ingredients(p_search, p_limit)` của DB11 (migration `202611210002_ingredient_dictionary.sql`): so khớp **tiền tố** (prefix) trên tên đã chuẩn hóa không dấu của tên chuẩn và các từ đồng nghĩa (`nguyen_lieu_dong_nghia`), không tự bỏ dấu trong Node. Vì là tiền tố, `chua` không tìm ra `Cà chua`. RPC chỉ trả `ma_nl` và `ten_nl` (quan sát 22/11/2026), **không** có cờ gia vị: backend lấy `is_basic_pantry` bằng truy vấn thứ hai `nguyen_lieu.la_gia_vi_co_ban` theo các `ma_nl` trả về. RPC không từ chối chuỗi rỗng (trả nguyên liệu bất kỳ), nên backend tự kiểm tra `search` không rỗng trước khi gọi.
 - Kết quả trả về là nguyên liệu **chuẩn** (id và tên chuẩn), không lặp nguyên liệu khi khớp nhiều cách.
 - Chỉ trả nguyên liệu có trong từ điển hệ thống.
-- Cột trả về của RPC và thứ tự do RPC quyết định (quan sát: khớp tên theo thứ tự tên); backend giữ nguyên thứ tự.
+- Cột trả về của RPC: `ma_nl`, `ten_nl` (đã xác nhận bằng SQL); thứ tự RPC giữ nguyên.
 
 #### Query
 
@@ -407,7 +409,7 @@ Lỗi: `400` (tham số sai), `500`.
 | `name` | string | Tên chuẩn. |
 | `is_basic_pantry` | boolean | `true` nếu thuộc tủ bếp cơ bản (muối, đường, dầu ăn, nước mắm, tiêu). Nguồn: `nguyen_lieu.la_gia_vi_co_ban`. |
 
-Không thấy: **`200` + `"data": []`**. Thứ tự: nguyên liệu khớp tên đứng trước khớp từ đồng nghĩa, sau đó theo tên tăng dần `TODO(DB11)` xác nhận cách xếp.
+Không thấy: **`200` + `"data": []`**. Thứ tự do RPC quyết định: khớp chính xác tên chuẩn đứng trước, sau đó theo `ten_nl`, rồi `ma_nl`. RPC giới hạn `p_limit` trong 1–100 và nhận chuỗi rỗng như "tìm tất cả", nên backend tự chặn `search` rỗng (mục 7.2 ở trên).
 
 Lỗi: `400`, `500`.
 
@@ -416,18 +418,28 @@ Lỗi: `400`, `500`.
 ### 7.3. `GET /api/dishes/match` — Đối sánh nguyên liệu (tab Theo nguyên liệu)
 
 - Cần **ít nhất 1 nguyên liệu hợp lệ** (QĐ 4.1).
-- Gọi RPC `match_dishes(p_ingredient_ids, p_include_pantry, p_limit, p_offset)` của DB12, **không** viết logic đối sánh trong Node. Theo mô tả RPC: mỗi món `ACTIVE` lấy **một công thức `ACTIVE` tốt nhất**; trọng số `PRIMARY:SECONDARY = 2:1`; tủ bếp cơ bản chỉ tính khi bật `p_include_pantry`; công thức `INCOMPLETE` không bao giờ khẳng định sẵn sàng. Cột trả về đã quan sát (22/11/2026): `ma_mon`, `ten_mon`, `ma_ct`, `ten_ct`, `match_percent` (0–100), `matched_weight`, `total_weight`, `missing_count`, `missing_ingredients[]` (`role`, `ma_nl`, `ten_nl`, `don_vi`, `so_luong`, `ghi_chu`), `readiness`, `is_incomplete`. Giá trị trọng số từng vai trò và ngưỡng nhóm vẫn chưa biết `TODO(DB12)`.
-- **Quyền gọi:** `service_role` bị từ chối (`permission denied for table han_che_nguyen_lieu`), `anon` gọi được. Backend phải gọi RPC này bằng client dùng khóa `anon`, hoặc TV3 cấp quyền cho `service_role` (Q14).
-- **Ánh xạ cột RPC → JSON:** `ma_mon` → `id`; `ten_mon` → `name`; `match_percent / 100` → `match_ratio`; `missing_ingredients[]` (`ma_nl`, `ten_nl`, `role`) → `missing[]` (`id`, `name`, `role`); `readiness`, `is_incomplete` giữ nguyên. `image_url` lấy thêm từ `mon_an.hinh_anh` (RPC không trả ảnh). RPC **không trả** `have_count` và `total_count`: **BE10 tự tính** (PO duyệt 22/11/2026): `total_count` = số dòng `ct_nguyen_lieu` của `ma_ct`; `have_count = total_count − missing_count`. `match_ratio = match_percent / 100`.
-- Endpoint không phân trang nhưng RPC có `p_limit`/`p_offset`: backend phải truyền `p_limit` đủ lớn để lấy hết `TODO(DB12)` (giá trị mặc định và tối đa của `p_limit`).
-- Mỗi món một dòng. Sắp xếp **do API quyết định** (theo `match_ratio` giảm dần); frontend giữ nguyên thứ tự và không tính lại.
+- Gọi RPC `match_dishes(p_ingredient_ids, p_include_pantry, p_limit, p_offset)` (migration `202611220001_dish_matching.sql`), **không** viết logic đối sánh trong Node. Quy tắc của RPC (đã xác nhận bằng SQL):
+  - Mỗi món `ACTIVE` lấy **một** công thức `ACTIVE`: ưu tiên công thức đủ dữ liệu, rồi % khớp cao nhất, rồi ít thiếu nhất, rồi `ma_ct` nhỏ nhất.
+  - **Trọng số `PRIMARY:SECONDARY = 2:1`.** `match_percent = round(100 × matched_weight / total_weight, 2)`.
+  - Tủ bếp cơ bản (`nguyen_lieu.la_gia_vi_co_ban`) chỉ được tính là có khi `p_include_pantry = true`.
+  - Món có nguyên liệu nằm trong hạn chế của người dùng (`han_che_nguyen_lieu`, theo `auth.uid()`) bị loại; khách không bị loại món nào.
+  - RPC trả **mọi món `ACTIVE`**, kể cả món khớp 0% và món chưa có công thức `ACTIVE`. Thứ tự: món đủ dữ liệu trước món chưa đầy đủ, rồi `match_percent` giảm dần, rồi ít thiếu hơn, rồi `ma_mon`. Sắp xếp do API quyết định; frontend giữ nguyên thứ tự.
 - Frontend chia 4 nhóm; API chỉ trả `readiness` (3 giá trị) và `is_incomplete`. Món `is_incomplete = true` được frontend xếp vào nhóm "Chưa đủ dữ liệu để kết luận" bất kể `readiness`.
+
+#### Quy tắc cho BE10 (PO chốt 22/11/2026)
+
+1. **Luôn truyền `p_include_pantry`** (giá trị `pantry` của request, mặc định contract là `true`). RPC tự mặc định `false`, nên không được bỏ trống.
+2. **Truyền `p_limit = 500`, `p_offset = 0`** để lấy hết món (RPC mặc định 100, tối đa 500).
+3. **Ánh xạ `readiness`:** RPC trả `COOK_NOW` → contract `READY`. RPC trả `MISSING_1_2` và `NEED_SHOPPING` → giữ nguyên. RPC trả `INCOMPLETE` → tính theo `missing_count` (0 → `READY`, 1–2 → `MISSING_1_2`, còn lại → `NEED_SHOPPING`) và đặt `is_incomplete = true`.
+4. **Lỗi `22023` của RPC → `400 VALIDATION_ERROR`** (ID nguyên liệu không tồn tại hoặc null). Mã lỗi khác → `500`, không lộ chi tiết.
+5. `have_count`, `total_count`: BE10 tự tính (`total_count` = số dòng `ct_nguyen_lieu` của `ma_ct`; `have_count = total_count − missing_count`). `match_ratio = match_percent / 100`; khi `match_percent` là `null` (món không có công thức `ACTIVE` hoặc công thức không có nguyên liệu, tức `total_weight = 0`) thì `match_ratio = 0` (đề xuất).
+6. RPC gọi bằng quyền nào: xem Q14 (hiện `service_role` bị từ chối).
 
 #### Query
 
 | Tham số | Bắt buộc | Quy tắc |
 |---|---|---|
-| `ingredients` | **Có** | CSV ID nguyên liệu, 1–30 ID. Thiếu, rỗng, hoặc không có ID nào tồn tại → 400. |
+| `ingredients` | **Có** | CSV ID nguyên liệu, 1–30 ID (RPC cho tới 1000). Thiếu hoặc rỗng → 400. **ID không tồn tại (dù chỉ một) → 400** (RPC từ chối, `22023`). |
 | `pantry` | Không | `true` hoặc `false`. Mặc định `true`. Khi `true`, nguyên liệu có `is_basic_pantry` được coi là đã có. Giá trị khác → 400. |
 
 #### Response `200`
@@ -452,23 +464,27 @@ Lỗi: `400`, `500`.
 }
 ```
 
-| Trường | Kiểu | Ghi chú |
+| Trường | Kiểu | Nguồn (cột RPC) |
 |---|---|---|
-| `match_ratio` | number 0–1 | Tỷ lệ khớp **có trọng số** theo vai trò chính/phụ (QĐ 4.2). Trọng số chính:phụ = 2:1 theo mô tả RPC; công thức chia chưa biết `TODO(DB12)`. |
-| `have_count` | integer | Số nguyên liệu của công thức đã có (tính cả tủ bếp cơ bản khi `pantry=true`). |
-| `total_count` | integer | Tổng số nguyên liệu của công thức. Luôn có `have_count + missing.length = total_count`. |
-| `missing` | array | Nguyên liệu còn thiếu: `id`, `name`, `role` (`PRIMARY` \| `SECONDARY`). Mảng rỗng nếu không thiếu gì. |
-| `readiness` | string | `READY` \| `MISSING_1_2` \| `NEED_SHOPPING`. |
-| `is_incomplete` | boolean | Công thức thiếu thành phần (QĐ 4.4). Nguồn dự kiến: `cong_thuc.trang_thai_thanh_phan = 'INCOMPLETE'`; RPC có thể dùng tiêu chí khác `TODO(DB12)`. |
+| `id` | integer | `ma_mon` |
+| `name` | string | `ten_mon` |
+| `image_url` | string \| null | RPC không trả ảnh: lấy thêm từ `mon_an.hinh_anh` |
+| `match_ratio` | number 0–1 | `match_percent / 100` (trọng số 2:1, QĐ 4.2); `null` → 0 |
+| `have_count` | integer | Tính như quy tắc 5 (tính cả tủ bếp cơ bản khi `pantry=true`) |
+| `total_count` | integer | Tính như quy tắc 5 |
+| `missing` | array | `missing_ingredients[]`: `ma_nl` → `id`, `ten_nl` → `name`, `role` giữ nguyên (`PRIMARY` \| `SECONDARY`). Mảng rỗng nếu không thiếu gì |
+| `readiness` | string | `READY` \| `MISSING_1_2` \| `NEED_SHOPPING`, ánh xạ theo quy tắc 3 |
+| `is_incomplete` | boolean | `is_incomplete` của RPC |
 
-**Quy tắc `readiness`** (tạm thời, chốt theo RPC DB12):
-- Thiếu 0 nguyên liệu chính và 0 nguyên liệu phụ → `READY`.
-- Tổng số nguyên liệu thiếu (chính + phụ) là 1 hoặc 2 → `MISSING_1_2`.
-- Còn lại → `NEED_SHOPPING`.
+Luôn có `have_count + missing.length = total_count`.
+
+**Ngưỡng `readiness` của RPC** (đã chốt): số nguyên liệu còn thiếu (`missing_count`, tính theo số dòng, không phân biệt chính/phụ) bằng 0 → `COOK_NOW` (`READY`); từ 1 đến 2 → `MISSING_1_2`; còn lại → `NEED_SHOPPING`. Món chưa đầy đủ luôn là `INCOMPLETE` ở RPC (không bao giờ khẳng định sẵn sàng).
+
+**`is_incomplete = true` khi** (theo SQL): món không có công thức `ACTIVE`; `trang_thai_thanh_phan` khác `COMPLETE`; công thức không có nguyên liệu; thiếu `thoi_gian_phut`; không có bước nào; hoặc có nguyên liệu không có (định lượng dương và đơn vị) và cũng không có ghi chú khi `so_luong` rỗng.
 
 Hệ số khớp `match_ratio` và con số `have_count/total_count` có thể không tương ứng nhau (ví dụ 5/7 nhưng 0.78); đó là thiết kế.
 
-Không có món nào: **`200` + `"data": []`**.
+Không có món nào: **`200` + `"data": []`**. Lưu ý RPC trả cả món khớp 0%, nên kết quả thường không rỗng; có lọc bớt món khớp 0% hay không: Q4.
 
 Lỗi: `400`, `500`.
 
@@ -480,10 +496,10 @@ Giữ nguyên `search`, `ingredients`, `page`, `limit` và response như mục 2
 
 | Tham số | Bắt buộc | Quy tắc |
 |---|---|---|
-| `search` | Không | **Nâng cấp:** không phân biệt hoa thường **và không phân biệt dấu** (`pho bo` tìm được `Phở bò`). SQL `supabase/search_public_dishes.sql` (RPC `search_public_dishes`) đã so khớp bằng `unaccent(lower(...))`; BE09 dùng lại hoặc mở rộng RPC để thêm bộ lọc `the`/`flavor`/`max_cook_time` `TODO(DB10)`. |
-| `the` | Không | CSV mã tag, điều kiện AND. Mã lạ → 400. |
+| `search` | Không | **Nâng cấp:** không phân biệt hoa thường **và không phân biệt dấu** (`pho bo` tìm được `Phở bò`). SQL `supabase/search_public_dishes.sql` (RPC `search_public_dishes`) đã so khớp bằng `unaccent(lower(...))`; BE09 dùng lại hoặc mở rộng RPC để thêm bộ lọc `the`/`flavor`/`max_cook_time`. |
+| `the` | Không | CSV mã tag (mã API, ánh xạ sang `tag.slug` theo 7.0), điều kiện AND. Mã lạ → 400. |
 | `flavor` | Không | Một mã khẩu vị (`MAN`, `CAY`, `NGOT`, `CHUA`, `THANH`). Mã lạ → 400. |
-| `max_cook_time` | Không | Số nguyên 1–1440 (phút). Chỉ trả món có `cook_time_minutes ≤` giá trị này; món chưa có thời gian bị loại khi dùng bộ lọc này. |
+| `max_cook_time` | Không | Số nguyên 1–1440 (phút). Chỉ trả món có ít nhất một công thức `ACTIVE` với `thoi_gian_phut ≤` giá trị này (tương đương `MIN ≤` giá trị, và cùng nghĩa với `max_minutes` của RPC `search_dishes`); món chưa có thời gian bị loại khi dùng bộ lọc này. |
 
 Các bộ lọc kết hợp AND với nhau và với `search`, `ingredients`. Response mỗi phần tử như v1.0: `id`, `name`, `description`, `image_url`; `meta` có `total` đúng theo bộ lọc. Không có món: `200` + `"data": []`.
 
@@ -592,15 +608,20 @@ Lỗi: `400`, `404`, `500`.
 
 ---
 
-### 7.8. `GET /api/ingredients/suggest-next` — Nguyên liệu nên mua thêm (**dời Sprint 3**)
+### 7.8. `GET /api/ingredients/suggest-next` — Nguyên liệu nên mua thêm (P1)
 
-> **Không triển khai ở Sprint 2** (PO chốt 22/11/2026): chưa có RPC trong Supabase. Phần dưới là thiết kế dự kiến, có thể đổi khi có RPC.
+> **P1, không còn dời Sprint 3** (PO chốt 22/11/2026). Migration `origin/db` không có RPC riêng cho việc này, nên làm từ kết quả của `match_dishes`.
 
-- Trả nguyên liệu mà nếu có thêm sẽ "mở khóa" nhiều món nhất. Dùng RPC DB12 `TODO(DB12)` (tên RPC và tham số).
+**Cách làm:** gọi `match_dishes` **một lần** (cùng quy tắc gọi và xử lý lỗi như 7.3, kể cả luôn truyền `p_include_pantry`), rồi trong backend chỉ gom nhóm kết quả, không viết lại công thức đối sánh:
+1. Giữ các món có `missing_count = 1` **và** `is_incomplete = false`.
+2. Mỗi món có đúng một nguyên liệu thiếu (phần tử duy nhất trong `missing_ingredients`).
+3. Nhóm theo nguyên liệu thiếu: `unlock_count` = số món, `dish_ids` = ID các món (tăng dần).
+4. Sắp xếp theo `unlock_count` giảm dần, rồi `ingredient.id` tăng dần.
 
 | Tham số | Bắt buộc | Quy tắc |
 |---|---|---|
-| `ingredients` | **Có** | CSV ID nguyên liệu đang có, 1–30 ID. Thiếu, rỗng hoặc sai → 400. |
+| `ingredients` | **Có** | CSV ID nguyên liệu đang có, 1–30 ID. Thiếu, rỗng hoặc ID không tồn tại (`22023`) → 400. |
+| `pantry` | Không | Như 7.3, mặc định `true`, để khớp công tắc tủ bếp ở tab Theo nguyên liệu (đề xuất của TV1). |
 
 #### Response `200`
 ```json
@@ -611,7 +632,7 @@ Lỗi: `400`, `404`, `500`.
 }
 ```
 
-Sắp xếp theo `unlock_count` giảm dần. Không có gợi ý: `200` + `"data": []`. Số phần tử tối đa `TODO(DB12)`.
+Trả tối đa 10 phần tử (đề xuất của TV1). Không có gợi ý: `200` + `"data": []`.
 
 Lỗi: `400`, `500`.
 
@@ -619,38 +640,37 @@ Lỗi: `400`, `500`.
 
 ### 7.9. Ánh xạ JSON ↔ Database (Sprint 2)
 
-Nguồn: `docs/schema-notes.md`, snapshot Supabase 22/11/2026 ([schema-snapshot-2026-11-22.md](schema-snapshot-2026-11-22.md), đọc từ Supabase, không phải migration) và SQL trong `supabase/`.
+Nguồn: migration DB10–DB12 trên `origin/db` (`23b78ef`), `docs/schema-notes.md` và SQL trong `supabase/`; snapshot Supabase 22/11/2026 chỉ dùng khi migration không nói ([schema-snapshot-2026-11-22.md](schema-snapshot-2026-11-22.md)).
 
-**Đã xác nhận:**
+**Đã xác nhận bằng migration:**
 
 | JSON | Bảng.cột DB |
 |---|---|
-| `id`, `name`, `description` / `short_description`, `image_url` (món) | `mon_an.ma_mon`, `ten_mon`, `mo_ta_ngan`, `hinh_anh`; lọc bằng `mon_an.trang_thai = 'ACTIVE'` |
-| `region`, lọc `vung_mien` | `mon_an.vung_mien` (`BAC`/`TRUNG`/`NAM`/`KHAC`, `NULL` = chưa phân loại) |
-| `tags[]`, lọc `the` | `tag.slug` qua `mon_an_tag` (`ma_mon`, `ma_tag`); khách chỉ thấy tag của món `ACTIVE` |
-| `is_basic_pantry` | `nguyen_lieu.la_gia_vi_co_ban` |
-| `ingredients[].id`, `name` (tìm nguyên liệu) | `nguyen_lieu.ma_nl`, `ten_nl`; từ đồng nghĩa ở `nguyen_lieu_dong_nghia` (`ten_goi`, `ten_khong_dau`, `ma_nl`) |
+| `id`, `name`, `description` / `short_description`, `image_url` (món) | `mon_an.ma_mon`, `ten_mon`, `mo_ta_ngan`, `hinh_anh`; lọc `mon_an.trang_thai = 'ACTIVE'` |
+| `region`, lọc `vung_mien` | `mon_an.vung_mien`, `CHECK IN ('BAC','TRUNG','NAM','KHAC')`, `NULL` = chưa phân loại |
+| `tags[]`, lọc `the` | `tag.slug` (kebab-case chữ thường, `UNIQUE`) qua `mon_an_tag(ma_mon, ma_tag)`; mã API ↔ slug theo 7.0 (đề xuất). Khách chỉ thấy tag của món `ACTIVE` (RLS) |
+| `is_basic_pantry` | `nguyen_lieu.la_gia_vi_co_ban` (boolean, mặc định `false`) |
+| Tìm nguyên liệu | RPC `search_ingredients`; tên chuẩn hóa không dấu: `nguyen_lieu.ten_khong_dau` (cột sinh từ `normalize_ingredient_name`); đồng nghĩa: `nguyen_lieu_dong_nghia(ten_goi, ten_khong_dau, ma_nl)` |
 | `recipes[].id`, `dish_id`, `name` | `cong_thuc.ma_ct`, `ma_mon`, `ten_ct` |
 | `prep_time_minutes` | `cong_thuc.thoi_gian_phut` |
-| `incomplete` | `cong_thuc.trang_thai_thanh_phan = 'INCOMPLETE'` |
-| `ingredients[]` (công thức) | `ct_nguyen_lieu` (`so_luong`, `don_vi`, `vai_tro_nl`) + `nguyen_lieu` (`ma_nl`, `ten_nl`) |
+| Công thức đang hiển thị | `cong_thuc.trang_thai = 'ACTIVE'` (`CHECK IN ('ACTIVE','HIDDEN','DELETED')`); RLS cho phép đọc công thức `ACTIVE` |
+| `ingredients[]` (công thức) | `ct_nguyen_lieu` (`so_luong`, `don_vi`, `vai_tro_nl` ∈ `PRIMARY`/`SECONDARY`) + `nguyen_lieu` (`ma_nl`, `ten_nl`) |
 | `steps[]` | `buoc_cong_thuc` (`stt` → `order`, `noi_dung` → `content`) |
 | `ingredient_count` | số dòng `ct_nguyen_lieu` của công thức |
-| Trọng số đối sánh | `PRIMARY:SECONDARY = 2:1` theo mô tả RPC `match_dishes` |
+| `match_ratio`, `missing`, `readiness`, `is_incomplete` | RPC `match_dishes`, ánh xạ ở 7.3: trọng số 2:1, ngưỡng 0 / ≤2 / còn lại, `COOK_NOW` → `READY` |
+| `cook_time_minutes` (món), lọc `max_cook_time` | PO chốt: `MIN(cong_thuc.thoi_gian_phut)` của công thức `ACTIVE`, `null` nếu không có; lọc cùng nghĩa với `search_dishes(max_minutes)` |
+| `suggest-next` | Không có RPC riêng; gom nhóm từ `match_dishes` (7.8) |
 
-**Chưa trả lời được, giữ `TODO`:**
+**Chưa chốt hoặc có lệch:**
 
-| JSON / nội dung | Vì sao chưa trả lời được | Trạng thái |
-|---|---|---|
-| Tập giá trị `tag.slug` | Bảng `tag` và `mon_an_tag` đều **rỗng** (22/11/2026): lọc `the` sẽ không trả món nào cho đến khi DA04 nạp tag. Chưa biết slug thực tế có đúng 5 mã viết hoa không | `TODO(DB10)` (chờ dữ liệu DA04) |
-| `flavor`, lọc `flavor` | `mon_an` không có cột khẩu vị. `thuoc_tinh_mon` (ứng viên) **không đọc được bằng `service_role`** (`42501`), nên chưa biết `nhom_tt` có nhóm khẩu vị không. **Hiện `flavor` luôn `null`** (PO) | `TODO(DB10)` |
-| `cook_time_minutes` (món), lọc `max_cook_time` | `mon_an` không có cột thời gian. **Đã chốt (PO):** dùng `cong_thuc.thoi_gian_phut` của công thức đại diện, `MIN` các công thức `ACTIVE` khi không có đầu vào nguyên liệu, `null` nếu không có. Cách tính cho lọc `max_cook_time` trong DB (RPC `search_dishes` có `max_minutes`, chưa rõ cách tính) | `TODO(DB10)` cho cách lọc |
-| `servings` | **Đã chốt (PO):** nullable, luôn `null` ở Sprint 2; DB chưa có cột khẩu phần (kiểm tra 22/11/2026), thêm ở Sprint 3 | Không còn TODO cho Sprint 2 |
-| Công khai của công thức (`/recipes/:id`, `/dishes/:id/recipes`) | `cong_thuc.trang_thai` có giá trị `ACTIVE` ở 90/90 dòng (22/11/2026); tập giá trị đầy đủ không biết. Quy tắc công khai là **đề xuất của PO**, chờ TV3 | Đề xuất, xem Q3 |
-| Giá trị trọng số từng vai trò và ngưỡng `readiness` của `match_dishes`; có `readiness` nào ngoài `NEED_SHOPPING` hay không | Đã quan sát cột trả về (xem 7.3, snapshot mục 5.2) và `match_percent = matched_weight / total_weight × 100`; chỉ quan sát `readiness = NEED_SHOPPING`. `have_count`/`total_count`: BE10 tự tính (PO) | `TODO(DB12)` cho trọng số và ngưỡng |
-| `search_ingredients`: cột trả về, thứ tự kết quả | **Đã quan sát:** chỉ `ma_nl`, `ten_nl`; khớp có dấu/không dấu/đồng nghĩa; thứ tự theo tên. Cờ gia vị lấy bằng truy vấn riêng `nguyen_lieu.la_gia_vi_co_ban`; `service_role` có quyền `SELECT` trên `nguyen_lieu` (đã kiểm tra 22/11/2026) | Đã trả lời |
-| `GET /api/ingredients/suggest-next` | **Không có RPC nào** tương ứng trong snapshot. **Dời Sprint 3** (PO) | Ngoài Sprint 2 |
-| Gợi ý theo tag và vùng miền (`GET /api/suggestions`) | Không có RPC riêng (`search_dishes` chỉ lọc theo `attribute_ids`, không theo tag hay vùng). Backend sẽ truy vấn `mon_an`, `mon_an_tag`, `tag` trong service | Không phải TODO nếu TV3 đồng ý; xem Q5 |
+| Nội dung | Tình trạng |
+|---|---|
+| Slug thật của chip hoàn cảnh | Bảng `tag` và `mon_an_tag` **đang rỗng** (đọc 22/11/2026); fixture test của TV3 dùng `bua-sang`, `an-nhanh`. Lọc `the` không trả món nào cho đến khi DA04 nạp tag. Quy tắc mã ↔ slug ở 7.0 là đề xuất (Q15) |
+| `flavor`, lọc `flavor` | `mon_an` không có cột khẩu vị. Ứng viên chưa xác nhận: `thuoc_tinh_mon` (`nhom_tt`, `gia_tri`) qua `mon_an_thuoc_tinh` (fixture test của TV3 có nhóm `TASTE`, chỉ là dữ liệu thử). `service_role` chưa có quyền đọc `thuoc_tinh_mon`. **Hiện `flavor` luôn `null`** (PO) |
+| `servings` | Không có cột khẩu phần. PO chốt: luôn `null` ở Sprint 2, thêm cột ở Sprint 3 |
+| `incomplete` của công thức (7.5–7.7) | DB định nghĩa `du_thong_tin_huong_dan` (view `thong_tin_cong_thuc`: `COMPLETE` **và** có `thoi_gian_phut` **và** có ít nhất một bước). Đề xuất `incomplete = NOT du_thong_tin_huong_dan` (Q17). View chỉ cấp `SELECT` cho `anon`, `authenticated`, **không** cho `service_role` |
+| Công thức công khai (7.5–7.7) | DB chỉ kiểm tra `cong_thuc.trang_thai = 'ACTIVE'` (RLS). Điều kiện "bài đăng gắn kèm phải `PUBLIC`" là đề xuất của PO, backend phải tự kiểm tra (Q3) |
+| Quyền gọi `match_dishes` bằng `service_role` | Thiếu `GRANT SELECT ON public.han_che_nguyen_lieu TO service_role` (Q14, còn mở) |
 
 ---
 
@@ -658,11 +678,14 @@ Nguồn: `docs/schema-notes.md`, snapshot Supabase 22/11/2026 ([schema-snapshot-
 
 **Cho TV3 (Database):**
 - **Q1.** `servings`: **đã chốt (PO 22/11/2026)**: nullable, luôn `null` ở Sprint 2; thêm cột ở Sprint 3. Frontend hiện "chưa có thông tin".
-- **Q2.** Đã biết: cột trả về của `match_dishes` và `search_ingredients` (xem 7.3, 7.9), `match_percent = matched_weight / total_weight × 100`, trọng số chính:phụ = 2:1 theo mô tả RPC. `have_count`/`total_count`: **đã chốt (PO)**, BE10 tự tính như ở 7.3. Dầu ăn và Nước mắm vẫn nằm trong danh sách thiếu khi `p_include_pantry = true` vì `nguyen_lieu.la_gia_vi_co_ban = false` (đã đọc `Dầu ăn`, 22/11/2026); đây là vấn đề dữ liệu cần DA04/TV3 gán cờ. **Còn thiếu:** giá trị trọng số cụ thể và ngưỡng `readiness` (chỉ quan sát `NEED_SHOPPING`). Nếu khác quy tắc ở 7.3 thì sửa contract theo RPC.
-- **Q3.** Đã biết: `match_dishes` lấy một công thức `ACTIVE` tốt nhất cho mỗi món; `cong_thuc.trang_thai` hiện chỉ có giá trị `ACTIVE`. **Đề xuất của PO, chờ TV3 xác nhận ở buổi họp:** công thức công khai = `cong_thuc.trang_thai = 'ACTIVE'` và, nếu gắn bài đăng (`bai_dang.ma_ct`), bài đó phải `PUBLIC` (tránh lộ bài `HIDDEN`/`DELETED`, QĐ 3.3).
-- **Q4.** Món có `match_ratio` thấp nhất bao nhiêu thì vẫn được trả (có cần ngưỡng, tính cả nguyên liệu tủ bếp cơ bản không)? Khi `pantry=true` mà người dùng chỉ chọn một nguyên liệu, mọi món có muối đều khớp ≥ 1.
-- **Q5.** Đã biết: `region` ← `mon_an.vung_mien`; `is_basic_pantry` ← `nguyen_lieu.la_gia_vi_co_ban`; tag ← `tag.slug`; `cook_time_minutes` theo quy tắc PO. **Còn mở:** nguồn của `flavor` (`thuoc_tinh_mon` không đọc được bằng `service_role`), dữ liệu `tag`/`mon_an_tag` (đang rỗng, chờ DA04), và đồng ý để `GET /api/suggestions` truy vấn bảng `mon_an`/`mon_an_tag`/`tag` thay vì RPC.
-- **Q14.** `match_dishes` không gọi được bằng `service_role` (thiếu `SELECT` trên `han_che_nguyen_lieu`), nhưng gọi được bằng `anon`. TV3 muốn cấp quyền cho `service_role`, hay backend dùng client `anon` cho RPC này? Cần quyết định trước khi làm BE10.
+- **Q2.** **Đã chốt** bằng migration `202611220001_dish_matching.sql`: trọng số `PRIMARY:SECONDARY = 2:1`; ngưỡng `readiness` (thiếu 0 / ≤ 2 / còn lại); nguồn `is_incomplete`; cột trả về của `match_dishes` và `search_ingredients`. `have_count`/`total_count`: BE10 tự tính (PO). Hai điều còn nhắc: RPC không có tham số `limit` mặc định phù hợp (mặc định 100, BE10 truyền 500) và `match_percent` có thể `null` (xem 7.3).
+- **Q3.** Đã biết: `cong_thuc.trang_thai` ∈ `ACTIVE`/`HIDDEN`/`DELETED` và RLS chỉ kiểm tra `ACTIVE`; `match_dishes` lấy một công thức `ACTIVE` tốt nhất cho mỗi món. **Đề xuất của PO, chờ TV3 xác nhận ở buổi họp:** công thức công khai = `cong_thuc.trang_thai = 'ACTIVE'` và, nếu gắn bài đăng (`bai_dang.ma_ct`), bài đó phải `PUBLIC` (tránh lộ bài `HIDDEN`/`DELETED`, QĐ 3.3). Vì RLS không kiểm tra bài đăng nên backend phải tự kiểm tra.
+- **Q4.** `match_dishes` **không có ngưỡng**: trả mọi món `ACTIVE`, kể cả món khớp 0% (hiện 72 món). Nếu giữ nguyên, nhóm "Cần đi chợ" sẽ chứa cả những món không dùng nguyên liệu nào người dùng chọn. BE10 có nên bỏ các món `matched_weight = 0` không? (Với `pantry=true`, món chỉ khớp bằng gia vị cơ bản vẫn có `matched_weight > 0`.) Cần PO quyết định; hiện contract chưa lọc.
+- **Q5.** Đã biết: `region` ← `mon_an.vung_mien`; `is_basic_pantry` ← `nguyen_lieu.la_gia_vi_co_ban`; tag ← `tag.slug`; `cook_time_minutes` theo quy tắc PO. **Còn mở:** nguồn của `flavor`; dữ liệu `tag`/`mon_an_tag` (đang rỗng, chờ DA04); và đồng ý để `GET /api/suggestions` truy vấn bảng `mon_an`/`mon_an_tag`/`tag` thay vì RPC (RPC `search_dishes` của DB không lọc theo tag và không có vùng miền).
+- **Q14.** **Còn mở.** `match_dishes` được `GRANT EXECUTE` cho `service_role` nhưng `service_role` chưa có `SELECT` trên `han_che_nguyen_lieu` (RPC `SECURITY INVOKER` có join bảng này), nên gọi bằng `service_role` trả `42501`; gọi bằng `anon` thì chạy. Cần `GRANT SELECT ON public.han_che_nguyen_lieu TO service_role;` hoặc backend dùng client `anon` cho RPC này. Cần quyết định trước khi làm BE10.
+- **Q15.** `tag.slug` bắt buộc kebab-case chữ thường nên mã chip API (`TROI_MUA`…) không thể là slug. Xác nhận quy tắc ánh xạ ở 7.0 (`troi-mua` ↔ `TROI_MUA`) và danh sách slug mà DA04 sẽ nạp.
+- **Q16.** DB coi món "đủ điều kiện gợi ý" là món `ACTIVE` có ảnh và mô tả không rỗng (`search_dishes`, `audit.sql`). `GET /api/suggestions` có áp dụng tiêu chí này không (đề xuất: có, vì thẻ gợi ý cần ảnh và mô tả)?
+- **Q17.** `incomplete` của công thức ở 7.5–7.7: dùng `NOT du_thong_tin_huong_dan` như đề xuất ở 7.9, hay chỉ `trang_thai_thanh_phan`? (`match_dishes` đã dùng tiêu chí rộng hơn cho `is_incomplete`, xem 7.3.)
 
 **Cho TV2 (Frontend, gồm Hương cho FE07–FE09 và người làm FE10):**
 - **Q6.** Contract dùng key tiếng Anh; `adapters.js` nhận được cả hai nên không cần sửa. Xin xác nhận đồng ý chọn tiếng Anh.
@@ -674,7 +697,7 @@ Nguồn: `docs/schema-notes.md`, snapshot Supabase 22/11/2026 ([schema-snapshot-
 **Cho TV4 (BE09, BE10):**
 - **Q11.** `GET /api/dishes/match` bắt buộc đăng ký trước route `/:id` (xem 7.0).
 - **Q12.** `ingredients` ở `GET /api/dishes` (v1.0: món chứa **tất cả** ID, tối đa 20) và ở `/api/dishes/match` (đối sánh, tối đa 30) khác ngữ nghĩa và khác giới hạn; xác nhận vẫn giữ riêng.
-- **Q13.** Khi mọi ID ở `ingredients` đều không tồn tại: contract đang quy định `400` (QĐ 4.1); xin xác nhận.
+- **Q13.** **Đã chốt:** RPC từ chối **mọi** ID không tồn tại bằng `22023`, nên contract quy định `400` khi có bất kỳ ID nào không tồn tại (QĐ 4.1).
 
 ### 7.11. Đối chiếu với frontend (22/11/2026)
 
@@ -686,10 +709,10 @@ Nguồn: `docs/schema-notes.md`, snapshot Supabase 22/11/2026 ([schema-snapshot-
 
 ### 7.12. Xác nhận contract v2.0
 
-Contract chỉ chốt khi các thành viên sau xác nhận dùng được và các câu hỏi Q1–Q14 đã có câu trả lời.
+Contract chỉ chốt khi các thành viên sau xác nhận dùng được và các câu hỏi Q1–Q17 đã có câu trả lời.
 
 | Vai trò | Người | Nội dung xác nhận | Họ tên / ngày |
 |---|---|---|---|
 | TV2 (Frontend) | | Khớp adapter/mapper; Q6–Q10 | |
-| TV3 (Database) | | Khớp schema Supabase, DB10–DB12; Q1–Q5, Q14 | |
+| TV3 (Database) | | Khớp schema Supabase, DB10–DB12; Q1–Q5, Q14–Q17 | |
 | TV4 (Backend BE09, BE10) | | Dùng được cho BE09, BE10; Q11–Q13 | |

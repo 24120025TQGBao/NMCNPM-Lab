@@ -3,7 +3,7 @@
 > **Trạng thái:** Đã được PO duyệt, đã tích hợp các quyết định của nhóm (PO02 / KAN-232). Người soạn: TV1.
 > **Hạn Sprint 2:** chưa có ngày, điền khi nhóm chốt. Các hạn cũ trên Jira (15/11–21/11) chỉ dùng để biết thứ tự ưu tiên.
 > **Nguồn:** mô tả các issue Jira KAN-232…KAN-254 (trích 22/11/2026) và các quy định nghiệp vụ (QĐ) trong `report.md`.
-> **Ký hiệu:** `[P0]` bắt buộc cho Sprint Goal; `[P1]` làm nếu còn thời gian; `[tạm thời]` là giá trị sẽ chốt theo nguồn khác (xem mục 6).
+> **Ký hiệu:** `[P0]` bắt buộc cho Sprint Goal; `[P1]` làm nếu còn thời gian.
 
 ---
 
@@ -74,7 +74,7 @@ Người dùng nhập nguyên liệu đang có và xem món nấu được, kèm
 | S2-02.6 | Người dùng gõ một chữ không chọn gợi ý nào | Bấm Enter | **Không thêm gì** (không tạo chip, không gửi tìm kiếm), vì chỉ nguyên liệu hợp lệ mới được tính (QĐ 4.1) |
 | S2-02.7 | Công tắc **Tủ bếp cơ bản** (muối, đường, dầu ăn, nước mắm, tiêu) | Mở tab lần đầu | Công tắc **bật mặc định**: các nguyên liệu cơ bản được tính là đã có khi đối sánh |
 | S2-02.8 | Như trên | Tắt công tắc | Các nguyên liệu cơ bản được tính như mọi nguyên liệu khác: thiếu thì ghi vào danh sách thiếu |
-| S2-02.9 | Đã có ít nhất 1 nguyên liệu | Tìm món | Kết quả chia thành **4 nhóm** theo thứ tự: **Nấu ngay / Thiếu 1–2 thứ / Cần đi chợ / Chưa đủ dữ liệu để kết luận** (QĐ 4.4). API trả `readiness` 3 giá trị (`READY`, `MISSING_1_2`, `NEED_SHOPPING`) cùng cờ `is_incomplete`; nhóm thứ tư do giao diện suy ra từ cờ này. Quy tắc xếp nhóm (món không `is_incomplete`): không thiếu gì → Nấu ngay; tổng thiếu 1 hoặc 2 → Thiếu 1–2 thứ; còn lại → Cần đi chợ. Ngưỡng này **`[tạm thời]`, chốt theo RPC DB12** |
+| S2-02.9 | Đã có ít nhất 1 nguyên liệu | Tìm món | Kết quả chia thành **4 nhóm** theo thứ tự: **Nấu ngay / Thiếu 1–2 thứ / Cần đi chợ / Chưa đủ dữ liệu để kết luận** (QĐ 4.4). API trả `readiness` 3 giá trị (`READY`, `MISSING_1_2`, `NEED_SHOPPING`) cùng cờ `is_incomplete`; nhóm thứ tư do giao diện suy ra từ cờ này. Quy tắc xếp nhóm (món không `is_incomplete`) theo RPC `match_dishes` của DB12: số nguyên liệu thiếu bằng 0 → Nấu ngay; 1 hoặc 2 → Thiếu 1–2 thứ; còn lại → Cần đi chợ. Tỷ lệ khớp tính với trọng số nguyên liệu chính : phụ = 2 : 1 |
 | S2-02.10 | Một món có `is_incomplete = true` | Xem kết quả | Món vào nhóm **Chưa đủ dữ liệu để kết luận** bất kể `readiness`, và không được trình bày như đã đủ nguyên liệu (QĐ 4.4). Nhóm không có món nào thì không hiển thị |
 | S2-02.11 | Có kết quả | Duyệt từng nhóm | Thứ tự món trong mỗi nhóm đúng như API trả về (API xếp theo % khớp giảm dần); frontend không sắp xếp lại và không tính lại % |
 | S2-02.12 | Có kết quả | Xem một món | Hiện thanh tiến độ và **"X% khớp"** lấy từ `match_ratio` (có trọng số theo vai trò chính/phụ, QĐ 4.2). Cạnh đó hiện dòng **"Có a/b nguyên liệu"** là số đếm, cùng chip nguyên liệu thiếu, ví dụ "Có 5/7 nguyên liệu, thiếu: hành lá, nước mắm". Hai con số có thể không tương ứng nhau (ví dụ 5/7 nhưng không phải 71%); đó là thiết kế |
@@ -83,7 +83,7 @@ Người dùng nhập nguyên liệu đang có và xem món nấu được, kèm
 | S2-02.15 | Khách chưa đăng nhập | Dùng toàn bộ tab | Dùng được, không bị chặn |
 | S2-02.16 | Đang tải hoặc API lỗi | Chờ phản hồi | Có trạng thái đang tải; lỗi thì có thông báo và nút **Thử lại** |
 | S2-02.17 | Bộ 3–5 ca mẫu tính tay (dữ liệu mẫu chốt cùng TV3) | Chạy đối sánh | Nhóm, `match_ratio`, "có/tổng", danh sách thiếu và thứ tự khớp với kết quả tính tay |
-| S2-02.18 `[Sprint 3]` | Đã có nguyên liệu | Xem gợi ý "mua thêm" | Hiện nguyên liệu mở khóa nhiều món nhất kèm số món. Có thể ghim nguyên liệu và sao chép danh sách đi chợ (FE11). Không có gợi ý thì API 200 + `[]` và giao diện ẩn mục này |
+| S2-02.18 `[P1]` | Đã có nguyên liệu | Xem gợi ý "mua thêm" | Hiện nguyên liệu mở khóa nhiều món nhất kèm số món. Có thể ghim nguyên liệu và sao chép danh sách đi chợ (FE11). Không có gợi ý thì API 200 + `[]` và giao diện ẩn mục này |
 
 ### S2-03 — Tìm và lọc món `[P0]`
 
@@ -123,8 +123,7 @@ Người dùng vào `/search` để tìm món theo tên và lọc. Đây là nơ
 - Cộng đồng và quản trị (duyệt, ẩn bài, tương tác, phân quyền admin) ngoài những gì Sprint 1 đã có.
 - Cảnh báo dị ứng và kiêng kỵ (QĐ 4.3).
 - Chế độ Khám phá món ngoài sở thích (QĐ 1.3).
-- **BE12** (`GET /api/ingredients/suggest-next`) và **FE11** (mua thêm, ghim, sao chép danh sách đi chợ): dời Sprint 3 vì chưa có RPC (PO chốt 22/11/2026). Bao gồm AC S2-02.18.
-- Nếu bị cắt do thiếu thời gian: chip vùng miền (S2-01.12).
+- Các việc P1 (S2-01.12 chip vùng miền, S2-02.18 gợi ý "mua thêm" gồm BE12 và FE11) chỉ làm khi còn thời gian. Nếu bị cắt thì dời sang Sprint 3. **BE12 vẫn P1** (làm từ `match_dishes`, không cần RPC mới); **FE11 vẫn P1, tùy TV5**.
 - Chức năng "Quán ăn" (mới chỉ hiện nhãn "Sắp có").
 
 ---
@@ -134,7 +133,7 @@ Người dùng vào `/search` để tìm món theo tên và lọc. Đây là nơ
 Theo mẫu DoD Sprint 1. Sprint 2 chỉ được coi là hoàn thành khi **tất cả** các điều kiện sau đúng:
 
 - **(a) Luồng chạy trên môi trường chung:** hai luồng S2-01 (Gợi ý món) và S2-02 (Theo nguyên liệu), cùng luồng tìm món → chi tiết → công thức, chạy được trên môi trường chung (staging nếu có, không thì local) với FE nối backend thật (`VITE_USE_MOCK_API=false`). Phần nào còn mock phải ghi rõ trong `docs/sprint2-demo.md`.
-- **(b) Story đạt đủ AC:** mỗi story S2-01…S2-04 đạt mọi AC `[P0]`. AC `[P1]` chưa làm thì ghi rõ là dời Sprint 3 (S2-02.18 đã dời hẳn).
+- **(b) Story đạt đủ AC:** mỗi story S2-01…S2-04 đạt mọi AC `[P0]`. AC `[P1]` chưa làm thì ghi rõ là dời Sprint 3.
 - **(c) Review và CI:** mỗi PR có ít nhất 1 reviewer duyệt (đề xuất TV3 duyệt backend) và CI xanh. CI xanh không thay cho các điều kiện còn lại.
 - **(d) Bug:** không còn bug P0 mở.
 - **(e) Dữ liệu:** dataset **tối thiểu 30 món**, trong đó **tối thiểu 20 món đủ dữ liệu**, có tag, vùng miền và vai trò nguyên liệu (chính/phụ), đã nạp trên Supabase.
@@ -158,11 +157,11 @@ Mỗi task Jira gắn với một PR riêng vào `main`. Không có `.env` hay s
 6. Tủ bếp cơ bản mặc định bật (S2-02.7).
 7. Món một công thức vẫn qua danh sách công thức (S2-04.3).
 8. Nội dung các QĐ đã đối chiếu `report.md` (mục 2).
-9. Tên nhóm thứ tư là "Chưa đủ dữ liệu để kết luận", theo `groupMatchResults.js` của Hương.
+9. Ngưỡng nhóm mức khớp (thiếu 0 / ≤ 2 / còn lại) và trọng số 2 : 1 đã chốt theo RPC `match_dishes` (migration DB12 trên `origin/db`).
+10. Tên nhóm thứ tư là "Chưa đủ dữ liệu để kết luận", theo `groupMatchResults.js` của Hương.
 
 **Còn mở:**
 
-- **Ngưỡng nhóm mức khớp** `[tạm thời]`: chốt theo RPC DB12 của TV3 (S2-02.9). Nếu RPC khác quy tắc trên thì sửa AC và contract theo RPC.
 - **Hạn Sprint 2:** chưa có ngày.
 - **Dataset ≥30 món** (DoD e) phụ thuộc DB14 và DA04; chưa có bằng chứng đã nạp.
 
@@ -176,7 +175,7 @@ Mỗi task Jira gắn với một PR riêng vào `main`. Không có `.env` hay s
 | KAN-233 | BE07 | TV1 | API contract Sprint 2 | Chung |
 | KAN-234 | BE11 | TV1 | `GET /api/ingredients?search=` | S2-02 |
 | KAN-235 | BE08 | TV1 | `GET /api/suggestions` | S2-01 |
-| KAN-236 | BE12 (dời Sprint 3) | TV1 | `GET /api/ingredients/suggest-next` | S2-02.18 (Sprint 3) |
+| KAN-236 | BE12 (P1) | TV1 | `GET /api/ingredients/suggest-next` | S2-02.18 (P1) |
 | KAN-237 | INT02 | TV1 | Tích hợp và demo | Chung |
 | KAN-238 | FE07 | Hương | `/goi-y` hai tab, route khung | S2-01, S2-02, S2-03, S2-04 |
 | KAN-239 | FE08 | Hương | Tab Gợi ý món | S2-01 |
@@ -194,6 +193,6 @@ Mỗi task Jira gắn với một PR riêng vào `main`. Không có `.env` hay s
 | KAN-251 | DO04 (P1) | Hiền | CI + staging | Chung |
 | KAN-252 | QA05 | Hiền | Test API + UI hai tab, đối chiếu 3–5 ca | S2-01, S2-02, S2-04 |
 | KAN-253 | QA06 | Hiền | Hồi quy + report | Tất cả |
-| KAN-254 | FE11 (dời Sprint 3) | Hiền | Mua thêm, ghim, sao chép danh sách đi chợ | S2-02.18 (Sprint 3) |
+| KAN-254 | FE11 (P1) | Hiền | Mua thêm, ghim, sao chép danh sách đi chợ | S2-02.18 (P1) |
 
 Đường găng: DB12 → BE10 → FE09 → INT02.
