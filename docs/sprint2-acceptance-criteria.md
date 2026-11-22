@@ -125,6 +125,7 @@ Người dùng vào `/search` để tìm món theo tên và lọc. Đây là nơ
 - Chế độ Khám phá món ngoài sở thích (QĐ 1.3).
 - Các việc P1 (S2-01.12 chip vùng miền, S2-02.18 gợi ý "mua thêm" gồm BE12 và FE11) chỉ làm khi còn thời gian. Nếu bị cắt thì dời sang Sprint 3. **BE12 vẫn P1** (làm từ `match_dishes`, không cần RPC mới); **FE11 vẫn P1, tùy TV5**.
 - Chức năng "Quán ăn" (mới chỉ hiện nhãn "Sắp có").
+- Tìm nguyên liệu theo từ ở giữa tên (gõ `chua` ra `Cà chua`): backlog Sprint 3; Sprint 2 chỉ tìm theo tiền tố (cụm từ đầu tên chuẩn hoặc từ đồng nghĩa).
 
 ---
 
