@@ -142,6 +142,7 @@ Chỉ dùng `GET` và gọi RPC đọc; không ghi gì vào Supabase. Đây là 
 | `tag` | **0 dòng.** Chưa có tag nào, nên chưa có `slug` hoàn cảnh nào để lọc |
 | `mon_an_tag` | **0 dòng** |
 | `thuoc_tinh_mon` | **Không đọc được:** `42501 permission denied for table thuoc_tinh_mon` với `service_role` (chưa `GRANT SELECT`). Không cấp quyền vì chỉ được phép đọc. Chưa xác định được nhóm thuộc tính, nên **chưa xác định được nguồn của `flavor`** |
+| `nguyen_lieu` | **Đọc được bằng `service_role`** (`SELECT ma_nl, ten_nl, la_gia_vi_co_ban`). Mẫu đã đọc: `Dầu ăn` (`ma_nl` 5) và `Cà chua` (46) đều có `la_gia_vi_co_ban = false`, nên `Dầu ăn` chưa được coi là tủ bếp cơ bản trong dữ liệu |
 | `cong_thuc` | 90 dòng. `trang_thai`: chỉ có `ACTIVE` (90/90). `trang_thai_thanh_phan`: `COMPLETE` 75, `INCOMPLETE` 15. Tập giá trị đầy đủ của `trang_thai` (ngoài `ACTIVE`) không biết được từ dữ liệu |
 
 ### 5.2. RPC
@@ -170,5 +171,5 @@ Chỉ dùng `GET` và gọi RPC đọc; không ghi gì vào Supabase. Đây là 
 
 - Kết quả sắp xếp theo `match_percent` giảm dần (3 dòng mẫu).
 - **Không có** `hinh_anh` (ảnh món), `have_count`, `total_count`.
-- Trong dòng mẫu thứ hai, `Dầu ăn` (`ma_nl` 5) và `Nước mắm` (`ma_nl` 13) vẫn nằm trong `missing_ingredients` dù `p_include_pantry = true`. Chưa xác định nguyên nhân (có thể hai nguyên liệu này chưa được gán `la_gia_vi_co_ban`; chưa đọc `nguyen_lieu`).
+- Trong dòng mẫu thứ hai, `Dầu ăn` (`ma_nl` 5) và `Nước mắm` (`ma_nl` 13) vẫn nằm trong `missing_ingredients` dù `p_include_pantry = true`. Nguyên nhân tại `Dầu ăn`: `nguyen_lieu.la_gia_vi_co_ban = false` (xem 5.1). `Nước mắm` chưa kiểm tra.
 - Công thức trọng số cụ thể (giá trị trọng số từng vai trò) và ngưỡng `readiness` **không suy ra được** từ ba dòng mẫu; giữ nguyên là chưa biết.
