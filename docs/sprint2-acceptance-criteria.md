@@ -83,7 +83,7 @@ Người dùng nhập nguyên liệu đang có và xem món nấu được, kèm
 | S2-02.15 | Khách chưa đăng nhập | Dùng toàn bộ tab | Dùng được, không bị chặn |
 | S2-02.16 | Đang tải hoặc API lỗi | Chờ phản hồi | Có trạng thái đang tải; lỗi thì có thông báo và nút **Thử lại** |
 | S2-02.17 | Bộ 3–5 ca mẫu tính tay (dữ liệu mẫu chốt cùng TV3) | Chạy đối sánh | Nhóm, `match_ratio`, "có/tổng", danh sách thiếu và thứ tự khớp với kết quả tính tay |
-| S2-02.18 `[P1]` | Đã có nguyên liệu | Xem gợi ý "mua thêm" | Hiện nguyên liệu mở khóa nhiều món nhất kèm số món. Có thể ghim nguyên liệu và sao chép danh sách đi chợ (FE11). Không có gợi ý thì API 200 + `[]` và giao diện ẩn mục này |
+| S2-02.18 `[Sprint 3]` | Đã có nguyên liệu | Xem gợi ý "mua thêm" | Hiện nguyên liệu mở khóa nhiều món nhất kèm số món. Có thể ghim nguyên liệu và sao chép danh sách đi chợ (FE11). Không có gợi ý thì API 200 + `[]` và giao diện ẩn mục này |
 
 ### S2-03 — Tìm và lọc món `[P0]`
 
@@ -123,7 +123,8 @@ Người dùng vào `/search` để tìm món theo tên và lọc. Đây là nơ
 - Cộng đồng và quản trị (duyệt, ẩn bài, tương tác, phân quyền admin) ngoài những gì Sprint 1 đã có.
 - Cảnh báo dị ứng và kiêng kỵ (QĐ 4.3).
 - Chế độ Khám phá món ngoài sở thích (QĐ 1.3).
-- Nếu bị cắt do thiếu thời gian: BE12 (`GET /api/ingredients/suggest-next`) cùng FE11 (S2-02.18), và chip vùng miền (S2-01.12).
+- **BE12** (`GET /api/ingredients/suggest-next`) và **FE11** (mua thêm, ghim, sao chép danh sách đi chợ): dời Sprint 3 vì chưa có RPC (PO chốt 22/11/2026). Bao gồm AC S2-02.18.
+- Nếu bị cắt do thiếu thời gian: chip vùng miền (S2-01.12).
 - Chức năng "Quán ăn" (mới chỉ hiện nhãn "Sắp có").
 
 ---
@@ -133,7 +134,7 @@ Người dùng vào `/search` để tìm món theo tên và lọc. Đây là nơ
 Theo mẫu DoD Sprint 1. Sprint 2 chỉ được coi là hoàn thành khi **tất cả** các điều kiện sau đúng:
 
 - **(a) Luồng chạy trên môi trường chung:** hai luồng S2-01 (Gợi ý món) và S2-02 (Theo nguyên liệu), cùng luồng tìm món → chi tiết → công thức, chạy được trên môi trường chung (staging nếu có, không thì local) với FE nối backend thật (`VITE_USE_MOCK_API=false`). Phần nào còn mock phải ghi rõ trong `docs/sprint2-demo.md`.
-- **(b) Story đạt đủ AC:** mỗi story S2-01…S2-04 đạt mọi AC `[P0]`. AC `[P1]` chưa làm thì ghi rõ là dời Sprint 3.
+- **(b) Story đạt đủ AC:** mỗi story S2-01…S2-04 đạt mọi AC `[P0]`. AC `[P1]` chưa làm thì ghi rõ là dời Sprint 3 (S2-02.18 đã dời hẳn).
 - **(c) Review và CI:** mỗi PR có ít nhất 1 reviewer duyệt (đề xuất TV3 duyệt backend) và CI xanh. CI xanh không thay cho các điều kiện còn lại.
 - **(d) Bug:** không còn bug P0 mở.
 - **(e) Dữ liệu:** dataset **tối thiểu 30 món**, trong đó **tối thiểu 20 món đủ dữ liệu**, có tag, vùng miền và vai trò nguyên liệu (chính/phụ), đã nạp trên Supabase.
@@ -175,7 +176,7 @@ Mỗi task Jira gắn với một PR riêng vào `main`. Không có `.env` hay s
 | KAN-233 | BE07 | TV1 | API contract Sprint 2 | Chung |
 | KAN-234 | BE11 | TV1 | `GET /api/ingredients?search=` | S2-02 |
 | KAN-235 | BE08 | TV1 | `GET /api/suggestions` | S2-01 |
-| KAN-236 | BE12 (P1) | TV1 | `GET /api/ingredients/suggest-next` | S2-02 (P1) |
+| KAN-236 | BE12 (dời Sprint 3) | TV1 | `GET /api/ingredients/suggest-next` | S2-02.18 (Sprint 3) |
 | KAN-237 | INT02 | TV1 | Tích hợp và demo | Chung |
 | KAN-238 | FE07 | Hương | `/goi-y` hai tab, route khung | S2-01, S2-02, S2-03, S2-04 |
 | KAN-239 | FE08 | Hương | Tab Gợi ý món | S2-01 |
@@ -193,6 +194,6 @@ Mỗi task Jira gắn với một PR riêng vào `main`. Không có `.env` hay s
 | KAN-251 | DO04 (P1) | Hiền | CI + staging | Chung |
 | KAN-252 | QA05 | Hiền | Test API + UI hai tab, đối chiếu 3–5 ca | S2-01, S2-02, S2-04 |
 | KAN-253 | QA06 | Hiền | Hồi quy + report | Tất cả |
-| KAN-254 | FE11 (P1) | Hiền | Mua thêm, ghim, sao chép danh sách đi chợ | S2-02 (P1) |
+| KAN-254 | FE11 (dời Sprint 3) | Hiền | Mua thêm, ghim, sao chép danh sách đi chợ | S2-02.18 (Sprint 3) |
 
 Đường găng: DB12 → BE10 → FE09 → INT02.

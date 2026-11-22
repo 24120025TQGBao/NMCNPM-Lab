@@ -12,7 +12,7 @@
   - Kiểu và tên cột **trả về** của RPC (OpenAPI chỉ ghi `200 OK`).
   - Thân hàm, công thức tính, ngưỡng nhóm.
   - Ràng buộc `CHECK`/enum, khóa `UNIQUE` không phải khóa chính, chỉ mục, RLS, grant.
-  - **Dữ liệu** trong bảng (kể cả các bảng danh mục như `tag`): tập giá trị `slug`, `nhom_tt`, `gia_tri` chưa đọc, vì ngoài phạm vi yêu cầu lấy snapshot.
+  - **Dữ liệu** trong bảng: mục 1–4 chỉ từ OpenAPI. Một phần dữ liệu và kết quả gọi RPC được đọc thêm ở **mục 5** (chỉ đọc, không ghi).
 - Chỉ phản ánh các đối tượng mà vai trò dùng khi gọi nhìn thấy trong schema `public` tại thời điểm 22/11/2026.
 
 ## 2. Bảng và view liên quan Sprint 2
@@ -105,7 +105,7 @@ Không có cột khẩu phần.
 
 ## 3. RPC
 
-Tất cả RPC đều **chưa biết cột trả về** (xem mục 1).
+OpenAPI không ghi cột trả về của RPC. Cột trả về của `search_ingredients` và `match_dishes` đã quan sát bằng cách gọi thử (mục 5.2); các RPC còn lại chưa biết.
 
 ### 3.1. Dùng cho Sprint 2
 
@@ -130,3 +130,45 @@ Tất cả RPC đều **chưa biết cột trả về** (xem mục 1).
 ## 4. Khác biệt so với `docs/schema-notes.md` (11/11/2026)
 
 Có thêm: `mon_an.vung_mien`; `nguyen_lieu.la_gia_vi_co_ban`, `ten_khong_dau`; `cong_thuc.tao_luc`, `trang_thai`; các bảng `tag`, `mon_an_tag`, `nguyen_lieu_dong_nghia`, `thuoc_tinh_mon`, `mon_an_thuoc_tinh`; view `thong_tin_cong_thuc`; các RPC ở mục 3.1. Vẫn **không có** cột khẩu phần ở `cong_thuc`.
+
+## 5. Kết quả đọc thêm (22/11/2026, chỉ đọc)
+
+Chỉ dùng `GET` và gọi RPC đọc; không ghi gì vào Supabase. Đây là quan sát tại một thời điểm, không phải đặc tả.
+
+### 5.1. Dữ liệu bảng
+
+| Bảng | Kết quả |
+|---|---|
+| `tag` | **0 dòng.** Chưa có tag nào, nên chưa có `slug` hoàn cảnh nào để lọc |
+| `mon_an_tag` | **0 dòng** |
+| `thuoc_tinh_mon` | **Không đọc được:** `42501 permission denied for table thuoc_tinh_mon` với `service_role` (chưa `GRANT SELECT`). Không cấp quyền vì chỉ được phép đọc. Chưa xác định được nhóm thuộc tính, nên **chưa xác định được nguồn của `flavor`** |
+| `cong_thuc` | 90 dòng. `trang_thai`: chỉ có `ACTIVE` (90/90). `trang_thai_thanh_phan`: `COMPLETE` 75, `INCOMPLETE` 15. Tập giá trị đầy đủ của `trang_thai` (ngoài `ACTIVE`) không biết được từ dữ liệu |
+
+### 5.2. RPC
+
+**`search_ingredients(p_search, p_limit)`** gọi được bằng `service_role` và `anon`.
+- Cột trả về: `ma_nl` (số nguyên), `ten_nl` (text). **Không có `la_gia_vi_co_ban`.**
+- Quan sát: `'ca chua'` và `'CÀ CHUA'` → Cà chua (`ma_nl` 46); `'hanh xanh'` → Hành lá (28), tức là tìm được qua từ đồng nghĩa; `'hanh'` → Hành (144), Hành boa rô (72), Hành lá (28) (thứ tự theo tên); `'%'` → mảng rỗng; **chuỗi rỗng `''` → trả về các nguyên liệu bất kỳ** (không phải mảng rỗng). Kết quả là mảng JSON thuần.
+
+**`match_dishes(p_ingredient_ids, p_include_pantry, p_limit, p_offset)`**
+- **`service_role` bị từ chối:** `42501 permission denied for table han_che_nguyen_lieu`. RPC chạy được bằng `anon` (đã thử với `p_ingredient_ids = [46, 28, 1]`, `p_include_pantry = true`, `p_limit = 3`, `p_offset = 0`).
+- Cột trả về (mỗi phần tử):
+
+| Cột | Kiểu quan sát | Ghi chú |
+|---|---|---|
+| `ma_mon` | số nguyên | |
+| `ten_mon` | text | |
+| `ma_ct` | số nguyên | Công thức được chọn |
+| `ten_ct` | text | |
+| `match_percent` | số, 2 chữ số thập phân (0–100) | Cả 3 dòng mẫu: `match_percent = matched_weight / total_weight × 100` (2/8 = 25.00; 4/20 = 20.00; 2/11 = 18.18) |
+| `matched_weight` | số nguyên | |
+| `total_weight` | số nguyên | |
+| `missing_count` | số nguyên | |
+| `missing_ingredients` | mảng JSON | Mỗi phần tử: `role`, `ma_nl`, `ten_nl`, `don_vi`, `so_luong`, `ghi_chu` |
+| `readiness` | text | Chỉ quan sát giá trị `NEED_SHOPPING` (3 dòng, `missing_count` = 3, 9, 5). Các giá trị khác chưa quan sát |
+| `is_incomplete` | boolean | Quan sát `false` |
+
+- Kết quả sắp xếp theo `match_percent` giảm dần (3 dòng mẫu).
+- **Không có** `hinh_anh` (ảnh món), `have_count`, `total_count`.
+- Trong dòng mẫu thứ hai, `Dầu ăn` (`ma_nl` 5) và `Nước mắm` (`ma_nl` 13) vẫn nằm trong `missing_ingredients` dù `p_include_pantry = true`. Chưa xác định nguyên nhân (có thể hai nguyên liệu này chưa được gán `la_gia_vi_co_ban`; chưa đọc `nguyen_lieu`).
+- Công thức trọng số cụ thể (giá trị trọng số từng vai trò) và ngưỡng `readiness` **không suy ra được** từ ba dòng mẫu; giữ nguyên là chưa biết.
