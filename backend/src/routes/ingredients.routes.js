@@ -16,6 +16,7 @@ export function createIngredientsRouter(client = serviceRoleClient) {
   const controller = createIngredientsController(client);
 
   router.get('/', controller.searchIngredients);
+  router.get('/suggest-next', controller.suggestNext);
 
   return router;
 }
