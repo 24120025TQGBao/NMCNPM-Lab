@@ -1,0 +1,1093 @@
+{
+  "info": {
+    "name": "QA05 Sprint 2 ? public API contract",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Pinned BE07 5aae4f6, DB12 23b78ef; GET only. Configure controlled QA dataset variables; unset variables are errors, never pass/skip."
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "dishId",
+      "value": "SET_dishId"
+    },
+    {
+      "key": "recipeId",
+      "value": "SET_recipeId"
+    },
+    {
+      "key": "missingId",
+      "value": "SET_missingId"
+    },
+    {
+      "key": "hiddenDishId",
+      "value": "SET_hiddenDishId"
+    },
+    {
+      "key": "noRecipeDishId",
+      "value": "SET_noRecipeDishId"
+    },
+    {
+      "key": "allDishIds",
+      "value": "SET_allDishIds"
+    },
+    {
+      "key": "eggId",
+      "value": "SET_eggId"
+    },
+    {
+      "key": "tomatoId",
+      "value": "SET_tomatoId"
+    },
+    {
+      "key": "saltId",
+      "value": "SET_saltId"
+    },
+    {
+      "key": "oilId",
+      "value": "SET_oilId"
+    },
+    {
+      "key": "springOnionId",
+      "value": "SET_springOnionId"
+    },
+    {
+      "key": "phoId",
+      "value": "SET_phoId"
+    },
+    {
+      "key": "sampleDishId",
+      "value": "SET_sampleDishId"
+    }
+  ],
+  "item": [
+    {
+      "name": "S2-01 guest suggestion",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/suggestions?limit=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"At most one dish\", () => { pm.expect(body.data).to.be.an(\"array\"); pm.expect(body.data.length).to.be.at.most(1); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "S2-01 excludes viewed dish",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/suggestions?exclude={{dishId}}&limit=5"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"dishId\") || String(pm.variables.get(\"dishId\")).startsWith(\"SET_\")) throw new Error(\"Configure dishId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Excluded ID absent\", () => pm.expect(body.data.map(x => String(x.id))).not.to.include(String(pm.variables.get(\"dishId\"))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "S2-01 random respects tag",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/suggestions?random=true&the=TROI_MUA&limit=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Tag preserved\", () => body.data.forEach(x => pm.expect(x.tags).to.include(\"TROI_MUA\")));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "S2-01 all matching dishes exhausted",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/suggestions?exclude={{allDishIds}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"allDishIds\") || String(pm.variables.get(\"allDishIds\")).startsWith(\"SET_\")) throw new Error(\"Configure allDishIds from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"No relaxation\", () => pm.expect(body.data).to.eql([]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /suggestions?the=UNKNOWN",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/suggestions?the=UNKNOWN"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /suggestions?exclude=abc",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/suggestions?exclude=abc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /suggestions?limit=0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/suggestions?limit=0"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /ingredients?search=",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients?search="
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /dishes/match",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/match"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /dishes/match?ingredients=",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/match?ingredients="
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /dishes/match?ingredients=abc",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/match?ingredients=abc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /dishes/match?ingredients={{eggId}}&pantry=bad",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/match?ingredients={{eggId}}&pantry=bad"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"eggId\") || String(pm.variables.get(\"eggId\")).startsWith(\"SET_\")) throw new Error(\"Configure eggId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /dishes?page=0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes?page=0"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /dishes?limit=51",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes?limit=51"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /dishes?flavor=UNKNOWN",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes?flavor=UNKNOWN"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /dishes?max_cook_time=0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes?max_cook_time=0"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /dishes/abc",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/abc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "400 /recipes/-1",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/recipes/-1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ingredients accentless",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients?search=ca%20chua"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"tomatoId\") || String(pm.variables.get(\"tomatoId\")).startsWith(\"SET_\")) throw new Error(\"Configure tomatoId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Canonical tomato\", () => pm.expect(body.data.map(x=>String(x.id))).to.include(String(pm.variables.get(\"tomatoId\"))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ingredients synonym",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients?search=hanh%20xanh"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"springOnionId\") || String(pm.variables.get(\"springOnionId\")).startsWith(\"SET_\")) throw new Error(\"Configure springOnionId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Canonical spring onion\", () => pm.expect(body.data.map(x=>String(x.id))).to.include(String(pm.variables.get(\"springOnionId\"))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empty /ingredients?search=qa04zzznomatch20261123",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients?search=qa04zzznomatch20261123"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Empty data\", () => pm.expect(body.data).to.eql([]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empty /dishes?search=qa04zzznomatch20261123",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes?search=qa04zzznomatch20261123"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Empty data\", () => pm.expect(body.data).to.eql([]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dish search without accents",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes?search=pho%20bo"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"phoId\") || String(pm.variables.get(\"phoId\")).startsWith(\"SET_\")) throw new Error(\"Configure phoId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Expected dish\", () => pm.expect(body.data.map(x=>String(x.id))).to.include(String(pm.variables.get(\"phoId\")))); pm.test(\"Total\", () => pm.expect(body.meta.total).to.be.at.least(body.data.length));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dish detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/{{dishId}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"dishId\") || String(pm.variables.get(\"dishId\")).startsWith(\"SET_\")) throw new Error(\"Configure dishId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Detail contract\", () => { pm.expect(body.data).to.include.all.keys(\"id\",\"name\",\"recipes\",\"cook_time_minutes\"); pm.expect(body.data.recipes).to.be.an(\"array\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipe list",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/{{dishId}}/recipes"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"dishId\") || String(pm.variables.get(\"dishId\")).startsWith(\"SET_\")) throw new Error(\"Configure dishId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Recipe list\", () => pm.expect(body.data).to.be.an(\"array\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipe detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/recipes/{{recipeId}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"recipeId\") || String(pm.variables.get(\"recipeId\")).startsWith(\"SET_\")) throw new Error(\"Configure recipeId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Recipe contract\", () => { pm.expect(body.data).to.include.all.keys(\"id\",\"dish_id\",\"servings\",\"ingredients\",\"steps\"); pm.expect(body.data.servings).to.eql(null); const order=body.data.steps.map(x=>x.order); pm.expect(order).to.eql([...order].sort((a,b)=>a-b)); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "404 unknown dishes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/{{missingId}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"missingId\") || String(pm.variables.get(\"missingId\")).startsWith(\"SET_\")) throw new Error(\"Configure missingId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"NOT_FOUND\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "404 unknown recipes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/recipes/{{missingId}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"missingId\") || String(pm.variables.get(\"missingId\")).startsWith(\"SET_\")) throw new Error(\"Configure missingId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"NOT_FOUND\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "404 hidden dish",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/{{hiddenDishId}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"hiddenDishId\") || String(pm.variables.get(\"hiddenDishId\")).startsWith(\"SET_\")) throw new Error(\"Configure hiddenDishId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error envelope\", () => pm.expect(body.error.code).to.eql(\"NOT_FOUND\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "No recipes is not 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/{{noRecipeDishId}}/recipes"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"noRecipeDishId\") || String(pm.variables.get(\"noRecipeDishId\")).startsWith(\"SET_\")) throw new Error(\"Configure noRecipeDishId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Empty recipes\", () => pm.expect(body.data).to.eql([]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Oracle 1 pantry=False",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/match?ingredients={{eggId}}&pantry=false"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"tomatoId\") || String(pm.variables.get(\"tomatoId\")).startsWith(\"SET_\")) throw new Error(\"Configure tomatoId from QA dataset before running\");",
+              "if (!pm.variables.get(\"eggId\") || String(pm.variables.get(\"eggId\")).startsWith(\"SET_\")) throw new Error(\"Configure eggId from QA dataset before running\");",
+              "if (!pm.variables.get(\"sampleDishId\") || String(pm.variables.get(\"sampleDishId\")).startsWith(\"SET_\")) throw new Error(\"Configure sampleDishId from QA dataset before running\");",
+              "if (!pm.variables.get(\"oilId\") || String(pm.variables.get(\"oilId\")).startsWith(\"SET_\")) throw new Error(\"Configure oilId from QA dataset before running\");",
+              "if (!pm.variables.get(\"saltId\") || String(pm.variables.get(\"saltId\")).startsWith(\"SET_\")) throw new Error(\"Configure saltId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Match invariants and order\", () => {",
+              " pm.expect(body.data).to.be.an(\"array\");",
+              " pm.expect(new Set(body.data.map(x=>x.id)).size).to.eql(body.data.length);",
+              " body.data.forEach((x,i) => {",
+              "  pm.expect(x.match_ratio).to.be.within(0,1);",
+              "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
+              "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
+              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
+              " });",
+              "});",
+              "pm.test(\"Hand calculated scenario 1\", () => {",
+              " const x=body.data.find(x=>String(x.id)===String(pm.variables.get(\"sampleDishId\")));",
+              " pm.expect(x,\"QA sample dish must exist\").to.be.an(\"object\");",
+              " pm.expect(x.match_ratio).to.be.closeTo(0.3333,0.00001);",
+              " pm.expect(x.have_count).to.eql(1); pm.expect(x.total_count).to.eql(4);",
+              " pm.expect(x.is_incomplete).to.eql(false); pm.expect(x.readiness).to.eql(\"NEED_SHOPPING\");",
+              " const expected=[\"tomatoId\", \"saltId\", \"oilId\"].map(v=>String(pm.variables.get(v))).sort();",
+              " pm.expect(x.missing.map(x=>String(x.id)).sort()).to.eql(expected);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Oracle 2 pantry=False",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/match?ingredients={{eggId}},{{tomatoId}}&pantry=false"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"tomatoId\") || String(pm.variables.get(\"tomatoId\")).startsWith(\"SET_\")) throw new Error(\"Configure tomatoId from QA dataset before running\");",
+              "if (!pm.variables.get(\"eggId\") || String(pm.variables.get(\"eggId\")).startsWith(\"SET_\")) throw new Error(\"Configure eggId from QA dataset before running\");",
+              "if (!pm.variables.get(\"sampleDishId\") || String(pm.variables.get(\"sampleDishId\")).startsWith(\"SET_\")) throw new Error(\"Configure sampleDishId from QA dataset before running\");",
+              "if (!pm.variables.get(\"oilId\") || String(pm.variables.get(\"oilId\")).startsWith(\"SET_\")) throw new Error(\"Configure oilId from QA dataset before running\");",
+              "if (!pm.variables.get(\"saltId\") || String(pm.variables.get(\"saltId\")).startsWith(\"SET_\")) throw new Error(\"Configure saltId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Match invariants and order\", () => {",
+              " pm.expect(body.data).to.be.an(\"array\");",
+              " pm.expect(new Set(body.data.map(x=>x.id)).size).to.eql(body.data.length);",
+              " body.data.forEach((x,i) => {",
+              "  pm.expect(x.match_ratio).to.be.within(0,1);",
+              "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
+              "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
+              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
+              " });",
+              "});",
+              "pm.test(\"Hand calculated scenario 2\", () => {",
+              " const x=body.data.find(x=>String(x.id)===String(pm.variables.get(\"sampleDishId\")));",
+              " pm.expect(x,\"QA sample dish must exist\").to.be.an(\"object\");",
+              " pm.expect(x.match_ratio).to.be.closeTo(0.6667,0.00001);",
+              " pm.expect(x.have_count).to.eql(2); pm.expect(x.total_count).to.eql(4);",
+              " pm.expect(x.is_incomplete).to.eql(false); pm.expect(x.readiness).to.eql(\"MISSING_1_2\");",
+              " const expected=[\"saltId\", \"oilId\"].map(v=>String(pm.variables.get(v))).sort();",
+              " pm.expect(x.missing.map(x=>String(x.id)).sort()).to.eql(expected);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Oracle 3 pantry=False",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/match?ingredients={{eggId}},{{tomatoId}},{{saltId}}&pantry=false"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"tomatoId\") || String(pm.variables.get(\"tomatoId\")).startsWith(\"SET_\")) throw new Error(\"Configure tomatoId from QA dataset before running\");",
+              "if (!pm.variables.get(\"eggId\") || String(pm.variables.get(\"eggId\")).startsWith(\"SET_\")) throw new Error(\"Configure eggId from QA dataset before running\");",
+              "if (!pm.variables.get(\"sampleDishId\") || String(pm.variables.get(\"sampleDishId\")).startsWith(\"SET_\")) throw new Error(\"Configure sampleDishId from QA dataset before running\");",
+              "if (!pm.variables.get(\"oilId\") || String(pm.variables.get(\"oilId\")).startsWith(\"SET_\")) throw new Error(\"Configure oilId from QA dataset before running\");",
+              "if (!pm.variables.get(\"saltId\") || String(pm.variables.get(\"saltId\")).startsWith(\"SET_\")) throw new Error(\"Configure saltId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Match invariants and order\", () => {",
+              " pm.expect(body.data).to.be.an(\"array\");",
+              " pm.expect(new Set(body.data.map(x=>x.id)).size).to.eql(body.data.length);",
+              " body.data.forEach((x,i) => {",
+              "  pm.expect(x.match_ratio).to.be.within(0,1);",
+              "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
+              "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
+              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
+              " });",
+              "});",
+              "pm.test(\"Hand calculated scenario 3\", () => {",
+              " const x=body.data.find(x=>String(x.id)===String(pm.variables.get(\"sampleDishId\")));",
+              " pm.expect(x,\"QA sample dish must exist\").to.be.an(\"object\");",
+              " pm.expect(x.match_ratio).to.be.closeTo(0.8333,0.00001);",
+              " pm.expect(x.have_count).to.eql(3); pm.expect(x.total_count).to.eql(4);",
+              " pm.expect(x.is_incomplete).to.eql(false); pm.expect(x.readiness).to.eql(\"MISSING_1_2\");",
+              " const expected=[\"oilId\"].map(v=>String(pm.variables.get(v))).sort();",
+              " pm.expect(x.missing.map(x=>String(x.id)).sort()).to.eql(expected);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Oracle 4 pantry=False",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/match?ingredients={{eggId}},{{tomatoId}},{{saltId}},{{oilId}}&pantry=false"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"tomatoId\") || String(pm.variables.get(\"tomatoId\")).startsWith(\"SET_\")) throw new Error(\"Configure tomatoId from QA dataset before running\");",
+              "if (!pm.variables.get(\"eggId\") || String(pm.variables.get(\"eggId\")).startsWith(\"SET_\")) throw new Error(\"Configure eggId from QA dataset before running\");",
+              "if (!pm.variables.get(\"sampleDishId\") || String(pm.variables.get(\"sampleDishId\")).startsWith(\"SET_\")) throw new Error(\"Configure sampleDishId from QA dataset before running\");",
+              "if (!pm.variables.get(\"oilId\") || String(pm.variables.get(\"oilId\")).startsWith(\"SET_\")) throw new Error(\"Configure oilId from QA dataset before running\");",
+              "if (!pm.variables.get(\"saltId\") || String(pm.variables.get(\"saltId\")).startsWith(\"SET_\")) throw new Error(\"Configure saltId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Match invariants and order\", () => {",
+              " pm.expect(body.data).to.be.an(\"array\");",
+              " pm.expect(new Set(body.data.map(x=>x.id)).size).to.eql(body.data.length);",
+              " body.data.forEach((x,i) => {",
+              "  pm.expect(x.match_ratio).to.be.within(0,1);",
+              "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
+              "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
+              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
+              " });",
+              "});",
+              "pm.test(\"Hand calculated scenario 4\", () => {",
+              " const x=body.data.find(x=>String(x.id)===String(pm.variables.get(\"sampleDishId\")));",
+              " pm.expect(x,\"QA sample dish must exist\").to.be.an(\"object\");",
+              " pm.expect(x.match_ratio).to.be.closeTo(1,0.00001);",
+              " pm.expect(x.have_count).to.eql(4); pm.expect(x.total_count).to.eql(4);",
+              " pm.expect(x.is_incomplete).to.eql(false); pm.expect(x.readiness).to.eql(\"READY\");",
+              " const expected=[].map(v=>String(pm.variables.get(v))).sort();",
+              " pm.expect(x.missing.map(x=>String(x.id)).sort()).to.eql(expected);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Oracle 5 pantry=True",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dishes/match?ingredients={{eggId}},{{tomatoId}}&pantry=true"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.variables.get(\"tomatoId\") || String(pm.variables.get(\"tomatoId\")).startsWith(\"SET_\")) throw new Error(\"Configure tomatoId from QA dataset before running\");",
+              "if (!pm.variables.get(\"eggId\") || String(pm.variables.get(\"eggId\")).startsWith(\"SET_\")) throw new Error(\"Configure eggId from QA dataset before running\");",
+              "if (!pm.variables.get(\"sampleDishId\") || String(pm.variables.get(\"sampleDishId\")).startsWith(\"SET_\")) throw new Error(\"Configure sampleDishId from QA dataset before running\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Data envelope\", () => pm.expect(body).to.have.property(\"data\"));",
+              "pm.test(\"Match invariants and order\", () => {",
+              " pm.expect(body.data).to.be.an(\"array\");",
+              " pm.expect(new Set(body.data.map(x=>x.id)).size).to.eql(body.data.length);",
+              " body.data.forEach((x,i) => {",
+              "  pm.expect(x.match_ratio).to.be.within(0,1);",
+              "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
+              "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
+              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
+              " });",
+              "});",
+              "pm.test(\"Hand calculated scenario 5\", () => {",
+              " const x=body.data.find(x=>String(x.id)===String(pm.variables.get(\"sampleDishId\")));",
+              " pm.expect(x,\"QA sample dish must exist\").to.be.an(\"object\");",
+              " pm.expect(x.match_ratio).to.be.closeTo(1,0.00001);",
+              " pm.expect(x.have_count).to.eql(4); pm.expect(x.total_count).to.eql(4);",
+              " pm.expect(x.is_incomplete).to.eql(false); pm.expect(x.readiness).to.eql(\"READY\");",
+              " const expected=[].map(v=>String(pm.variables.get(v))).sort();",
+              " pm.expect(x.missing.map(x=>String(x.id)).sort()).to.eql(expected);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
