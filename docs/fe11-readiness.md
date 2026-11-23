@@ -1,5 +1,7 @@
 # FE11 — P1 Sprint 2, đã chuẩn bị riêng, chờ FE09 merge để nối
 
+**Cập nhật xuất bản 23/11:** đã commit/push `hien/FE11` bằng danh tính Git hiện tại, không co-author. [PR #31](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/31) đã mở; [CI pull_request xanh](https://github.com/24120025TQGBao/NMCNPM-Lab/actions/runs/45198179155) tại SHA `e6ff0a1`. PR draft: chỉ code chuẩn bị độc lập, chưa nối UI; chờ FE09 merge và metadata ghim.
+
 Cập nhật PO do người dùng cung cấp và origin/linh/sprint2-po-be a68473d thay kết luận hoãn trước đó: FE11 vẫn P1 Sprint2, tùy capacity TV5, ưu tiên QA04–06 P0. BE12 đã có code102ce6b, không còn blocker RPC. Main vẫn23bcb17; FE09 786605d chưa merge. Không sửa component/state/adapter của Hương trước merge.
 
 ## Đã tự thực hiện
