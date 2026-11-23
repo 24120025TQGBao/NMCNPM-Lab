@@ -1,5 +1,7 @@
 # QA04 — Test plan và test cases Sprint 2
 
+**Cập nhật xuất bản 23/11:** đã commit/push `hien/QA04` bằng danh tính Git hiện tại, không co-author. [PR #27](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/27) đã mở; [CI pull_request xanh](https://github.com/24120025TQGBao/NMCNPM-Lab/actions/runs/45198150165) tại SHA `647fe9e`. Còn PO review/xác nhận; không coi 49 AC đã chạy đủ.
+
 Nguồn PO02/BE07 a68473d, FE09 786605d, DB12 23b78ef và SE_SP2.md. PO review: CHỜ XÁC NHẬN. Bảng giữ nguyên Given/When/Then từ từng AC; không tự sửa tiêu chí của PO.
 
 Phạm vi P0 S2-01…04; vùng miền P1 báo riêng; FE11/BE12 và S2-02.18 vẫn P1 Sprint 2, ưu tiên sau P0. Entry: FE/BE đã tích hợp, ghi SHA FE/BE/DB và URL, cả VITE_USE_MOCK=false và VITE_USE_MOCK_API=false; dataset QA có ID chuẩn, món ACTIVE/HIDDEN, 0/1/nhiều công thức, công thức thiếu dữ liệu. Không nạp fixture lên DB chung.

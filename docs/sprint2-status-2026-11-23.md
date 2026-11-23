@@ -47,3 +47,7 @@ FE09 chưa merge main là điều kiện nối FE11 để tránh sửa chồng c
 Browser smoke bổ sung: Chromium desktop, Firefox desktop và Chromium390×844 đều12/12 PASS, tổng36/36 sau retest Firefox ngoài sandbox. Có screenshot và latest-results.json trên nhánh QA05. Đây là smoke trên FE09+preview live, không phải hồi quy toàn bộ49 AC hoặc nghiệm thu FE10. Mobile8 có đủ4 nhóm; chưa test INCOMPLETE100% và pantry thay đổi dữ liệu.
 
 Retest BUG-S2-001 trên dfd7ba2: script Supertest vẫn fail đúng assertion, main401 UNAUTHORIZED / bảnQ4 mới404 NOT_FOUND. Q4 chưa khôi phục /api/me; đây là lỗi còn mở trên source mới, không chỉ rủi ro từ nhánh cũ.
+
+## Đã xuất bản
+
+Năm nhánh đã commit/push, mỗi nhánh có upstream riêng, không pushmain. PR QA04#27 và DO04#28 sẵn sàng review; QA05#29, QA06#30, FE11#31 là draft. CI pull_request trên cả5 PR đều success tại code SHA nêu trong tài liệu từng nhánh. Reviewer/PO chưa duyệt; không tự merge hoặc yêu cầu reviewer qua notification. Main vẫn23bcb17 sau lần fetch kiểm tra cuối, FE09 vẫn786605d chưa merge. Chỉ bổ sung tài liệu xuất bản sau các code SHA đó, không đổi code đã test.
