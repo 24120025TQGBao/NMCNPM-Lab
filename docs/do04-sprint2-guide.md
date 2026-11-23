@@ -1,5 +1,7 @@
 # DO04 — CI và staging Sprint 2
 
+**Cập nhật xuất bản 23/11:** đã commit/push `hien/DO04` bằng danh tính Git hiện tại, không co-author. [PR #28](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/28) đã mở; [CI pull_request xanh](https://github.com/24120025TQGBao/NMCNPM-Lab/actions/runs/45198155342) tại SHA `a5135b3`. Còn reviewer duyệt và PO/INT02 xác nhận demo local; không yêu cầu Hiền deploy Vercel.
+
 Main đã có lint/test FE+BE và build FE. Thay đổi: đặt cả VITE_USE_MOCK=false và VITE_USE_MOCK_API=false; thay kiểm tra ba entrypoint bằng node scripts/check-backend-syntax.mjs cho toàn bộ JS backend/src, backend/tests, index.js và eslint.config.js. BE là JS ESM, không có bước biên dịch; syntax check là build check phù hợp. Script không import app, không đọc .env hoặc gọi DB. CI unit dùng mock, không chứng minh live integration.
 
 ## Chạy lại local
@@ -34,4 +36,4 @@ Main23bcb17 vẫn không đổi; nhánhDO04 đã merge origin/main, up-to-date. 
 
 Đã chạy preview localhost BE3102/FE5175 chỉ đọc +Supabase thật để giảm phần thủ công QA05: API37pass/1fail (recipes-list404); browser Chromium/Firefox/mobile smoke36pass. Đây là bằng chứng local preview, chưa là bản tích hợp cuối. Khi INT02 có bản chung, smoke lại đúng SHA đó và lưu lệnh khởi động/dataset/link report. Không cần xin quyền Vercel để chạy local.
 
-Phần còn lại DO04: push nhánh và CI kiểm tra đúng SHA; tạo PRmain, lưu URL run xanh và nhờ reviewer duyệt; bạn ghi trong ticket không có quyền Vercel, dùng demo local và nhờ PO xác nhận. Nếu nhóm vẫn muốn staging thì người có quyền Vercel nhận việc, không chặn bạn chuẩn bị local. Các thao tác publish/deploy chưa thực hiện.
+Đã push nhánh, mở PR28 và có CI pull_request xanh như đầu tài liệu. Phần còn lại DO04: nhờ reviewer duyệt; bạn ghi trong ticket không có quyền Vercel, dùng demo local và nhờ PO xác nhận. Nếu nhóm vẫn muốn staging thì người có quyền Vercel nhận việc, không chặn bạn chuẩn bị local. Các thao tác publish/deploy chưa thực hiện.
