@@ -43,7 +43,7 @@ Mọi tính năng Sprint 2 **dùng được khi chưa đăng nhập** (khách).
 
 ### S2-01 — Tab Gợi ý món `[P0]`
 
-Người dùng vào `/goi-y`, tab **Gợi ý món**, nhận từng món một và có thể thu hẹp bằng chip hoàn cảnh. Tab này **chỉ có chip hoàn cảnh** (và chip vùng miền ở mức P1). Lọc theo khẩu vị và thời gian chế biến thuộc S2-03.
+Người dùng vào `/goi-y`, tab **Gợi ý món**, nhận từng món một và có thể thu hẹp bằng chip hoàn cảnh. Tab này **chỉ có chip hoàn cảnh** (và chip vùng miền ở mức P1). Lọc theo thời gian chế biến thuộc S2-03; lọc theo khẩu vị dời sang Sprint 3.
 
 | ID | Given | When | Then |
 |---|---|---|---|
@@ -76,7 +76,7 @@ Người dùng nhập nguyên liệu đang có và xem món nấu được, kèm
 | S2-02.8 | Như trên | Tắt công tắc | Các nguyên liệu cơ bản được tính như mọi nguyên liệu khác: thiếu thì ghi vào danh sách thiếu |
 | S2-02.9 | Đã có ít nhất 1 nguyên liệu | Tìm món | Kết quả chia thành **4 nhóm** theo thứ tự: **Nấu ngay / Thiếu 1–2 thứ / Cần đi chợ / Chưa đủ dữ liệu để kết luận** (QĐ 4.4). API trả `readiness` 3 giá trị (`READY`, `MISSING_1_2`, `NEED_SHOPPING`) cùng cờ `is_incomplete`; nhóm thứ tư do giao diện suy ra từ cờ này. Quy tắc xếp nhóm (món không `is_incomplete`) theo RPC `match_dishes` của DB12: số nguyên liệu thiếu bằng 0 → Nấu ngay; 1 hoặc 2 → Thiếu 1–2 thứ; còn lại → Cần đi chợ. Tỷ lệ khớp tính với trọng số nguyên liệu chính : phụ = 2 : 1 |
 | S2-02.10 | Một món có `is_incomplete = true` | Xem kết quả | Món vào nhóm **Chưa đủ dữ liệu để kết luận** bất kể `readiness`, và không được trình bày như đã đủ nguyên liệu (QĐ 4.4). Nhóm không có món nào thì không hiển thị |
-| S2-02.11 | Có kết quả | Duyệt từng nhóm | Thứ tự món trong mỗi nhóm đúng như API trả về (API xếp theo % khớp giảm dần); frontend không sắp xếp lại và không tính lại % |
+| S2-02.11 | Có kết quả | Duyệt từng nhóm | Thứ tự món trong mỗi nhóm đúng như API trả về, tức giữ thứ tự của RPC `match_dishes` (món đủ dữ liệu trước, rồi % khớp giảm dần, rồi món ít thiếu hơn trước); frontend không sắp xếp lại và không tính lại % |
 | S2-02.12 | Có kết quả | Xem một món | Hiện thanh tiến độ và **"X% khớp"** lấy từ `match_ratio` (có trọng số theo vai trò chính/phụ, QĐ 4.2). Cạnh đó hiện dòng **"Có a/b nguyên liệu"** là số đếm, cùng chip nguyên liệu thiếu, ví dụ "Có 5/7 nguyên liệu, thiếu: hành lá, nước mắm". Hai con số có thể không tương ứng nhau (ví dụ 5/7 nhưng không phải 71%); đó là thiết kế |
 | S2-02.13 | Không món nào phù hợp | Tìm món | API trả 200 + `[]`; giao diện hiện thông báo rỗng, không phải lỗi |
 | S2-02.14 | Có kết quả | Chọn một món | Chuyển sang `/dishes/:id` rồi tới công thức. Quay lại thì giữ nguyên chip nguyên liệu, công tắc tủ bếp và kết quả (QĐ 1.4) |
@@ -87,12 +87,12 @@ Người dùng nhập nguyên liệu đang có và xem món nấu được, kèm
 
 ### S2-03 — Tìm và lọc món `[P0]`
 
-Người dùng vào `/search` để tìm món theo tên và lọc. Đây là nơi duy nhất có bộ lọc khẩu vị và thời gian chế biến.
+Người dùng vào `/search` để tìm món theo tên và lọc. Đây là nơi duy nhất có bộ lọc thời gian chế biến. Sprint 2 chỉ bắt buộc lọc theo **tên và thời gian chế biến**; lọc theo khẩu vị và loại món dời sang Sprint 3.
 
 | ID | Given | When | Then |
 |---|---|---|---|
 | S2-03.1 | Có món "Phở bò" | Tìm `pho bo`, `PHỞ BÒ` hoặc `Pho` | Đều thấy "Phở bò" (không phân biệt hoa/thường, có dấu/không dấu) |
-| S2-03.2 | Trang tìm kiếm | Lọc theo loại món, **khẩu vị** (`MAN`, `CAY`, `NGOT`, `CHUA`, `THANH`) và **thời gian chế biến** | Chỉ hiện món thỏa các bộ lọc đã chọn, kết hợp AND với từ khóa tên |
+| S2-03.2 | Trang tìm kiếm | Lọc theo **thời gian chế biến** (`max_cook_time`, phút) | Chỉ hiện món có ít nhất một công thức công khai với thời gian nấu không quá giá trị đã chọn, kết hợp AND với từ khóa tên. **Lọc theo khẩu vị (`MAN`, `CAY`, `NGOT`, `CHUA`, `THANH`) và theo loại món: DEFERRED Sprint 3**, vì `flavor` hiện luôn `null` và chưa có nguồn dữ liệu (`thuoc_tinh_mon`); giao diện không hiển thị hai bộ lọc này trong Sprint 2 |
 | S2-03.3 | Từ khóa hoặc bộ lọc không có món nào | Tìm | API 200 + `[]` với `total` = 0; giao diện hiện thông báo "không tìm thấy món phù hợp" |
 | S2-03.4 | Nhiều món hơn một trang | Chuyển trang | Phân trang đúng quy ước mục 1.3 của `docs/api.md`: không trùng, không sót món với dữ liệu cố định; `meta.total` đúng |
 | S2-03.5 | `page`/`limit` sai (≤0, không phải số, vượt giới hạn) hoặc mã bộ lọc lạ | Gọi API trực tiếp | 400 |
@@ -104,10 +104,10 @@ Người dùng vào `/search` để tìm món theo tên và lọc. Đây là nơ
 
 | ID | Given | When | Then |
 |---|---|---|---|
-| S2-04.1 | Món tồn tại | Mở `/dishes/:id` | Hiện tên, ảnh, mô tả, thời gian nấu, nút **Tự nấu**, mục "Quán ăn: Sắp có" (chưa có chức năng), và danh sách công thức (tên, khẩu phần, thời gian) |
+| S2-04.1 | Món tồn tại | Mở `/dishes/:id` | Hiện tên, ảnh, mô tả, thời gian nấu, nút **Tự nấu**, mục "Quán ăn: Sắp có" (chưa có chức năng), và danh sách công thức (tên, khẩu phần, thời gian). Khẩu phần hiện hiển thị **"chưa có thông tin"** vì `servings` luôn `null` (thêm cột ở Sprint 3) |
 | S2-04.2 | Món chưa có công thức nào | Mở chi tiết | Hiện thông báo rõ "chưa có công thức", không để vùng trống khó hiểu (QĐ 1.5) |
 | S2-04.3 | Món có công thức, kể cả chỉ có **một** công thức | Bấm **Tự nấu** | Hiện danh sách công thức của món; người dùng chọn một công thức để mở `/recipes/:id`. Không tự vào thẳng công thức khi chỉ có một |
-| S2-04.4 | Công thức tồn tại | Mở `/recipes/:id` | Hiện tên, khẩu phần, thời gian chuẩn bị, **nguyên liệu kèm định lượng và đơn vị**, và **các bước đánh số theo thứ tự** (QĐ 1.5) |
+| S2-04.4 | Công thức tồn tại | Mở `/recipes/:id` | Hiện tên, khẩu phần, thời gian chuẩn bị, **nguyên liệu kèm định lượng và đơn vị**, và **các bước đánh số theo thứ tự** (QĐ 1.5). Khẩu phần hiện hiển thị **"chưa có thông tin"** vì `servings` luôn `null` (thêm cột ở Sprint 3) |
 | S2-04.5 | Nguyên liệu không có định lượng cố định (`quantity` rỗng) | Xem danh sách nguyên liệu | Hiện "tùy khẩu vị", không hiện 0 hay để trống |
 | S2-04.6 | Công thức thiếu thành phần (đánh dấu chưa đầy đủ, hoặc thiếu thời gian/khẩu phần) | Xem công thức hoặc danh sách công thức | Báo rõ phần nào thiếu ("chưa có thông tin") và gắn nhãn "chưa đầy đủ" nếu có; không khẳng định đủ nguyên liệu và không bịa giá trị (QĐ 1.5, QĐ 4.4) |
 | S2-04.7 | ID món hoặc công thức không tồn tại, hoặc món không còn `ACTIVE` | Mở trang, hoặc gọi API | API 404; giao diện hiện trang "không tìm thấy" có đường quay về |
@@ -123,6 +123,7 @@ Người dùng vào `/search` để tìm món theo tên và lọc. Đây là nơ
 - Cộng đồng và quản trị (duyệt, ẩn bài, tương tác, phân quyền admin) ngoài những gì Sprint 1 đã có.
 - Cảnh báo dị ứng và kiêng kỵ (QĐ 4.3).
 - Chế độ Khám phá món ngoài sở thích (QĐ 1.3).
+- Lọc món theo **khẩu vị** (`MAN`, `CAY`, `NGOT`, `CHUA`, `THANH`) và theo **loại món** (phần của S2-03.2): DEFERRED Sprint 3. `flavor` luôn `null` trong Sprint 2 và chưa có nguồn dữ liệu (`thuoc_tinh_mon` chưa có dữ liệu dùng được, `service_role` chưa đọc được).
 - Các việc P1 (S2-01.12 chip vùng miền, S2-02.18 gợi ý "mua thêm" gồm BE12 và FE11) chỉ làm khi còn thời gian. Nếu bị cắt thì dời sang Sprint 3. **BE12 vẫn P1** (làm từ `match_dishes`, không cần RPC mới); **FE11 vẫn P1, tùy TV5**.
 - Chức năng "Quán ăn" (mới chỉ hiện nhãn "Sắp có").
 - Tìm nguyên liệu theo từ ở giữa tên (gõ `chua` ra `Cà chua`): backlog Sprint 3; Sprint 2 chỉ tìm theo tiền tố (cụm từ đầu tên chuẩn hoặc từ đồng nghĩa).
@@ -151,7 +152,7 @@ Mỗi task Jira gắn với một PR riêng vào `main`. Không có `.env` hay s
 **Đã chốt:**
 
 1. Kết quả đối sánh hiển thị 4 nhóm; nhóm thứ tư suy ra từ `is_incomplete` (S2-02.9, S2-02.10).
-2. Tab Gợi ý chỉ có chip hoàn cảnh; khẩu vị và thời gian chỉ ở S2-03 (S2-01.4, S2-03.2).
+2. Tab Gợi ý chỉ có chip hoàn cảnh; thời gian chế biến chỉ ở S2-03, khẩu vị dời Sprint 3 (S2-01.4, S2-03.2).
 3. Nút "Hôm nay ăn gì?" áp dụng chip đang chọn và `exclude` (S2-01.6).
 4. "X% khớp" là `match_ratio` có trọng số; "Có a/b nguyên liệu" là số đếm (S2-02.12).
 5. Chỉ chọn nguyên liệu trong từ điển; Enter không chọn gợi ý thì không thêm gì (S2-02.5, S2-02.6).
