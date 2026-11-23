@@ -192,7 +192,7 @@ Migration đã đọc: `202611210001_discovery_metadata.sql` (DB10), `2026112100
 | `search_ingredients` | Thứ tự "theo tên" | So khớp **tiền tố** trên tên chuẩn hóa của tên chuẩn và đồng nghĩa. Thứ tự: khớp chính xác trước, rồi `ten_nl`, rồi `ma_nl`. `p_limit` bị kẹp trong 1–100 (rỗng thì 20); `p_search` rỗng khớp mọi nguyên liệu |
 | Chuẩn hóa không dấu | Nghi là `unaccent` | Hàm `normalize_ingredient_name` dùng bảng thay chữ cố định; `nguyen_lieu.ten_khong_dau` là cột sinh (`GENERATED ALWAYS ... STORED`) |
 | `cong_thuc.trang_thai` | Tập giá trị không biết | `CHECK IN ('ACTIVE','HIDDEN','DELETED')`; RLS cho đọc `ACTIVE` (hoặc chủ công thức, quản trị viên); **không** kiểm tra trạng thái bài đăng |
-| Quyền `service_role` | `tag`, `mon_an_tag`, `nguyen_lieu_dong_nghia` đọc được | Khớp: migration cấp `ALL` cho `tag`, `mon_an_tag` và `SELECT` cho `nguyen_lieu_dong_nghia`. **Không** có `GRANT SELECT` cho `service_role` trên `han_che_nguyen_lieu`, `thuoc_tinh_mon` và view `thong_tin_cong_thuc` |
+| Quyền `service_role` | `tag`, `mon_an_tag`, `nguyen_lieu_dong_nghia` đọc được | Khớp: migration cấp `ALL` cho `tag`, `mon_an_tag` và `SELECT` cho `nguyen_lieu_dong_nghia`. Migration **không** có `GRANT SELECT` cho `service_role` trên `han_che_nguyen_lieu`, `thuoc_tinh_mon` và view `thong_tin_cong_thuc`. **Cập nhật 23/11/2026:** TV3 đã cấp `SELECT` cho `service_role` trên `han_che_nguyen_lieu` (và `thong_tin_cong_thuc`, đọc được) trực tiếp trên Supabase; `match_dishes` giờ gọi được bằng `service_role`. `thuoc_tinh_mon` chưa kiểm tra lại |
 
 ### 6.2. Điều migration cho biết thêm
 

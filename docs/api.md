@@ -256,6 +256,7 @@ Lỗi:
 | 22/11/2026 | 2.0 (nháp) | TV1 | PO chốt: `servings` nullable và hiện luôn `null`; quy tắc `cook_time_minutes` của món; công thức công khai (đề xuất, chờ TV3); BE12 `suggest-next` và FE11 dời Sprint 3. Bổ sung cột trả về của `search_ingredients`, `match_dishes` quan sát từ Supabase. |
 | 22/11/2026 | 2.0 (nháp) | TV1 | Đối chiếu với migration DB10–DB12 trên nhánh `origin/db` (`23b78ef`): chốt trọng số 2:1 và ngưỡng `readiness`; quy tắc BE10 ánh xạ `COOK_NOW`/`INCOMPLETE`, luôn truyền `p_include_pantry`, lỗi `22023` → 400; BE12 trở lại P1 (làm từ `match_dishes`); mã tag API ↔ `tag.slug` kebab-case. |
 | 22/11/2026 | 2.0 (nháp) | TV1 | PO duyệt: Q15 (mã tag API in hoa ↔ slug kebab-case, hai chiều), Q16 (chỉ gợi ý món `ACTIVE` có ảnh và mô tả), Q4 (BE10 chỉ trả món có công thức chứa ≥ 1 nguyên liệu người dùng chọn, tủ bếp không tính), Q17 (`incomplete = NOT du_thong_tin_huong_dan`), Q3 (backend kiểm tra bài đăng gắn kèm phải `PUBLIC`), `flavor = null` ở Sprint 2, BE12 có `pantry` và tối đa 10 phần tử. Backlog Sprint 3: tìm nguyên liệu theo từ ở giữa tên. |
+| 23/11/2026 | 2.0 (nháp) | TV1 | Đóng Q14: `service_role` đã gọi được `match_dishes` và đọc được `thong_tin_cong_thuc` sau khi TV3 chạy GRANT. |
 
 ---
 
@@ -440,7 +441,7 @@ Lỗi: `400`, `500`.
 4. **Lỗi `22023` của RPC → `400 VALIDATION_ERROR`** (ID nguyên liệu không tồn tại hoặc null). Mã lỗi khác → `500`, không lộ chi tiết.
 5. `have_count`, `total_count`: BE10 tự tính (`total_count` = số dòng `ct_nguyen_lieu` của `ma_ct`; `have_count = total_count − missing_count`). `match_ratio = match_percent / 100`; khi `match_percent` là `null` (món không có công thức `ACTIVE` hoặc công thức không có nguyên liệu, tức `total_weight = 0`) thì `match_ratio = 0` (PO chốt).
 6. **Lọc món (Q4, PO chốt):** chỉ giữ món mà công thức do RPC chọn (`ma_ct`) chứa **ít nhất một nguyên liệu người dùng đã chọn** (`ingredients` của request). Nguyên liệu tủ bếp cơ bản tự được coi là có **không tính** vào điều kiện này (nhưng nếu người dùng tự chọn một nguyên liệu tủ bếp thì nó là nguyên liệu người dùng chọn). Món không có công thức (`ma_ct` rỗng) bị loại. Thứ tự các món còn lại giữ nguyên như RPC. Cách làm gợi ý: một truy vấn thêm vào `ct_nguyen_lieu` theo các `ma_ct` và các `ma_nl` của request.
-7. RPC gọi bằng quyền nào: xem Q14 (hiện `service_role` bị từ chối).
+7. **Quyền gọi (Q14, đã đóng 23/11/2026):** backend gọi RPC bằng client `service_role`. Đã gọi thử `match_dishes` bằng `service_role`: `200`, trả kết quả; ID không tồn tại trả HTTP `400` với `code = '22023'` (supabase-js trả `error.code === '22023'`).
 
 #### Query
 
@@ -675,9 +676,9 @@ Nguồn: migration DB10–DB12 trên `origin/db` (`23b78ef`), `docs/schema-notes
 | Slug thật của chip hoàn cảnh | Bảng `tag` và `mon_an_tag` **đang rỗng** (đọc 22/11/2026); fixture test của TV3 dùng `bua-sang`, `an-nhanh`. Lọc `the` không trả món nào cho đến khi DA04 nạp tag đúng quy tắc mã ↔ slug (đã chốt, Q15) |
 | `flavor`, lọc `flavor` | `mon_an` không có cột khẩu vị. Ứng viên chưa xác nhận: `thuoc_tinh_mon` (`nhom_tt`, `gia_tri`) qua `mon_an_thuoc_tinh`. **`flavor = null` trong Sprint 2** (PO chốt); nguồn dữ liệu xử lý ở Sprint 3 |
 | `servings` | Không có cột khẩu phần. PO chốt: luôn `null` ở Sprint 2, thêm cột ở Sprint 3 |
-| `incomplete` của công thức (7.5–7.7) | **Đã chốt (PO, Q17):** `NOT du_thong_tin_huong_dan`, với `du_thong_tin_huong_dan` = `trang_thai_thanh_phan = 'COMPLETE'` và có `thoi_gian_phut` và có ít nhất một bước (định nghĩa của view `thong_tin_cong_thuc`). View chỉ cấp `SELECT` cho `anon`, `authenticated`, **không** cho `service_role`, nên backend tính cùng điều kiện trên bảng `cong_thuc` và `buoc_cong_thuc` |
+| `incomplete` của công thức (7.5–7.7) | **Đã chốt (PO, Q17):** `NOT du_thong_tin_huong_dan`, với `du_thong_tin_huong_dan` = `trang_thai_thanh_phan = 'COMPLETE'` và có `thoi_gian_phut` và có ít nhất một bước (định nghĩa của view `thong_tin_cong_thuc`). View do migration chỉ cấp `SELECT` cho `anon`, `authenticated`; TV3 đã cấp thêm cho `service_role` trên Supabase (23/11/2026, đọc được), nên backend có thể đọc view hoặc tính cùng điều kiện trên bảng `cong_thuc` và `buoc_cong_thuc` |
 | Công thức công khai (7.5–7.7) | **Đã chốt (PO, Q3):** `cong_thuc.trang_thai = 'ACTIVE'` và mọi bài đăng gắn kèm (`bai_dang.ma_ct`) phải `PUBLIC`; DB chỉ kiểm tra `ACTIVE` (RLS) nên backend (BE09) tự kiểm tra bài đăng. Migration chưa thấy ràng buộc mỗi công thức chỉ có một bài đăng |
-| Quyền gọi `match_dishes` bằng `service_role` | Thiếu `GRANT SELECT ON public.han_che_nguyen_lieu TO service_role` (Q14, còn mở) |
+| Quyền gọi `match_dishes` bằng `service_role` | **Đã đóng (Q14, 23/11/2026):** TV3 đã `GRANT SELECT ON public.han_che_nguyen_lieu TO service_role` trên Supabase; đã xác nhận `match_dishes` gọi được và view `thong_tin_cong_thuc` đọc được bằng `service_role`. Lệnh GRANT cần có trong migration (`supabase/migrations/202611230001_service_role_grants.sql`, nhánh `linh/db-grants`, chờ TV3 duyệt) để môi trường khác chạy lại được |
 
 ---
 
@@ -689,7 +690,7 @@ Nguồn: migration DB10–DB12 trên `origin/db` (`23b78ef`), `docs/schema-notes
 - **Q3.** **Đã chốt (PO 22/11/2026):** công thức công khai = `cong_thuc.trang_thai = 'ACTIVE'` và mọi bài đăng gắn kèm phải `PUBLIC`; backend tự kiểm tra vì RLS chỉ kiểm tra `ACTIVE`. Ghi cho BE09 (7.0). TV3 vẫn có thể xác nhận ở buổi họp, đặc biệt trường hợp một công thức có nhiều bài đăng.
 - **Q4.** **Đã chốt (PO 22/11/2026):** BE10 chỉ trả món có công thức (do RPC chọn) chứa ít nhất một nguyên liệu người dùng chọn; tủ bếp cơ bản không tính; `match_percent` `null` thì `match_ratio = 0` (7.3, quy tắc 5–6).
 - **Q5.** Đã biết: `region` ← `mon_an.vung_mien`; `is_basic_pantry` ← `nguyen_lieu.la_gia_vi_co_ban`; tag ← `tag.slug` (qua quy tắc ánh xạ); `cook_time_minutes` theo quy tắc PO; `flavor = null` ở Sprint 2. **Còn mở:** dữ liệu `tag`/`mon_an_tag` (đang rỗng, chờ DA04) và đồng ý để `GET /api/suggestions` truy vấn bảng `mon_an`/`mon_an_tag`/`tag` thay vì RPC (RPC `search_dishes` không lọc theo tag và không có vùng miền).
-- **Q14.** **Còn mở.** `match_dishes` được `GRANT EXECUTE` cho `service_role` nhưng `service_role` chưa có `SELECT` trên `han_che_nguyen_lieu` (RPC `SECURITY INVOKER` có join bảng này), nên gọi bằng `service_role` trả `42501`; gọi bằng `anon` thì chạy. Cần `GRANT SELECT ON public.han_che_nguyen_lieu TO service_role;` hoặc backend dùng client `anon` cho RPC này. Cần quyết định trước khi làm BE10.
+- **Q14.** **Đã đóng (23/11/2026).** TV3 đã chạy `GRANT SELECT ON public.han_che_nguyen_lieu TO service_role` trên Supabase. Xác nhận bằng cách gọi thật: `match_dishes` bằng `service_role` trả `200` (trước đó `42501`), ID không tồn tại trả `22023`; view `thong_tin_cong_thuc` cũng đọc được. Backend dùng client `service_role`, không cần client `anon`. Còn việc đưa lệnh GRANT vào migration để chạy lại được trên môi trường khác.
 - **Q15.** **Đã chốt (PO 22/11/2026):** API dùng mã in hoa; backend ánh xạ ↔ `tag.slug` kebab-case (`troi-mua` ↔ `TROI_MUA`) cả chiều vào (`the`) và ra (`tags[]`). Cần DA04 nạp slug theo quy tắc này.
 - **Q16.** **Đã chốt (PO 22/11/2026):** `GET /api/suggestions` chỉ gợi ý món `ACTIVE` có ảnh và mô tả không rỗng, giống `search_dishes`.
 - **Q17.** **Đã chốt (PO 22/11/2026):** `incomplete = NOT du_thong_tin_huong_dan` cho công thức ở 7.5–7.7.
@@ -716,10 +717,10 @@ Nguồn: migration DB10–DB12 trên `origin/db` (`23b78ef`), `docs/schema-notes
 
 ### 7.12. Xác nhận contract v2.0
 
-Contract chỉ chốt khi các thành viên sau xác nhận dùng được và các câu hỏi Q1–Q17 đã có câu trả lời (Q5 và Q14 còn mở).
+Contract chỉ chốt khi các thành viên sau xác nhận dùng được và các câu hỏi Q1–Q17 đã có câu trả lời (Q5 còn mở).
 
 | Vai trò | Người | Nội dung xác nhận | Họ tên / ngày |
 |---|---|---|---|
 | TV2 (Frontend) | | Khớp adapter/mapper; Q6–Q10 | |
-| TV3 (Database) | | Khớp schema Supabase, DB10–DB12; Q5, Q14 (Q1–Q4, Q15–Q17 đã chốt bởi PO) | |
+| TV3 (Database) | | Khớp schema Supabase, DB10–DB12; Q5 (Q1–Q4, Q14–Q17 đã đóng) | |
 | TV4 (Backend BE09, BE10) | | Dùng được cho BE09, BE10; Q11–Q13 | |
