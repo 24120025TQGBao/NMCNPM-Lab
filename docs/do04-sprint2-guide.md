@@ -27,3 +27,11 @@ PO02 mới nhất chưa chốt lại hạn Sprint 2. Mốc báo trước 17/11 t
 ## Kiểm chứng đã thực hiện
 
 Lint FE/BE PASS, build FE với cả hai cờ mock false PASS, BE 83 Vitest + 6 Node PASS, FE 149 PASS, syntax 29 file PASS. Bản sao tạm có JS sai cú pháp khiến gate trả nonzero như mong đợi. Dùng node_modules local qua junction; chưa cài sạch lockfile, chưa có CI remote hoặc staging run cho commit mới.
+
+## Cập nhật theo quyền hiện tại của Hiền và lần fetch mới
+
+Main23bcb17 vẫn không đổi; nhánhDO04 đã merge origin/main, up-to-date. Bạn đã xác nhận không có quyền Vercel: không yêu cầu bạn tự deploy. Phương án thực hiện là demo local theo fallback DO04, dùng backend/FE tích hợp từ INT02; nhờ PO/INT02 ghi nhận lựa chọn. Staging chưa có, không ghi đã đạt AC staging.
+
+Đã chạy preview localhost BE3102/FE5175 chỉ đọc +Supabase thật để giảm phần thủ công QA05: API37pass/1fail (recipes-list404); browser Chromium/Firefox/mobile smoke36pass. Đây là bằng chứng local preview, chưa là bản tích hợp cuối. Khi INT02 có bản chung, smoke lại đúng SHA đó và lưu lệnh khởi động/dataset/link report. Không cần xin quyền Vercel để chạy local.
+
+Phần còn lại DO04: push nhánh và CI kiểm tra đúng SHA; tạo PRmain, lưu URL run xanh và nhờ reviewer duyệt; bạn ghi trong ticket không có quyền Vercel, dùng demo local và nhờ PO xác nhận. Nếu nhóm vẫn muốn staging thì người có quyền Vercel nhận việc, không chặn bạn chuẩn bị local. Các thao tác publish/deploy chưa thực hiện.
