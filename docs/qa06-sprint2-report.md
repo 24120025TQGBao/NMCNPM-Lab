@@ -1,5 +1,7 @@
 # QA06 — Report tiến độ hồi quy sau fetch mới, 23/11/2026
 
+**Cập nhật xuất bản 23/11:** đã commit/push `hien/QA06` bằng danh tính Git hiện tại, không co-author. [PR #30](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/30) đã mở; [CI pull_request xanh](https://github.com/24120025TQGBao/NMCNPM-Lab/actions/runs/45198171387) tại SHA `40ca1a5`. PR draft: chưa là nghiệm thu cuối, còn QA05/INT02/FE10 và PO xác nhận.
+
 Main23bcb17 chưa có Sprint2. Đã merge origin/main vào nhánh task: up-to-date. Context POa68473d, FE09786605d, BE12102ce6b (gồm BE08/11), BE10Q4dfd7ba2, DB23b78ef, grants40f0c0f. Người chạy tự động: Codex, chưa có PO/INT02 ký nghiệm thu.
 
 ## Kết quả có bằng chứng
