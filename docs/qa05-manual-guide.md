@@ -1,5 +1,7 @@
 # QA05 — API, bằng chứng và hướng dẫn thủ công
 
+**Cập nhật xuất bản 23/11:** đã commit/push `hien/QA05` bằng danh tính Git hiện tại, không co-author. [PR #29](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/29) đã mở; [CI pull_request xanh](https://github.com/24120025TQGBao/NMCNPM-Lab/actions/runs/45198165370) tại SHA `90b63b7`. PR draft: còn lỗi route, FE10, INT02, full AC/collection và Jira như hướng dẫn bên dưới.
+
 Collection qa05-sprint2.postman_collection.json có 41 GET công khai, kiểm tra 200/400/404/rỗng, exclude, tag, autocomplete/alias, món/công thức và 5 ca tính tay. Nguồn PO/BE07 a68473d, DB12 23b78ef, BE12 102ce6b và BE10 Q4 dfd7ba2; BE12/FE11 vẫn P1 Sprint 2. JSON và event script parse PASS. Collection Postman đầy đủ chưa chạy; runner API preview riêng đã chạy live, xem mục cập nhật cuối.
 
 ## Chuẩn bị
