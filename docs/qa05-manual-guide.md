@@ -1,6 +1,6 @@
 # QA05 — API, bằng chứng và hướng dẫn thủ công
 
-Collection qa05-sprint2.postman_collection.json có 35 GET công khai, kiểm tra 200/400/404/rỗng, exclude, tag, autocomplete/alias, món/công thức và 5 ca tính tay. Nguồn BE07 5aae4f6, DB12 23b78ef; không gọi BE12 vì ngoài Sprint 2. JSON và toàn bộ event script parse PASS; CHƯA chạy collection trên API tích hợp.
+Collection qa05-sprint2.postman_collection.json có 41 GET công khai, kiểm tra 200/400/404/rỗng, exclude, tag, autocomplete/alias, món/công thức và 5 ca tính tay. Nguồn PO/BE07 a68473d, DB12 23b78ef, BE12 102ce6b và BE10 Q4 dfd7ba2; BE12/FE11 vẫn P1 Sprint 2. JSON và event script parse PASS. Collection Postman đầy đủ chưa chạy; runner API preview riêng đã chạy live, xem mục cập nhật cuối.
 
 ## Chuẩn bị
 
@@ -43,7 +43,7 @@ Source git archive không có .env, dùng node_modules local qua junction; khôn
 | BE10 0a5a8b3 gồm BE09 | 50 | 6 | PASS |
 | FE07–09 786605d | 185 | — | PASS |
 
-Không cộng các suite chồng lắp thành số test độc lập. BE10 hiện chỉ có posts/scaffold và test tìm món cũ; chưa có test mới chứng minh match/400/404 chi tiết. Tab FE mới mặc định mock nếu thiếu VITE_USE_MOCK_API=false.
+Không cộng các suite chồng lắp thành số test độc lập. Bảng ở trên là lần chạy ban đầu trên BE10 cũ; nhánh Q4 mới đã có 19 test đối sánh, xem cập nhật bên dưới. Tab FE mới mặc định mock nếu thiếu VITE_USE_MOCK_API=false.
 
 ### BUG-S2-001 — /api/me mất trên BE10
 
@@ -56,3 +56,55 @@ node docs/qa05-route-regression.mjs <duong-dan-main> <duong-dan-be10>
 ```
 
 Script đã chạy và fail đúng assertion 404 khác 401. Sau sửa phải pass. Không sửa nhánh thành viên trong task QA. Rà code cũng thấy nhánh BE09/BE10 bỏ test/chức năng main, BE10 chưa mount suggestions/ingredients; các phần này cần retest trên bản ghép.
+
+## Cập nhật sau fetch mới — phần đã tự làm thêm
+
+- Main vẫn23bcb17; merge origin/main vào nhánh QA05 đã up-to-date. BE12 102ce6b có34 test mới; suite toàn nhánh214 Vitest+6 Node PASS. Q4 dfd7ba2 có19 test đối sánh; toàn nhánh69+6 PASS.
+- Collection hiện41 GET, thêm BE12 validation/mẫu mở khóa/đủ bộ/rỗng. Không assert ratio giảm toàn cục: RPC ưu tiên COMPLETE trước INCOMPLETE. Biến emptySuggestIds phải lấy từ ca đã biết không có món thiếu đúng1; không tự giả định mọi bộ phổ biến đều rỗng.
+- Runner qa05-preview-api.mjs đã chạy với Supabase thật:37 PASS,1 FAIL,0 BLOCKED. Có5 ca độc lập món33/công thức25 và BE12 mua Sườn heo PASS. File qa05-live-preview-result.json chỉ chứa trạng thái và oracle công khai, không key/token.
+- Runner tạo snapshot source từ commit đã pin và ghép router tường minh, chỉ nhận GET. Đây là bản preview phục vụ QA, không sửa nhánh thành viên, không chứng nhận routes/index.js hoặc INT02 đã xong. Chỉ dùng RPC match/search/get đọc dữ liệu; không signup/insert/DDL.
+- Lần đầu trong sandbox không truy cập được DB; kết quả đã được chạy lại ngoài sandbox có mạng. Chỉ dùng kết quả live sau cùng để báo API, không coi lỗi mạng ban đầu là bug sản phẩm.
+
+### Chạy lại API preview tự động (PowerShell)
+
+Chuẩn bị npm ci --prefix backend ở checkout main, và .env local đúng quyền. Source refs đã pin trong script; cần git fetch trước. Không dán giá trị key lên terminal/chat.
+
+```powershell
+$env:QA_REPO_ROOT='D:/GitHub/NMCNPM-Lab'
+$env:QA_ENV_FILE='D:/GitHub/NMCNPM-Lab/backend/.env'
+$env:QA_RESULT_FILE='qa05-live-preview-result.json'
+node docs/qa05-preview-api.mjs
+```
+
+Script cố ý exit1 nếu còn lỗi contract; hiện route recipes-list thiếu nên chưa xanh. Oracle không lấy expected từ matcher: đọc recipe25, xác minh món33 chỉ một công thức, tính weight PRIMARY:SECONDARY=2:1 và số thiếu trước khi gọi5 bộ. Pantry=false,8 nguyên liệu `5,6,8,11,28,55,57,56`; weight15; ratio0.0667/0.2/0.4667/0.8667/1, count1/2/4/7/8. Không cần bạn nạp fixture hay tính lại5 ca này, trừ khi dataset/source thay đổi.
+
+### BUG-S2-002 — Thiếu route danh sách công thức
+
+GET /api/dishes/33/recipes trên preview source BE10 Q4 dfd7ba2 →404 NOT_FOUND, expected200 data:[RecipeSummary] theo contract7.6. Chi tiết món33 và recipe25 đều200. Đề xuất Châu/INT02 thêm route giữ quyền công khai/ACTIVE, pagination và404 món không tồn tại; QA retest sau sửa. Jira CHƯA TẠO, severity/owner/hạn cần nhóm xác nhận.
+
+### Browser smoke có thể chạy lại
+
+Script qa05-browser-smoke.cjs chỉ guest GET, không đăng ký hoặc ghi dữ liệu. Cần playwright-core trong thư mục QA tạm và browser cache tương thích (lần chạy này Chromium1255/Firefox1572).
+
+1. Terminal BE: cấu hình QA_REPO_ROOT/QA_ENV_FILE như trên; chạy `node docs/qa05-preview-api.mjs --serve` (localhost3102).
+2. Checkout FE09 riêng đã cài dependencies. Tạo config QA tạm kế thừa vite.config.js, override server.proxy['/api']='http://127.0.0.1:3102', host127.0.0.1, port5175. Đặt VITE_USE_MOCK=false, VITE_USE_MOCK_API=false, VITE_API_URL='' rồi khởi động Vite bằng config đó. Không sửa/commit config tạm lên nhánh Hương.
+3. Đặt QA_PLAYWRIGHT=đường dẫn package playwright-core, QA_BROWSER_ROOT=thư mục ms-playwright, QA_BASE_URL=http://127.0.0.1:5175, QA_BROWSER_OUTPUT=thư mục bằng chứng. Chạy `node docs/qa05-browser-smoke.cjs`.
+4. File results.json và ảnh chỉ UI công khai. Kiểm tra trước chia sẻ. Script xác nhận placeholder FE10 và back; không đánh bước placeholder là hoàn thành luồng đến công thức.
+
+### Bạn còn cần làm để task Done
+
+1. PO review QA04; INT02 merge các nhánh vào bản chung và giữ /api/me. Sửa BUG-S2-002, giữ regression BUG-S2-001; bạn tạo/gán Jira và xác nhận owner/hạn, retest đúng SHA sửa.
+2. Sau FE10 xong, chạy trọn49 AC QA04 trên bản tích hợp, bao gồm tìm/lọc/phân trang, Tự nấu→danh sách→công thức và back. Smoke preview không thay full matrix.
+3. Xác minh controlled data cho đủ4 nhóm, INCOMPLETE100%, tagAND, pantry bật/tắt thực sự đổi kết quả; nếu dataset chưa gán cờ thì BLOCKED phụ thuộc TV3/DA04, không sửa expected cho vừa dữ liệu.
+4. Chạy collection41 request với biến chuẩn và lưu run, gồm hidden-resource/no-recipe/emptySuggestIds từ dataset QA. Ca fixture trứng trong collection vẫn cần TV3 chuẩn bị;5 oracle live món33 đã có chứng cứ độc lập nhưng không tự biến fixture trứng thành PASS.
+5. Ghi browser/mobile actual và kết quả vào QA06; PO/INT02 xác nhận. Không cần tự có quyền Vercel: demo local theo DO04.
+
+### Kết quả browser đã tự chạy thêm
+
+Chromium desktop1440×1000, Firefox desktop1440×1000 và Chromium390×844:12 smoke checks mỗi cấu hình, tổng36 PASS,0 FAIL sau retest Firefox ngoài sandbox. Lần Firefox khởi chạy trong sandbox thất bại là lỗi môi trường, giữ results ban đầu và firefox-retest; tổng hợp cuối trong qa05-browser-evidence/latest-results.json.
+
+Đã bấm UI thật: guest có gợi ý, next không lặp, xem thẻ trước, đi placeholder FE10 và back giữ thẻ; chặn0 nguyên liệu/free text; autocomplete/alias chọn7 ID; món33 87%/7of8 thiếu Sườn heo; thêm56 thành100%/8of8; chuyển tab/back giữ kết quả; không tràn ngang390px. Có ảnh7/8 trong thư mục bằng chứng. Ảnh mobile8 cho thấy đủ4 nhóm trên bộ dữ liệu này; kiểm tra ảnh là quan sát phụ, chưa bao phủ mọi điều kiện nhóm. Chưa đánh giá tải toàn bộ ảnh món hoặc toàn bộ49 AC, chưa hoàn tất recipe flow do FE10.
+
+Bạn không cần chạy lại smoke2 trình duyệt/mobile trên cùng SHA chỉ để có bằng chứng lần đầu; cần chạy lại trên SHA tích hợp/sửa lỗi cuối và các case còn thiếu đã liệt kê.
+
+Retest BUG-S2-001 trên dfd7ba2: script Supertest vẫn fail đúng assertion, main401 UNAUTHORIZED / bảnQ4 mới404 NOT_FOUND. Q4 chưa khôi phục /api/me; đây là lỗi còn mở trên source mới, không chỉ rủi ro từ nhánh cũ.

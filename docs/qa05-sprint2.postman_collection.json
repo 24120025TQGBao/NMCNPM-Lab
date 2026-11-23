@@ -2,7 +2,7 @@
   "info": {
     "name": "QA05 Sprint 2 ? public API contract",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Pinned BE07 5aae4f6, DB12 23b78ef; GET only. Configure controlled QA dataset variables; unset variables are errors, never pass/skip."
+    "description": "BE07 a68473d, BE12 102ce6b, BE10 Q4 dfd7ba2. GET only. RPC completeness-first order; no global ratio sort. Configure controlled dataset variables."
   },
   "auth": {
     "type": "noauth"
@@ -63,6 +63,10 @@
     {
       "key": "sampleDishId",
       "value": "SET_sampleDishId"
+    },
+    {
+      "key": "emptySuggestIds",
+      "value": "SET_emptySuggestIds"
     }
   ],
   "item": [
@@ -862,7 +866,6 @@
               "  pm.expect(x.match_ratio).to.be.within(0,1);",
               "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
               "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
-              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
               " });",
               "});",
               "pm.test(\"Hand calculated scenario 1\", () => {",
@@ -915,7 +918,6 @@
               "  pm.expect(x.match_ratio).to.be.within(0,1);",
               "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
               "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
-              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
               " });",
               "});",
               "pm.test(\"Hand calculated scenario 2\", () => {",
@@ -968,7 +970,6 @@
               "  pm.expect(x.match_ratio).to.be.within(0,1);",
               "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
               "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
-              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
               " });",
               "});",
               "pm.test(\"Hand calculated scenario 3\", () => {",
@@ -1021,7 +1022,6 @@
               "  pm.expect(x.match_ratio).to.be.within(0,1);",
               "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
               "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
-              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
               " });",
               "});",
               "pm.test(\"Hand calculated scenario 4\", () => {",
@@ -1072,7 +1072,6 @@
               "  pm.expect(x.match_ratio).to.be.within(0,1);",
               "  pm.expect(x.have_count + x.missing.length).to.eql(x.total_count);",
               "  pm.expect([\"READY\",\"MISSING_1_2\",\"NEED_SHOPPING\"]).to.include(x.readiness);",
-              "  if (i) pm.expect(body.data[i-1].match_ratio).to.be.at.least(x.match_ratio);",
               " });",
               "});",
               "pm.test(\"Hand calculated scenario 5\", () => {",
@@ -1084,6 +1083,141 @@
               " const expected=[].map(v=>String(pm.variables.get(v))).sort();",
               " pm.expect(x.missing.map(x=>String(x.id)).sort()).to.eql(expected);",
               "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BE12 validation /ingredients/suggest-next",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients/suggest-next"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\",()=>pm.response.to.have.status(400));",
+              "const body=pm.response.json();",
+              "pm.test(\"Validation envelope\",()=>pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BE12 validation /ingredients/suggest-next?ingredients=abc",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients/suggest-next?ingredients=abc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\",()=>pm.response.to.have.status(400));",
+              "const body=pm.response.json();",
+              "pm.test(\"Validation envelope\",()=>pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BE12 validation /ingredients/suggest-next?ingredients=46&pantry=bad",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients/suggest-next?ingredients=46&pantry=bad"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\",()=>pm.response.to.have.status(400));",
+              "const body=pm.response.json();",
+              "pm.test(\"Validation envelope\",()=>pm.expect(body.error.code).to.eql(\"VALIDATION_ERROR\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BE12 live sample unlock dish33",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients/suggest-next?ingredients=5,6,8,11,28,55,57&pantry=false"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+              "const body=pm.response.json();",
+              "pm.test(\"Pork unlocks dish33\",()=>{ const x=body.data.find(x=>x.ingredient.id===56); pm.expect(x).to.be.an(\"object\"); pm.expect(x.dish_ids).to.include(33); pm.expect(x.unlock_count).to.eql(new Set(x.dish_ids).size); pm.expect(body.data.length).to.be.at.most(10); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BE12 full recipe does not unlock dish33",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients/suggest-next?ingredients=5,6,8,11,28,55,57,56&pantry=false"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+              "const body=pm.response.json();",
+              "pm.test(\"No duplicate unlocked dish33\",()=>body.data.forEach(x=>pm.expect(x.dish_ids).not.to.include(33)));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BE12 controlled empty",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/ingredients/suggest-next?ingredients={{emptySuggestIds}}&pantry=false"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if(!pm.variables.get(\"emptySuggestIds\") || String(pm.variables.get(\"emptySuggestIds\")).startsWith(\"SET_\")) throw new Error(\"Configure emptySuggestIds\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+              "const body=pm.response.json();",
+              "pm.test(\"Empty\",()=>pm.expect(body.data).to.eql([]));"
             ]
           }
         }
