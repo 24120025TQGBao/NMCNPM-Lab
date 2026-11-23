@@ -1,30 +1,46 @@
-# QA06 — Baseline hồi quy Sprint 2, 23/11/2026
+# QA06 — Report tiến độ hồi quy sau fetch mới, 23/11/2026
 
-Chưa phải báo cáo nghiệm thu cuối. Main 23bcb17 vẫn Sprint 1. Đã đọc FE09 786605d, BE08 5e0887b, BE11 5567501, BE09 41e2a65, BE10 0a5a8b3, DB 23b78ef, PO02/BE07 5aae4f6.
+Main23bcb17 chưa có Sprint2. Đã merge origin/main vào nhánh task: up-to-date. Context POa68473d, FE09786605d, BE12102ce6b (gồm BE08/11), BE10Q4dfd7ba2, DB23b78ef, grants40f0c0f. Người chạy tự động: Codex, chưa có PO/INT02 ký nghiệm thu.
 
-| Story | Kết luận hiện tại | Lý do |
+## Kết quả có bằng chứng
+
+| Lớp | PASS | FAIL | BLOCKED | Giới hạn |
+|---|---:|---:|---:|---|
+| API preview + Supabase thật |37|1|0| Ghép router tường minh, không chứng nhận production wiring |
+| Oracle tính độc lập món33/recipe25 |5|0|0| Đã nằm trong37 API pass, không cộng thêm |
+| Browser smoke Chromium desktop |12|0|0| FE09 + preview, chưa FE10 |
+| Browser smoke Firefox desktop |12|0|0| Retest ngoài sandbox, lỗi launch lần đầu giữ riêng |
+| Browser smoke Chromium390×844 |12|0|0| Viewport mô phỏng, không phải máy điện thoại thật |
+| BE12 suite |220|0|0|214 Vitest+6 Node, có mock/DB tạm, chồng lắp BE08/11 |
+| BE10Q4 suite |75|0|0|69 Vitest+6 Node, gồm19 test Q4 |
+
+Không cộng các lớp thành số AC đã pass. Full49 case QA04 chưa có kết quả đầy đủ; collection Postman41 request mới kiểm tra cú pháp, chưa chạy full. Năm oracle hiện có dữ liệu/expected/actual assertion trong qa05-live-preview-result.json trên nhánh QA05. Browser evidence có latest-results.json và ảnh; không có key/token/email QA.
+
+## Kết luận theo Story
+
+| Story | Kết luận | Thiếu gì |
 |---|---|---|
-| S2-01 | CHƯA NGHIỆM THU | FE08/BE08 chưa ghép main, chưa chạy luồng thật |
-| S2-02 | CHƯA NGHIỆM THU | Chờ INT02, 5 ca live, quyền RPC và dữ liệu |
-| S2-03 | BLOCKED | SearchPage là placeholder FE10 |
-| S2-04 | BLOCKED | DishDetailPage/RecipeDetailPage là placeholder FE10 |
-| S2-02.18 / FE11 | DEFERRED | PO dời Sprint 3, thiếu BE12/RPC |
+| S2-01 | CHƯA NGHIỆM THU | Smoke guest/next/history/back đạt; còn mọi AC loading/error/exhaustion/tag và bản tích hợp cuối |
+| S2-02 | CHƯA NGHIỆM THU |5 oracle và UI7/8 đạt; còn matrix, pantry có dữ liệu đúng, INCOMPLETE100%, bản cuối |
+| S2-03 | BLOCKED UI | FE10 SearchPage còn placeholder |
+| S2-04 | BLOCKED | FE10 chi tiết/công thức placeholder; API recipes-list thiếu route |
+| FE11 / S2-02.18 | P1 CHƯA XONG | BE12 mẫu đạt; FE11 chuẩn bị riêng, chờ FE09 merge và nối UI |
 
-Hồi quy tích hợp chưa chạy: pass=0, fail=0; số BLOCKED/NOT RUN từng case phải phân loại từ 49 case QA04 sau nhập kết quả thực tế. Không tính deferred là pass. Chưa có xác nhận INT02, kết quả browser/mobile hoặc Jira được giao/đã sửa.
+## Bug và rủi ro còn mở
 
-## Bằng chứng local, tách khỏi nghiệm thu
+| ID local | Actual / Expected | Người nhận đề xuất | Trạng thái |
+|---|---|---|---|
+| BUG-S2-001 | /api/me guest: main401, BE10 cũ404; cần giữ route khi tích hợp | Châu/INT02 | Chưa có Jira/owner/hạn được nhóm xác nhận; chưa retest bản cuối |
+| BUG-S2-002 | /api/dishes/33/recipes →404, contract7.6 yêu cầu200 data RecipeSummary | Châu/INT02 | Đã tái hiện trên preview Q4,1 API FAIL; chưa sửa/ret test |
 
-BE08: 163 Vitest+6 Node PASS; BE11:111+6 PASS; BE10:50+6 PASS; FE07–09:185 PASS. Suite chồng lắp, không cộng thành số case độc lập. Dùng snapshot git archive không .env và node_modules local qua junction; không phải npm ci sạch hoặc API Supabase thật. BE10 chưa có suite match mới. QA05 collection 35 GET parse PASS nhưng chưa chạy trên môi trường tích hợp.
+Không tự gán severity hoặc tuyên bố P0 đã có owner/hạn khi chưa được nhóm xác nhận. Route list thiếu và FE10 là rủi ro chặn luồng Sprint Goal. Main chưa ghép, tag/pantry/dataset và chữ ký contract còn cần kiểm chứng. Demo PO có số nhóm trước Q4, không dùng làm expected cho bản mới.
 
-BUG-S2-001 đã tái hiện: GET /api/me guest main →401 UNAUTHORIZED, BE10 →404 NOT_FOUND. Xem script docs/qa05-route-regression.mjs trên nhánh hien/QA05. Đề xuất Châu/INT02 giữ route main, severity/owner/hạn sửa cần nhóm xác nhận. Jira CHƯA TẠO, chưa retest bản sửa.
+## Việc còn lại để QA06 Done
 
-## Các bước hoàn tất
+1. INT02 ghép các PR đúng contract, giữ regression Sprint1; sửa2 bug trên, hoàn thiện FE10. Ghi SHA FE/BE/DB cuối và môi trường local chung (không có quyền Vercel).
+2. Lấy QA04 mới49 case và case bổ sung, QA05 collection41 GET/runner/evidence. Chạy toàn bộP0 còn thiếu trên bản cuối, không lặp lại vô ích suite cũ khi source không đổi; sau sửa phải retest vùng ảnh hưởng.
+3. Chromium và Firefox +390×844: đủ2 luồng đến công thức (Tự nấu vẫn qua danh sách dù1 công thức), tìm/lọc/phân trang/back; loading/rỗng/500/retry; controlled pantry/tag/INCOMPLETE100% và hidden/no-recipe. Ghi thực tế/ảnh/bug/runner/SHA từng case.
+4. Bạn tạo Jira, xác nhận severity/owner/hạn sửa, không P0 mở; PO duyệt QA04 và chốt từng Story. Báo PASS/FAIL/BLOCKED/NOT RUN/P1 không làm riêng; không tính thiếu test thành pass.
+5. Chia sẻ report trước Review theo hạn mới do PO xác nhận. Chưa gửi tin thay bạn trong phiên này.
 
-1. INT02 tích hợp FE/BE/DB, giữ API/test Sprint 1; nhập QA04/QA05/DO04. Ghi SHA cuối, URL, migration, ngày/runner/browser/dataset.
-2. Chạy mọi P0 QA04 và collection QA05 với API thật; lưu actual/JSON/ảnh đã lọc token. Có fixture chuẩn để đối chiếu 5 ca tính tay.
-3. Chromium và Firefox desktop chạy Gợi ý → Gợi ý khác không lặp → Nấu món này → chi tiết → Tự nấu → danh sách → chọn công thức → back giữ trạng thái.
-4. Theo nguyên liệu: chặn 0 ID, autocomplete/alias/chip, toggle pantry, đủ 4 nhóm gồm INCOMPLETE dù 100%, mở món/công thức/back. Tìm không dấu/lọc AND/phân trang/back. Lặp hai luồng tại 390×844, ghi mô phỏng hay thiết bị thật.
-5. Hồi quy /api/me, login, feed/detail/create post. Retest bug trên SHA sửa. Mọi case ghi actual/status/evidence/runner/SHA, mọi bug có Jira/severity/owner/hạn/trạng thái.
-6. Báo tổng PASS/FAIL/BLOCKED/NOT RUN/DEFERRED theo P0/P1; kết luận từng Story theo toàn bộ AC P0. Không P0 mở mới đề xuất đạt; PO/INT02 xác nhận và bạn chia sẻ trước Review.
-
-Rủi ro: FE10 chưa xong, nhánh chưa merge, regression Sprint 1, quyền RLS/RPC, tag/role/pantry và dataset ≥30 món/≥20 món đủ dữ liệu chưa được kiểm chứng trên môi trường chung. PO chưa chốt hạn Sprint mới; không dùng hạn 21/11 cũ để tuyên bố đúng hạn. Chưa gửi báo cáo/tin nhắn thay bạn.
+Retest BUG-S2-001 trên dfd7ba2: script Supertest vẫn fail đúng assertion, main401 UNAUTHORIZED / bảnQ4 mới404 NOT_FOUND. Q4 chưa khôi phục /api/me; đây là lỗi còn mở trên source mới, không chỉ rủi ro từ nhánh cũ.
