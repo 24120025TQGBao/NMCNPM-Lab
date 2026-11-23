@@ -2,6 +2,8 @@
 const RPC_PAGE_SIZE = 500;
 const LOOKUP_BATCH_SIZE = 100;
 const INGREDIENT_ROWS_PAGE_SIZE = 1000;
+// 30 công thức × tối đa 30 nguyên liệu người dùng chọn = 900 dòng, dưới giới hạn 1000 dòng mặc định của PostgREST.
+const USER_INGREDIENT_LOOKUP_BATCH_SIZE = 30;
 
 function requireRows(response, label) {
   if (response?.error) throw response.error;
@@ -44,6 +46,23 @@ async function getAllMatches(client, ingredientIds, includePantry) {
     if (!Number.isSafeInteger(offset)) throw new Error('Dish match offset overflow');
   }
   return rows;
+}
+
+// Q4 (docs/api.md 7.3, quy tắc 6): chỉ giữ món mà công thức do RPC chọn chứa ít nhất một nguyên liệu
+// NGƯỜI DÙNG chọn. Nguyên liệu tủ bếp cơ bản tự được coi là có KHÔNG tính; chỉ so với `ingredientIds` của request.
+async function getRecipesWithUserIngredient(client, recipeIds, ingredientIds) {
+  const matching = new Set();
+  for (const ids of chunks(recipeIds, USER_INGREDIENT_LOOKUP_BATCH_SIZE)) {
+    const rows = requireRows(
+      await client.from('ct_nguyen_lieu')
+        .select('ma_ct,ma_nl')
+        .in('ma_ct', ids)
+        .in('ma_nl', ingredientIds),
+      'user ingredient recipes'
+    );
+    for (const row of rows) matching.add(positiveId(row.ma_ct, 'recipe ID'));
+  }
+  return matching;
 }
 
 async function getImageUrls(client, dishIds) {
@@ -120,7 +139,10 @@ function adaptRow(row, images, counts) {
     throw new Error('Unknown DB12 readiness');
   }
   const isIncomplete = row.is_incomplete || rawReadiness === 'INCOMPLETE' || recipeId === null;
-  const readiness = isIncomplete ? 'NEED_SHOPPING' : rawReadiness === 'COOK_NOW' ? 'READY' : rawReadiness;
+  // Món chưa đầy đủ: readiness tính theo số nguyên liệu thiếu (docs/api.md 7.3, quy tắc 3); is_incomplete vẫn là true.
+  const readiness = isIncomplete
+    ? (missingCount === 0 ? 'READY' : missingCount <= 2 ? 'MISSING_1_2' : 'NEED_SHOPPING')
+    : rawReadiness === 'COOK_NOW' ? 'READY' : rawReadiness;
   const totalCount = recipeId === null ? 0 : counts.get(recipeId) ?? 0;
   if (totalCount < missingCount) throw new Error('Insufficient ingredient count metadata');
 
@@ -142,16 +164,22 @@ export function createDishesMatchService(client) {
     async matchDishes({ ingredientIds, includePantry }) {
       const rows = await getAllMatches(client, ingredientIds, includePantry);
       if (rows.length === 0) return [];
-      const dishIds = [...new Set(rows.map(row => positiveId(row.ma_mon, 'dish ID')))];
-      const recipeIds = [...new Set(rows.filter(row => row.ma_ct != null)
+
+      // Lọc Q4 trước khi tra ảnh và số nguyên liệu, để không truy vấn cho các món bị loại.
+      const candidateRecipeIds = [...new Set(rows.filter(row => row.ma_ct != null)
         .map(row => positiveId(row.ma_ct, 'recipe ID')))];
+      const recipesWithUserIngredient = await getRecipesWithUserIngredient(client, candidateRecipeIds, ingredientIds);
+      const kept = rows.filter(row => row.ma_ct != null && recipesWithUserIngredient.has(Number(row.ma_ct)));
+      if (kept.length === 0) return [];
+
+      const dishIds = [...new Set(kept.map(row => positiveId(row.ma_mon, 'dish ID')))];
+      const recipeIds = [...new Set(kept.map(row => positiveId(row.ma_ct, 'recipe ID')))];
       const [images, counts] = await Promise.all([
         getImageUrls(client, dishIds),
         getIngredientCounts(client, recipeIds)
       ]);
-      const result = rows.map(row => adaptRow(row, images, counts));
-      result.sort((a, b) => b.match_ratio - a.match_ratio || a.id - b.id);
-      return result;
+      // Giữ nguyên thứ tự của RPC: món đủ dữ liệu trước, rồi % khớp giảm dần, ít thiếu hơn, rồi id (docs/api.md 7.3).
+      return kept.map(row => adaptRow(row, images, counts));
     }
   };
 }
