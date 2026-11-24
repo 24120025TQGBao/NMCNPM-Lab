@@ -116,6 +116,7 @@ export function useIngredientMatch() {
     pantry,
     results,
     groupedResults,
+    queryKey,
     loading,
     error,
     addIngredient,

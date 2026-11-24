@@ -6,6 +6,10 @@ import IngredientChip from './IngredientChip'
 import PantryToggle from './PantryToggle'
 import MatchResults from './MatchResults'
 import { Button } from '../../../components/ui/Button'
+import { useIngredientEnhancements } from '../enhancements/useIngredientEnhancements'
+import PinIngredientButton from '../enhancements/PinIngredientButton'
+import ShoppingListButton from '../enhancements/ShoppingListButton'
+import PurchaseSuggestions from '../enhancements/PurchaseSuggestions'
 
 export default function IngredientMatchTab() {
   const {
@@ -13,6 +17,7 @@ export default function IngredientMatchTab() {
     pantry,
     results,
     groupedResults,
+    queryKey,
     loading,
     error,
     addIngredient,
@@ -22,6 +27,7 @@ export default function IngredientMatchTab() {
     togglePantry,
   } = useIngredientMatch()
 
+  const enhancements = useIngredientEnhancements({ ingredients, pantry, results, queryKey, groups: groupedResults })
   const [inputError, setInputError] = useState(null)
 
   const handleSelectIngredient = (item) => {
@@ -80,11 +86,24 @@ export default function IngredientMatchTab() {
                 <IngredientChip
                   key={ing.id}
                   ingredient={ing}
+                  actions={<PinIngredientButton ingredient={ing} pinned={enhancements.pinnedIds.includes(ing.id)}
+                    onToggle={enhancements.togglePin} disabled={loading} />}
                   onRemove={removeIngredient}
                   disabled={loading}
                 />
               ))}
             </div>
+          </div>
+        )}
+
+        {ingredients.length > 0 && (
+          <p className="text-xs text-muted">Ghim nguyên liệu cần dùng gấp để ưu tiên món có nguyên liệu đó trong từng nhóm.</p>
+        )}
+        {enhancements.pinLoading && <p role="status" className="text-xs text-muted">Đang ưu tiên món dùng nguyên liệu đã ghim…</p>}
+        {enhancements.pinError && (
+          <div role="alert" className="text-sm space-y-2">
+            <p>Chưa ưu tiên được món theo nguyên liệu ghim. Kết quả vẫn giữ thứ tự ban đầu.</p>
+            <Button variant="secondary" onClick={enhancements.retryPins}>Thử lại ưu tiên nguyên liệu ghim</Button>
           </div>
         )}
 
@@ -147,7 +166,31 @@ export default function IngredientMatchTab() {
         )}
 
         {!loading && !error && results !== null && (
-          <MatchResults groups={groupedResults} />
+          <div className="space-y-6">
+            {enhancements.isCurrent && (
+              <section aria-label="Danh sách đi chợ" className="rounded-2xl border border-border bg-white p-4 space-y-3">
+                <p className="text-sm">Chọn món bên dưới để gom nguyên liệu còn thiếu. Đã chọn {enhancements.selectedDishes.length} món.</p>
+                <ShoppingListButton dishes={enhancements.selectedDishes} />
+                {enhancements.selectedDishes.some(dish => dish.isIncomplete) && (
+                  <p className="text-xs text-amber-700">Món chưa đủ dữ liệu: danh sách chỉ gồm nguyên liệu thiếu đã biết, có thể chưa đầy đủ.</p>
+                )}
+                {enhancements.selectedDishes.length > 0 && (
+                  <Button variant="secondary" onClick={enhancements.clearShoppingDishes}>Bỏ chọn danh sách đi chợ</Button>
+                )}
+              </section>
+            )}
+            <MatchResults groups={enhancements.orderedGroups}
+              unlockSectionSlot={enhancements.isCurrent && <PurchaseSuggestions state={enhancements.purchase}
+                onRetry={enhancements.retryPurchase} onAddIngredient={handleSelectIngredient} disabled={loading || ingredients.length >= 20} />}
+              renderDishActions={enhancements.isCurrent ? dish => dish.missing?.length > 0 && (
+                <label className="flex items-center gap-2 px-2 text-sm text-foreground">
+                  <input type="checkbox" checked={enhancements.shoppingDishIds.includes(dish.id)}
+                    onChange={() => enhancements.toggleShoppingDish(dish.id)}
+                    aria-label={`Thêm nguyên liệu thiếu của ${dish.name} vào danh sách đi chợ`} />
+                  Thêm phần thiếu vào danh sách đi chợ
+                </label>
+              ) : undefined} />
+          </div>
         )}
       </div>
     </div>
