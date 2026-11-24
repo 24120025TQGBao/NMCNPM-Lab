@@ -1,17 +1,17 @@
 # Trạng thái Sprint 2 — cập nhật 24/11/2026
 
-Nguồn fetch mới: main23bcb17, FE09786605d, INT02449d189, BE09c7ceb72, PO72be7e1, BE12102ce6b. Thay thế kết luận hiện trạng trong report23/11; giữ report cũ làm lịch sử.
+Nguồn mới nhất đã dùng: `main@413a7b6` (merge PR #32 INT02), FE10 `587171e`, FE09 `786605d`, FE11 `e8de078`, PO `72be7e1`. PR #33 `revert-32-linh/int02` đang đề xuất đưa source về trước merge; kết quả QA dưới đây chạy trên ứng viên có INT02, chưa áp revert.
 
-| Task | Đã làm | Còn để Done |
+| Task | Trạng thái hiện tại | Còn lại |
 |---|---|---|
-| QA04 | Plan49 AC đồng bộ PO mới, ghi phần lọc loại/khẩu vị dờiSprint3; P1FE11 đã có test đủ | PO review/xác nhận |
-| DO04 | CodeCI và PR28 xanh; hướng dẫn demo local | Reviewer và PO/INT02 xác nhận local fallback, không có quyền Vercel |
-| QA05 | API40/40 trên INT02 thực,5 oracle; hai lỗi route cũ retest đạt; browser smoke và bằng chứng FE11 | Full AC trên bản cuối, FE10, controlled tag/pantry/hidden cases, Jira/PO |
-| QA06 | Đã cập nhật retest không còn2 lỗi route trên INT02 | QA05/FE10/full hồi quy và PO ký nghiệm thu |
-| FE11 | Đã merge FE09 vào riêng nhánh FE11 theo yêu cầu; đủ Mua thêm/ghim/copy trên UI,214 tests và33 browser checks đạt | CI SHA cuối/reviewer/merge; không còn blocker phải đợi FE09 merge mới viết code |
+| QA04 | Plan 49 AC đã đồng bộ PO và gắn trạng thái từ evidence; PR #27 từng được PO approve ở SHA cũ | Reviewer xác nhận revision mới sau sync/evidence |
+| DO04 | CI/gate code xong, 49 backend files syntax PASS; local fallback có hướng dẫn | CI HEAD mới, reviewer và PO xác nhận local thay Vercel |
+| QA05 | API 56/56; full browser và FE11 compatibility đã chạy | 3 lỗi sản phẩm, 4 AC thiếu dữ liệu, Jira/retest |
+| QA06 | Ma trận 49 AC: 40 PASS, 5 FAIL, 4 BLOCKED | Chưa thể nghiệm thu khi còn P0 FAIL/BLOCKED |
+| FE11 | Code xong; FE10 candidate compatibility 33/33 | CI/reviewer/merge; không còn blocker FE09 |
 
-FE11 giữ public HTTP/shared client/adapter/slots FE09. Pin membership qua catalog ingredients có phân trang, ưu tiên ổn định trong nhóm, không sửa điểm/nhóm; shoppinglist chỉ món được chọn. Test thật BE12 bộ7 mở món33 qua Sườn heo56; thêm56 thành100%/8of8. Lỗi HTTP và clipboard được mô phỏng trong browser, không sửa DB.
+Ba lỗi xác nhận: thiếu cook time ở chi tiết món, thiếu thông báo no-recipe tại entry point chi tiết, và link quay lại luôn về `/search` làm mất trạng thái `/goi-y`. Các AC tag AND, vùng miền và pantry bị blocked vì dataset hiện có 0 bản ghi tương ứng. Đây là khác biệt giữa lỗi code và thiếu dữ liệu, không gộp chung.
 
-Hai lỗi cũ đã đạt trên nhánh tích hợp449d189: /api/me401 và /api/dishes/33/recipes200. Không kết luận main đã chứa bản sửa vì main chưa merge. INT02 đã xuất hiện trên remote, không còn chờ nhánh tích hợp được push; vẫn chờ FE10 và nghiệm thu chung. FE10 không thuộc FE11 và vẫn là placeholder.
+PO `72be7e1` dời lọc loại món/khẩu vị sang Sprint 3; endpoint categories 500 do quyền bảng được ghi P2 theo dõi, không dùng để fail P0 Sprint 2. FE11 vẫn P1 Sprint 2 và đã đạt kiểm tra tương thích. Báo cáo ngày 23/11 giữ làm lịch sử; tài liệu này và ma trận QA06 là hiện trạng mới.
 
-PO72be7e1 dời bộ lọc loại món/khẩu vị sangSprint3; FE11 vẫnP1 Sprint2. Không tự tạo/gán/đóng Jira hoặc nhắn thành viên. Các PR riêng giữ đíchmain; FE11 có merge dependency FE09 nên review riêng diff từ786605d nếu cần. Không merge main trong phiên.
+Không tự merge/revert main, không tự tạo/gán/đóng Jira và không tuyên bố release được nghiệm thu. Quyết định PR #32/#33 phải được nhóm chốt trước vòng retest cuối.
