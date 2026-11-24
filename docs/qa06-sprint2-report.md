@@ -1,46 +1,39 @@
-# QA06 — Report hiện trạng hồi quy, 24/11/2026
+# QA06 — Báo cáo hồi quy Sprint 2, 24/11/2026
 
-PR [#30](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/30) vẫn draft, chưa phải nghiệm thu cuối. Main23bcb17 chưa merge Sprint2. Nguồn mới: INT02449d189 đã push, FE09786605d, FE11 đã merge dependency FE09 và hoàn thiện code, PO72be7e1, BE12102ce6b, BE09c7ceb72. Không suy rằng mọi source branch đã nằm trong main.
+PR [#30](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/30) vẫn draft. Kết quả dựa trên ứng viên QA `main@413a7b6` + FE10 `587171e` + FE11 `e8de078` (`e47c5f6`), không phải phê duyệt giữ merge PR #32 hay merge revert PR #33.
 
-## Kết quả đã xác minh
+## Kết quả
 
-| Lớp | PASS | FAIL | Giới hạn |
-|---|---:|---:|---|
-| HTTP app/route thật INT02 + Supabase |40|0| GET-only wrapper; không chứng nhận main đã tích hợp |
-|5 oracle độc lập món33/recipe25 |5|0| Đã nằm trong40 API, không cộng thêm |
-| FE09 browser smoke: Chromium/Firefox desktop và390×844 |36|0| Hai tab/back/placeholder, không full recipe flow |
-| FE11 browser: Chromium/Firefox desktop và390×844 |33|0| Mua thêm/ghim/copy/session/retry/[]; Firefox clipboard có kiểm soát, Chromium native |
-| FE11+FE09 frontend full suite |214|0| Unit/component/integration, có mock; sau đổi thông báo clipboard đã test lại9 primitive và browser |
+| Lớp kiểm tra | Kết quả |
+|---|---:|
+| API thật qua app/router + Supabase | 56/56 PASS |
+| Frontend suite | 227/227 PASS |
+| Backend Vitest + Node | 243/243 PASS |
+| Browser full flow, 3 cấu hình | 96 PASS / 12 FAIL / 9 BLOCKED checkpoint |
+| FE11 compatibility, 3 cấu hình | 33/33 PASS |
+| Ma trận chấp nhận | **40 PASS / 5 FAIL / 4 BLOCKED / 0 NOT RUN trên 49 AC** |
 
-JSON API mới: docs/qa05-int02-retest-2026-11-24.json trên nhánh QA05; runner qa05-int02-api-check.mjs. FE11 evidence: docs/fe11-browser-evidence trên nhánh FE11. Collection Postman41 GET mới parse, chưa chạy đủ với fixture riêng. Full49 AC QA04 chưa có kết quả đầy đủ. Không cộng các lớp thành số AC hoặc báo mọi case đã pass.
+P0: 39 PASS, 5 FAIL, 3 BLOCKED trên 47 AC. P1: 1 PASS, 1 BLOCKED. Không cộng số API/browser test thành số AC. Chi tiết từng AC và proof nằm trong `qa06-acceptance-matrix-2026-11-24.md/.json`; file sinh lại bằng `qa06-build-matrix.py`.
 
-Báo cáo23/11 API37/1 và BE10 cũ là lịch sử, không phải hiện trạng nhánh INT02 mới. Suite BE12/Q4 trước đó chồng lắp với Sprint1, không cộng tổng độc lập.
+## Kết luận theo Story
 
-## Kết luận theo Story/task
+| Story | PASS | FAIL | BLOCKED | Kết luận |
+|---|---:|---:|---:|---|
+| S2-01 | 9 | 1 | 2 | Chưa nghiệm thu: lỗi back-state; thiếu tag/vùng miền |
+| S2-02 | 15 | 1 | 2 | Chưa nghiệm thu: lỗi back-state; thiếu pantry |
+| S2-03 | 8 | 0 | 0 | Đạt trên ứng viên QA; cần retest release SHA |
+| S2-04 | 8 | 3 | 0 | Chưa nghiệm thu: thiếu cook time, no-recipe notice, back-state |
 
-| Story/task | Kết luận | Còn thiếu |
-|---|---|---|
-| S2-01 | CHƯA NGHIỆM THU | Smoke guest/next/history/back đạt; còn full AC và bản tích hợp cuối |
-| S2-02 | CHƯA NGHIỆM THU |5 oracle và UI7/8,8/8 đạt; còn controlled pantry/tag/INCOMPLETE100%, full matrix |
-| S2-03 | BLOCKED UI | FE10 SearchPage placeholder; thời gian/phân trang/tìm kiếm UI chưa đủ |
-| S2-04 | BLOCKED UI | FE10 chi tiết/công thức placeholder; API recipes-list mới đã đạt |
-| FE11 / S2-02.18 P1 | CODE/TEST ĐÃ XONG | PR31 cần CI SHA cuối/reviewer/merge; không còn chờ FE09 merge để viết code |
+Năm AC fail (`S2-01.7`, `S2-02.14`, `S2-04.1`, `S2-04.2`, `S2-04.10`) quy về ba lỗi `BUG-S2-003..005`, không phải năm lỗi độc lập. Bốn AC blocked do dataset không có tag/liên kết tag/vùng miền/pantry. Dataset vẫn đạt ngưỡng cơ bản: 72 món ACTIVE, 299 nguyên liệu chuẩn, 67 món matching-ready.
 
-PO72be7e1: lọc loại món/khẩu vị DEFERRED Sprint3, servings=null hiển thị chưa có thông tin. Không coi các phần đó là bug P0 Sprint2; S2-03.2 vẫn kiểm tra giới hạn thời gian. Dataset tag/pantry còn cần xác minh riêng.
+FE11/S2-02.18 P1 đạt 33/33 compatibility check và code đã xong; không còn chờ FE09 để triển khai. API phân trang đã kiểm tra không trùng/khuyết; recipe25 được kiểm tra định lượng, đơn vị, “Tùy khẩu vị”, thời gian và thứ tự bước trên ba cấu hình. Nhánh hidden-resource của S2-04.7 chưa có dữ liệu live riêng; nhánh unknown ID đã đạt, vì vậy proof này phải được đọc với giới hạn ghi trong JSON.
 
-## Retest bug
+## Điều kiện để QA06 Done
 
-| ID local | Lịch sử | Kết quả24/11 | Việc còn lại |
-|---|---|---|---|
-| BUG-S2-001 | /me guest trên BE10 cũ404, main401 | INT02449d189 trả401 UNAUTHORIZED, PASS | Retest main cuối; nhóm quản lý Jira nếu có, không tự đóng ticket |
-| BUG-S2-002 | recipes-list trả404, contract cần200 | /dishes/33/recipes trên INT02 trả200 córecipe25, PASS | Retest main cuối và các case400/404/hidden theo QA04 |
+1. Nhóm chốt quyết định PR #32/#33 và release SHA.
+2. Sửa ba lỗi trong `QA05/docs/qa05-bugs-2026-11-24.md`, retest năm AC fail trên SHA mới.
+3. TV3/DA04 cung cấp dữ liệu tag, vùng miền, pantry; retest bốn AC blocked mà không sửa DB dùng chung tùy tiện.
+4. Chạy smoke hồi quy trên Chromium, Firefox và 390×844; xác nhận CI đúng SHA. Local fallback được dùng vì Hiền không có quyền Vercel, nhưng cần PO ghi nhận.
+5. Nhập Jira/owner/severity/hạn và PO review ma trận. Không tuyên bố nghiệm thu khi còn P0 FAIL/BLOCKED nếu chưa có ngoại lệ được PO ghi rõ.
 
-Không còn tái hiện2 lỗi này trên source tích hợp đã kiểm tra; không nói lỗi đã sửa trong mọi nhánh. Severity/owner/hạn và Jira cần nhóm xác nhận nếu còn bug khác. FE10 thiếu là phụ thuộc tính năng, không giả lập thành luồng đã chạy xong.
-
-## Để QA06 Done
-
-1. INT02 tích hợp PR đã duyệt và hoàn thiện FE10; giữ chức năng/test Sprint1. Ghi SHA FE/BE/DB và URL/môi trường local chung (không có quyền Vercel).
-2. Chạy mọi AC P0 QA04 còn thiếu và collection QA05 với fixture/biến chuẩn, retest trên SHA cuối. Mỗi case có actual/status/evidence/runner/SHA/bug. Phân biệt PASS/FAIL/BLOCKED/NOT RUN và P1 chưa làm.
-3. Trên Chromium/Firefox và390×844: đủ2 luồng đến công thức, Tự nấu vẫn qua danh sách dù1 công thức; tìm/giới hạn thời gian/phân trang/back; loading/rỗng/500/retry; hidden/no-recipe/thiếu dữ liệu/INCOMPLETE100% và pantry có dữ liệu đúng.
-4. Hồi quy /me, login, feed/detail/create post trên môi trường QA phù hợp; không tự ghi dữ liệu dùng chung. Mọi bug mở có Jira, severity, owner, hạn và kết quả retest; không P0 mở mới đề xuất đạt.
-5. PO duyệt QA04, xác nhận từng Story và phương án local; bạn chia sẻ report trước Review theo hạn mới do PO chốt. Chưa gửi tin hoặc đóng Jira thay bạn.
+Hai lỗi lịch sử `/api/me` và recipes-list đã retest đạt trên INT02/ứng viên mới; không tự đóng Jira thay nhóm. Endpoint categories trả 500 do quyền bảng là theo dõi P2/Sprint 3 vì scope loại/khẩu vị đã được PO defer.
