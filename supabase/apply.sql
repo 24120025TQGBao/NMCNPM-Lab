@@ -8,4 +8,4 @@
 \ir migrations/202611210001_discovery_metadata.sql
 \ir migrations/202611210002_ingredient_dictionary.sql
 \ir migrations/202611220001_dish_matching.sql
-\ir migrations/202611230001_service_role_grants.sql
+\ir migrations/202611220002_service_role_recipe_read.sql
