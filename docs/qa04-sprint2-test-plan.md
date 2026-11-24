@@ -2,7 +2,7 @@
 
 **Cập nhật xuất bản 23/11:** đã commit/push `hien/QA04` bằng danh tính Git hiện tại, không co-author. [PR #27](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/27) đã mở; [CI pull_request xanh](https://github.com/24120025TQGBao/NMCNPM-Lab/actions/runs/45198150165) tại SHA `647fe9e`. Còn PO review/xác nhận; không coi 49 AC đã chạy đủ.
 
-Nguồn PO02/BE07 a68473d, FE09 786605d, DB12 23b78ef và SE_SP2.md. PO review: CHỜ XÁC NHẬN. Bảng giữ nguyên Given/When/Then từ từng AC; không tự sửa tiêu chí của PO.
+Nguồn PO02/BE07 72be7e1, FE09 786605d, DB12 23b78ef và SE_SP2.md. PO review: CHỜ XÁC NHẬN. Bảng giữ nguyên Given/When/Then từ từng AC; không tự sửa tiêu chí của PO.
 
 Phạm vi P0 S2-01…04; vùng miền P1 báo riêng; FE11/BE12 và S2-02.18 vẫn P1 Sprint 2, ưu tiên sau P0. Entry: FE/BE đã tích hợp, ghi SHA FE/BE/DB và URL, cả VITE_USE_MOCK=false và VITE_USE_MOCK_API=false; dataset QA có ID chuẩn, món ACTIVE/HIDDEN, 0/1/nhiều công thức, công thức thiếu dữ liệu. Không nạp fixture lên DB chung.
 
@@ -34,26 +34,26 @@ Exit: mọi P0 pass, không P0 mở, lỗi còn lại có owner/hạn xử lý, 
 | QA04-S2-02.8 | S2-02.8 | Như trên | Tắt công tắc | Các nguyên liệu cơ bản được tính như mọi nguyên liệu khác: thiếu thì ghi vào danh sách thiếu | NOT RUN |
 | QA04-S2-02.9 | S2-02.9 | Đã có ít nhất 1 nguyên liệu | Tìm món | Kết quả chia thành **4 nhóm** theo thứ tự: **Nấu ngay / Thiếu 1–2 thứ / Cần đi chợ / Chưa đủ dữ liệu để kết luận** (QĐ 4.4). API trả `readiness` 3 giá trị (`READY`, `MISSING_1_2`, `NEED_SHOPPING`) cùng cờ `is_incomplete`; nhóm thứ tư do giao diện suy ra từ cờ này. Quy tắc xếp nhóm (món không `is_incomplete`) theo RPC `match_dishes` của DB12: số nguyên liệu thiếu bằng 0 → Nấu ngay; 1 hoặc 2 → Thiếu 1–2 thứ; còn lại → Cần đi chợ. Tỷ lệ khớp tính với trọng số nguyên liệu chính : phụ = 2 : 1 | NOT RUN |
 | QA04-S2-02.10 | S2-02.10 | Một món có `is_incomplete = true` | Xem kết quả | Món vào nhóm **Chưa đủ dữ liệu để kết luận** bất kể `readiness`, và không được trình bày như đã đủ nguyên liệu (QĐ 4.4). Nhóm không có món nào thì không hiển thị | NOT RUN |
-| QA04-S2-02.11 | S2-02.11 | Có kết quả | Duyệt từng nhóm | Thứ tự món trong mỗi nhóm đúng như API trả về (API xếp theo % khớp giảm dần); frontend không sắp xếp lại và không tính lại % | NOT RUN |
+| QA04-S2-02.11 | S2-02.11 | Có kết quả | Duyệt từng nhóm | Thứ tự món trong mỗi nhóm đúng như API trả về, tức giữ thứ tự của RPC `match_dishes` (món đủ dữ liệu trước, rồi % khớp giảm dần, rồi món ít thiếu hơn trước); frontend không sắp xếp lại và không tính lại % | NOT RUN |
 | QA04-S2-02.12 | S2-02.12 | Có kết quả | Xem một món | Hiện thanh tiến độ và **"X% khớp"** lấy từ `match_ratio` (có trọng số theo vai trò chính/phụ, QĐ 4.2). Cạnh đó hiện dòng **"Có a/b nguyên liệu"** là số đếm, cùng chip nguyên liệu thiếu, ví dụ "Có 5/7 nguyên liệu, thiếu: hành lá, nước mắm". Hai con số có thể không tương ứng nhau (ví dụ 5/7 nhưng không phải 71%); đó là thiết kế | NOT RUN |
 | QA04-S2-02.13 | S2-02.13 | Không món nào phù hợp | Tìm món | API trả 200 + `[]`; giao diện hiện thông báo rỗng, không phải lỗi | NOT RUN |
 | QA04-S2-02.14 | S2-02.14 | Có kết quả | Chọn một món | Chuyển sang `/dishes/:id` rồi tới công thức. Quay lại thì giữ nguyên chip nguyên liệu, công tắc tủ bếp và kết quả (QĐ 1.4) | NOT RUN |
 | QA04-S2-02.15 | S2-02.15 | Khách chưa đăng nhập | Dùng toàn bộ tab | Dùng được, không bị chặn | NOT RUN |
 | QA04-S2-02.16 | S2-02.16 | Đang tải hoặc API lỗi | Chờ phản hồi | Có trạng thái đang tải; lỗi thì có thông báo và nút **Thử lại** | NOT RUN |
 | QA04-S2-02.17 | S2-02.17 | Bộ 3–5 ca mẫu tính tay (dữ liệu mẫu chốt cùng TV3) | Chạy đối sánh | Nhóm, `match_ratio`, "có/tổng", danh sách thiếu và thứ tự khớp với kết quả tính tay | NOT RUN |
-| QA04-S2-02.18 | S2-02.18 `[P1]` | Đã có nguyên liệu | Xem gợi ý "mua thêm" | Hiện nguyên liệu mở khóa nhiều món nhất kèm số món. Có thể ghim nguyên liệu và sao chép danh sách đi chợ (FE11). Không có gợi ý thì API 200 + `[]` và giao diện ẩn mục này | NOT RUN |
+| QA04-S2-02.18 | S2-02.18 `[P1]` | Đã có nguyên liệu | Xem gợi ý "mua thêm" | Hiện nguyên liệu mở khóa nhiều món nhất kèm số món. Có thể ghim nguyên liệu và sao chép danh sách đi chợ (FE11). Không có gợi ý thì API 200 + `[]` và giao diện ẩn mục này | PASS tự động FE11/INT02, chờ review |
 | QA04-S2-03.1 | S2-03.1 | Có món "Phở bò" | Tìm `pho bo`, `PHỞ BÒ` hoặc `Pho` | Đều thấy "Phở bò" (không phân biệt hoa/thường, có dấu/không dấu) | NOT RUN |
-| QA04-S2-03.2 | S2-03.2 | Trang tìm kiếm | Lọc theo loại món, **khẩu vị** (`MAN`, `CAY`, `NGOT`, `CHUA`, `THANH`) và **thời gian chế biến** | Chỉ hiện món thỏa các bộ lọc đã chọn, kết hợp AND với từ khóa tên | NOT RUN |
+| QA04-S2-03.2 | S2-03.2 | Trang tìm kiếm | Lọc theo **thời gian chế biến** (`max_cook_time`, phút) | Chỉ hiện món có ít nhất một công thức công khai với thời gian nấu không quá giá trị đã chọn, kết hợp AND với từ khóa tên. **Lọc theo khẩu vị (`MAN`, `CAY`, `NGOT`, `CHUA`, `THANH`) và theo loại món: DEFERRED Sprint 3**, vì `flavor` hiện luôn `null` và chưa có nguồn dữ liệu (`thuoc_tinh_mon`); giao diện không hiển thị hai bộ lọc này trong Sprint 2 | NOT RUN |
 | QA04-S2-03.3 | S2-03.3 | Từ khóa hoặc bộ lọc không có món nào | Tìm | API 200 + `[]` với `total` = 0; giao diện hiện thông báo "không tìm thấy món phù hợp" | NOT RUN |
 | QA04-S2-03.4 | S2-03.4 | Nhiều món hơn một trang | Chuyển trang | Phân trang đúng quy ước mục 1.3 của `docs/api.md`: không trùng, không sót món với dữ liệu cố định; `meta.total` đúng | NOT RUN |
 | QA04-S2-03.5 | S2-03.5 | `page`/`limit` sai (≤0, không phải số, vượt giới hạn) hoặc mã bộ lọc lạ | Gọi API trực tiếp | 400 | NOT RUN |
 | QA04-S2-03.6 | S2-03.6 | Đã nhập từ khóa, bộ lọc và sang trang 2, rồi mở chi tiết một món | Bấm quay lại | Từ khóa, bộ lọc và số trang giữ nguyên (QĐ 1.4) | NOT RUN |
 | QA04-S2-03.7 | S2-03.7 | Khách chưa đăng nhập | Tìm món | Dùng được | NOT RUN |
 | QA04-S2-03.8 | S2-03.8 | Đang tải hoặc API lỗi | Chờ phản hồi | Có đang tải; lỗi thì có thông báo và **Thử lại** | NOT RUN |
-| QA04-S2-04.1 | S2-04.1 | Món tồn tại | Mở `/dishes/:id` | Hiện tên, ảnh, mô tả, thời gian nấu, nút **Tự nấu**, mục "Quán ăn: Sắp có" (chưa có chức năng), và danh sách công thức (tên, khẩu phần, thời gian) | NOT RUN |
+| QA04-S2-04.1 | S2-04.1 | Món tồn tại | Mở `/dishes/:id` | Hiện tên, ảnh, mô tả, thời gian nấu, nút **Tự nấu**, mục "Quán ăn: Sắp có" (chưa có chức năng), và danh sách công thức (tên, khẩu phần, thời gian). Khẩu phần hiện hiển thị **"chưa có thông tin"** vì `servings` luôn `null` (thêm cột ở Sprint 3) | NOT RUN |
 | QA04-S2-04.2 | S2-04.2 | Món chưa có công thức nào | Mở chi tiết | Hiện thông báo rõ "chưa có công thức", không để vùng trống khó hiểu (QĐ 1.5) | NOT RUN |
 | QA04-S2-04.3 | S2-04.3 | Món có công thức, kể cả chỉ có **một** công thức | Bấm **Tự nấu** | Hiện danh sách công thức của món; người dùng chọn một công thức để mở `/recipes/:id`. Không tự vào thẳng công thức khi chỉ có một | NOT RUN |
-| QA04-S2-04.4 | S2-04.4 | Công thức tồn tại | Mở `/recipes/:id` | Hiện tên, khẩu phần, thời gian chuẩn bị, **nguyên liệu kèm định lượng và đơn vị**, và **các bước đánh số theo thứ tự** (QĐ 1.5) | NOT RUN |
+| QA04-S2-04.4 | S2-04.4 | Công thức tồn tại | Mở `/recipes/:id` | Hiện tên, khẩu phần, thời gian chuẩn bị, **nguyên liệu kèm định lượng và đơn vị**, và **các bước đánh số theo thứ tự** (QĐ 1.5). Khẩu phần hiện hiển thị **"chưa có thông tin"** vì `servings` luôn `null` (thêm cột ở Sprint 3) | NOT RUN |
 | QA04-S2-04.5 | S2-04.5 | Nguyên liệu không có định lượng cố định (`quantity` rỗng) | Xem danh sách nguyên liệu | Hiện "tùy khẩu vị", không hiện 0 hay để trống | NOT RUN |
 | QA04-S2-04.6 | S2-04.6 | Công thức thiếu thành phần (đánh dấu chưa đầy đủ, hoặc thiếu thời gian/khẩu phần) | Xem công thức hoặc danh sách công thức | Báo rõ phần nào thiếu ("chưa có thông tin") và gắn nhãn "chưa đầy đủ" nếu có; không khẳng định đủ nguyên liệu và không bịa giá trị (QĐ 1.5, QĐ 4.4) | NOT RUN |
 | QA04-S2-04.7 | S2-04.7 | ID món hoặc công thức không tồn tại, hoặc món không còn `ACTIVE` | Mở trang, hoặc gọi API | API 404; giao diện hiện trang "không tìm thấy" có đường quay về | NOT RUN |
@@ -101,3 +101,7 @@ Nguồn PO a68473d, BE12 102ce6b, BE08 57af6da, BE10 Q4 dfd7ba2, DB grants 40f0c
 | QA04-FE11-COPY | Chọn món, copy danh sách thiếu; cho phép rồi từ chối clipboard | Chỉ copy phần thiếu đã biết, báo thành công sau writeText resolve; lỗi không báo thành công |
 
 Năm ca live mới dùng món 33/công thức 25 thay vì nạp fixture: 1/8 (weight 1/15, ratio 0.0667), 2/8 (3/15, 0.2), 4/8 (7/15, 0.4667), 7/8 (13/15, 0.8667), 8/8 (15/15, 1). pantry=false, expected suy độc lập từ ingredient/role của công thức trước khi gọi match; 5 ca đã PASS trên preview ghép router + Supabase thật. Không thay thế toàn bộ QA04 hoặc nghiệm thu INT02.
+
+## Cập nhật PO và thực thi 24/11
+
+Đã đồng bộ49 dòng AC theo72be7e1: giữ thứ tự RPC, khẩu phần thiếu hiện chưa có thông tin, lọc loại món/khẩu vị DEFERRED Sprint3; S2-03.2 vẫn kiểm tra thời gian chế biến P0. S2-02.18 P1 đã chạy đủ phần Mua thêm/ghim/copy/[] qua33 browser checks FE11 trên3 cấu hình, nhưng còn reviewer/PO xác nhận. API40/40 trên INT02 mới đã sửa2 lỗi route. Xem sprint2-status-2026-11-24.md; không dùng các kết luận blocker cũ ngày23 làm hiện trạng.

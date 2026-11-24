@@ -1,5 +1,7 @@
 # Trạng thái Sprint 2 sau cập nhật PO — 23/11/2026
 
+**Có cập nhật mới:** xem [trạng thái24/11](sprint2-status-2026-11-24.md). Hai lỗi API đã retest đạt trên INT02, FE11 đã hoàn thiện trên nền FE09; phần dưới là lịch sử23/11.
+
 Đã fetch origin --prune lần nữa; main vẫn 23bcb17, không có commit Sprint 2 mới. Đã chạy merge origin/main trên main và cả năm nhánh task: tất cả up-to-date, không xung đột. Không merge các nhánh phụ thuộc chưa duyệt vào main/task; kiểm thử bằng snapshot và preview riêng.
 
 ## Nguồn hiện tại
