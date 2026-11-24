@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-24T03:02:40.488Z",
+  "source": "e47c5f638cd30924603bc4956426c0961a3c22be",
+  "readOnly": true,
+  "activeDishes": 72,
+  "canonicalIngredients": 299,
+  "pantryFlagged": 0,
+  "taggedRows": 0,
+  "dishTagRows": 0,
+  "knownRegionDishes": 0,
+  "completeMatchingDishes": 67,
+  "unusedIngredient": {
+    "id": 2,
+    "name": "Cá chẽm"
+  },
+  "errors": []
+}

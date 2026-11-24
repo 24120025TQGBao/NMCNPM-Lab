@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 const base = process.env.QA_API_BASE || 'http://127.0.0.1:3102';
-const refs = { int02:'449d189', fe09:'786605d' };
+const refs = { target:process.env.QA_SOURCE_REF || '449d189', fe09:'786605d' };
 
   const results = [];
   const oracle = [];
@@ -77,8 +77,33 @@ const refs = { int02:'449d189', fe09:'786605d' };
     assert(b.data.length<=10);
   });
   await check('BE12 full set cannot unlock dish33','/ingredients/suggest-next?ingredients='+all.join(',')+'&pantry=false',200,b=>assert(b.data.every(x=>!x.dish_ids.includes(33))));
+
+  for (const route of ['/suggestions?exclude=abc','/suggestions?limit=11','/suggestions?vung_mien=UNKNOWN',
+    '/ingredients','/ingredients?search=a&limit=21','/dishes?limit=51','/dishes?max_cook_time=0',
+    '/dishes?max_cook_time=1441','/dishes/abc/recipes']) await check('extra validation '+route,route,400);
+  await check('missing dish recipe list','/dishes/999999999/recipes',404);
+  await check('cook time filter independently checked via dish details','/dishes?max_cook_time=30&limit=50',200,async b=>{
+    assert(b.data.length>0);
+    const details=await Promise.all(b.data.map(x=>fetch(base+'/api/dishes/'+x.id).then(r=>r.json())));
+    assert(details.every(x=>Number.isFinite(x.data.cook_time_minutes)&&x.data.cook_time_minutes<=30));
+  });
+  const single=await check('canonical single ingredient match','/dishes/match?ingredients=46&pantry=false',200);
+  if(single) await check('duplicate selected IDs do not inflate matches','/dishes/match?ingredients=46,46&pantry=false',200,b=>assert.deepEqual(b.data,single.data));
+  if(process.env.QA_DATASET_AUDIT){
+    const audit=JSON.parse(readFileSync(process.env.QA_DATASET_AUDIT,'utf8'));
+    if(audit.errors.length===0 && audit.unusedIngredient){
+      await check('valid unused ingredient gives empty matches','/dishes/match?ingredients='+audit.unusedIngredient.id+'&pantry=false',200,b=>assert.deepEqual(b.data,[]));
+      await check('valid unused ingredient gives empty BE12','/ingredients/suggest-next?ingredients='+audit.unusedIngredient.id+'&pantry=false',200,b=>assert.deepEqual(b.data,[]));
+    }
+  }
+  await check('fixed-dataset pagination has no duplicates or gaps','/dishes?page=1&limit=12',200,async first=>{
+    const total=first.meta.total;assert(Number.isInteger(total));assert(total>12);
+    const pages=await Promise.all(Array.from({length:Math.ceil(total/12)-1},(_,i)=>fetch(base+'/api/dishes?page='+(i+2)+'&limit=12').then(r=>r.json())));
+    assert(pages.every((p,i)=>p.meta.page===i+2&&p.meta.total===total));
+    const all=[...first.data,...pages.flatMap(p=>p.data)];assert.equal(all.length,total);assert.equal(new Set(all.map(x=>x.id)).size,total);
+  });
   console.error = savedError;
-  const report = { checkedAt: new Date().toISOString(), environment: 'actual INT02 449d189 HTTP routes + live Supabase, GET-only QA wrapper',
+  const report = { checkedAt: new Date().toISOString(), environment: 'selected source HTTP routes + live Supabase through GET-only QA wrapper (see refs)',
     refs, verifiedIntegratedBranchWiring: true, certifiedMainWiring: false, results, oracle,
     summary: Object.fromEntries(['PASS','FAIL','BLOCKED'].map(s=>[s,results.filter(x=>x.status===s).length])) };
   const output = path.resolve(process.env.QA_RESULT_FILE || 'qa05-int02-retest-result.json');
