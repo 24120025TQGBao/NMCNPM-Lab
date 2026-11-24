@@ -10,10 +10,6 @@ import CommunityPage from '../features/community/CommunityPage'
 import PostDetailPage from '../features/posts/PostDetailPage'
 import CreatePostPage from '../features/posts/CreatePostPage'
 import DishListPage from '../features/dishes/DishListPage'
-import SuggestPage from '../pages/SuggestPage'
-import SearchPage from '../pages/SearchPage'
-import DishDetailPage from '../pages/DishDetailPage'
-import RecipeDetailPage from '../pages/RecipeDetailPage'
 import { ROLE_ADMIN } from '../lib/config'
 import { vi } from '../i18n/vi'
 
@@ -31,11 +27,9 @@ export const router = createBrowserRouter([
       { path: 'register', element: <RegisterPage /> },
       { path: 'posts/:id', element: <PostDetailPage /> },
       { path: 'dishes', element: <DishListPage /> },
-      { path: 'goi-y', element: <SuggestPage /> },
-      { path: 'search', element: <SearchPage /> },
-      { path: 'dishes/:id', element: <DishDetailPage /> },
-      { path: 'recipes/:id', element: <RecipeDetailPage /> },
+      { path: 'dishes/:id', element: wip(f.dish) },
       { path: 'dishes/:id/recipes', element: wip(f.dishRecipes) },
+      { path: 'recipes/:id', element: wip(f.recipe) },
       { path: 'by-ingredient', element: wip(f.byIngredient) },
       { path: 'restaurants', element: wip(f.restaurants) },
       {

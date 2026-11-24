@@ -8,7 +8,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { AppError } from './utils/AppError.js';
 
-export function createApp({ dishesClient, profileClient, ingredientsClient, suggestionsClient } = {}) {
+export function createApp({ dishesClient, profileClient } = {}) {
   const app = express();
 
   // Bảo mật HTTP Headers
@@ -45,7 +45,7 @@ export function createApp({ dishesClient, profileClient, ingredientsClient, sugg
   });
 
   // Gắn router nghiệp vụ
-  app.use('/api', createApiRouter({ dishesClient, profileClient, ingredientsClient, suggestionsClient }));
+  app.use('/api', createApiRouter({ dishesClient, profileClient }));
 
   // Xử lý 404 cho route không tồn tại
   app.use(notFoundHandler);
