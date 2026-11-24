@@ -6,7 +6,7 @@ import ShoppingListButton from './ShoppingListButton'
 import PinIngredientButton from './PinIngredientButton'
 const dishes = [{ id: 33, missing: [{ id: 56, name: 'Sườn heo' }] }]
 
-describe('FE11 standalone enhancements (not integrated until FE09 merges)', () => {
+describe('FE11 shopping list and pin primitives', () => {
   it('copies only known missing names, de-duplicates canonical IDs and preserves order', () => {
     expect(buildShoppingList([...dishes, { missing: [{ id: 56, name: 'Sườn heo' }, { id: 28, name: 'Hành lá' }] }]))
       .toBe('- Sườn heo\n- Hành lá')
@@ -22,7 +22,7 @@ describe('FE11 standalone enhancements (not integrated until FE09 merges)', () =
     const denied = { writeText: vi.fn().mockRejectedValue(new Error('Permission denied')) }
     render(<ShoppingListButton dishes={dishes} clipboard={denied} />)
     fireEvent.click(screen.getByRole('button'))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Permission denied')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Không sao chép được danh sách')
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
   it('reports success only after writeText resolves and clears feedback when list changes', async () => {

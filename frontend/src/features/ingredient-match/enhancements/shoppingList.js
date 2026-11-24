@@ -16,5 +16,9 @@ export async function copyShoppingList(text, clipboard) {
   if (typeof clipboard?.writeText !== 'function') {
     throw new Error('Trình duyệt không hỗ trợ sao chép. Hãy thử trên HTTPS hoặc localhost.')
   }
-  await clipboard.writeText(text)
+  try {
+    await clipboard.writeText(text)
+  } catch {
+    throw new Error('Không sao chép được danh sách. Vui lòng cho phép sao chép hoặc thử lại.')
+  }
 }

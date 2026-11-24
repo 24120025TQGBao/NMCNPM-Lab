@@ -108,3 +108,23 @@ export function mapMatchDishList(body) {
   const items = Array.isArray(body) ? body : Array.isArray(body?.data) ? body.data : []
   return items.map(mapMatchDish).filter(Boolean)
 }
+
+
+// BE12 uses the same public HTTP envelope; never pass raw RPC rows to the UI.
+export function mapPurchaseSuggestions(body) {
+  if (!Array.isArray(body?.data)) throw new Error('Không đọc được gợi ý mua thêm.')
+  return body.data.map(item => {
+    if (!Number.isSafeInteger(item?.ingredient?.id) || item.ingredient.id < 1 ||
+        typeof item.ingredient.name !== 'string' || !item.ingredient.name.trim() ||
+        !Number.isSafeInteger(item.unlock_count) || item.unlock_count < 1 ||
+        !Array.isArray(item.dish_ids) || item.dish_ids.some(id => !Number.isSafeInteger(id) || id < 1) ||
+        new Set(item.dish_ids).size !== item.unlock_count || item.dish_ids.length !== item.unlock_count) {
+      throw new Error('Không đọc được gợi ý mua thêm.')
+    }
+    return {
+      ingredient: { id: item.ingredient.id, name: item.ingredient.name },
+      unlockCount: item.unlock_count,
+      dishIds: [...item.dish_ids],
+    }
+  })
+}

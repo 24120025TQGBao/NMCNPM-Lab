@@ -1,0 +1,323 @@
+{
+  "checkedAt": "2026-11-24T00:20:03.282Z",
+  "environment": "actual INT02 449d189 HTTP routes + live Supabase, GET-only QA wrapper",
+  "refs": {
+    "int02": "449d189",
+    "fe09": "786605d"
+  },
+  "verifiedIntegratedBranchWiring": true,
+  "certifiedMainWiring": false,
+  "results": [
+    {
+      "name": "suggestions guest",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "suggestions random excludes viewed",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "suggestions tag empty without relaxation",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "validation /suggestions?limit=0",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /suggestions?the=UNKNOWN",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /ingredients?search=",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /dishes/match",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /dishes/match?ingredients=abc",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /dishes/match?ingredients=46&pantry=bad",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /dishes/match?ingredients=999999999",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /dishes?page=0",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /dishes?flavor=UNKNOWN",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /dishes/abc",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /recipes/-1",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /ingredients/suggest-next",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /ingredients/suggest-next?ingredients=999999999",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "validation /ingredients/suggest-next?ingredients=46&pantry=bad",
+      "status": "PASS",
+      "http": 400
+    },
+    {
+      "name": "ingredient ca chua",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "ingredient Cà Chua",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "ingredient cà chua",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "ingredient synonym",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "ingredient prefix excludes infix",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "ingredient empty",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "dish empty",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "dish search pho",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "dish search PHỞ",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "dish not found",
+      "status": "PASS",
+      "http": 404
+    },
+    {
+      "name": "recipe not found",
+      "status": "PASS",
+      "http": 404
+    },
+    {
+      "name": "dish33 detail",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "recipe25 detail",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "contract recipe list route",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "BUG-S2-001 retest: me route remains mounted",
+      "status": "PASS",
+      "http": 401
+    },
+    {
+      "name": "pin membership from catalog",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "independent oracle 1/8",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "independent oracle 2/8",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "independent oracle 4/8",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "independent oracle 7/8",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "independent oracle 8/8",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "BE12 known unlock dish33",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "BE12 full set cannot unlock dish33",
+      "status": "PASS",
+      "http": 200
+    }
+  ],
+  "oracle": [
+    {
+      "selected": [
+        5
+      ],
+      "pantry": false,
+      "matchedWeight": 1,
+      "totalWeight": 15,
+      "ratio": 0.0667,
+      "have": 1,
+      "total": 8,
+      "missingIds": [
+        6,
+        8,
+        11,
+        28,
+        55,
+        56,
+        57
+      ],
+      "readiness": "NEED_SHOPPING"
+    },
+    {
+      "selected": [
+        5,
+        6
+      ],
+      "pantry": false,
+      "matchedWeight": 3,
+      "totalWeight": 15,
+      "ratio": 0.2,
+      "have": 2,
+      "total": 8,
+      "missingIds": [
+        8,
+        11,
+        28,
+        55,
+        56,
+        57
+      ],
+      "readiness": "NEED_SHOPPING"
+    },
+    {
+      "selected": [
+        5,
+        6,
+        8,
+        11
+      ],
+      "pantry": false,
+      "matchedWeight": 7,
+      "totalWeight": 15,
+      "ratio": 0.4667,
+      "have": 4,
+      "total": 8,
+      "missingIds": [
+        28,
+        55,
+        56,
+        57
+      ],
+      "readiness": "NEED_SHOPPING"
+    },
+    {
+      "selected": [
+        5,
+        6,
+        8,
+        11,
+        28,
+        55,
+        57
+      ],
+      "pantry": false,
+      "matchedWeight": 13,
+      "totalWeight": 15,
+      "ratio": 0.8667,
+      "have": 7,
+      "total": 8,
+      "missingIds": [
+        56
+      ],
+      "readiness": "MISSING_1_2"
+    },
+    {
+      "selected": [
+        5,
+        6,
+        8,
+        11,
+        28,
+        55,
+        57,
+        56
+      ],
+      "pantry": false,
+      "matchedWeight": 15,
+      "totalWeight": 15,
+      "ratio": 1,
+      "have": 8,
+      "total": 8,
+      "missingIds": [],
+      "readiness": "READY"
+    }
+  ],
+  "summary": {
+    "PASS": 40,
+    "FAIL": 0,
+    "BLOCKED": 0
+  }
+}

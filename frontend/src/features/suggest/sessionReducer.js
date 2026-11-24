@@ -1,3 +1,5 @@
+import { retainSelectedPins, togglePinnedIngredient } from '../ingredient-match/enhancements/pinnedIngredients'
+
 export const STORAGE_KEY = 'hnag:suggest-session:v1'
 
 export const initialSessionState = {
@@ -13,6 +15,8 @@ export const initialSessionState = {
     pantry: true,
     results: null,
     queryKey: null,
+    pinnedIds: [],
+    shoppingDishIds: [],
   },
 }
 
@@ -35,6 +39,12 @@ export function loadSession() {
         pantry: typeof parsed.match?.pantry === 'boolean' ? parsed.match.pantry : true,
         results: Array.isArray(parsed.match?.results) ? parsed.match.results : null,
         queryKey: typeof parsed.match?.queryKey === 'string' ? parsed.match.queryKey : null,
+        pinnedIds: retainSelectedPins(
+          Array.isArray(parsed.match?.pinnedIds) ? parsed.match.pinnedIds : [],
+          Array.isArray(parsed.match?.ingredients) ? parsed.match.ingredients.map(item => item.id) : [],
+        ),
+        shoppingDishIds: Array.isArray(parsed.match?.shoppingDishIds)
+          ? [...new Set(parsed.match.shoppingDishIds)].filter(id => parsed.match?.results?.some(dish => dish.id === id && dish.missing?.length > 0)) : [],
       },
     }
   } catch {
@@ -129,6 +139,7 @@ export function sessionReducer(state, action) {
         match: {
           ...state.match,
           ingredients: action.payload,
+          pinnedIds: retainSelectedPins(state.match.pinnedIds ?? [], action.payload.map(item => item.id)),
         },
       }
     }
@@ -149,9 +160,24 @@ export function sessionReducer(state, action) {
           ...state.match,
           results,
           queryKey,
+          shoppingDishIds: queryKey === state.match.queryKey
+            ? (state.match.shoppingDishIds ?? []).filter(id => results?.some(dish => dish.id === id && dish.missing?.length > 0)) : [],
         },
       }
     }
+    case 'TOGGLE_MATCH_PIN':
+      return { ...state, match: { ...state.match, pinnedIds: togglePinnedIngredient(
+        state.match.pinnedIds ?? [], action.payload, state.match.ingredients.map(item => item.id),
+      ) } }
+    case 'TOGGLE_SHOPPING_DISH': {
+      const id = action.payload
+      if (!state.match.results?.some(dish => dish.id === id && dish.missing?.length > 0)) return state
+      const selected = state.match.shoppingDishIds ?? []
+      return { ...state, match: { ...state.match, shoppingDishIds: selected.includes(id)
+        ? selected.filter(value => value !== id) : [...selected, id] } }
+    }
+    case 'CLEAR_SHOPPING_DISHES':
+      return { ...state, match: { ...state.match, shoppingDishIds: [] } }
     case 'RESET_ALL':
       return initialSessionState
 
