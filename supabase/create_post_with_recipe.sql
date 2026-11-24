@@ -50,15 +50,27 @@ begin
       end if;
     else
       v_name := btrim(v_item->>'name');
-      select ma_nl into v_nl from nguyen_lieu
-      where lower(ten_nl) = lower(v_name) limit 1;
+      -- Dictionary migration adds exact accent-insensitive / synonym resolution.
+      -- Keep this standalone Sprint 1 script usable before that migration is installed.
+      if to_regprocedure('public.resolve_ingredient(text)') is not null then
+        v_nl := public.resolve_ingredient(v_name);
+      else
+        select ma_nl into v_nl from nguyen_lieu
+        where lower(ten_nl) = lower(v_name) limit 1;
+      end if;
       if v_nl is null then
-        insert into nguyen_lieu (ten_nl) values (v_name)
-        on conflict (ten_nl) do nothing
-        returning ma_nl into v_nl;
-        if v_nl is null then
-          select ma_nl into v_nl from nguyen_lieu where ten_nl = v_name;
-        end if;
+        begin
+          insert into nguyen_lieu (ten_nl) values (v_name)
+          returning ma_nl into v_nl;
+        exception when unique_violation then
+          -- Concurrent creators may have registered the same name or alias.
+          if to_regprocedure('public.resolve_ingredient(text)') is not null then
+            v_nl := public.resolve_ingredient(v_name);
+          else
+            select ma_nl into v_nl from nguyen_lieu where lower(ten_nl)=lower(v_name);
+          end if;
+          if v_nl is null then raise; end if;
+        end;
       end if;
     end if;
 
