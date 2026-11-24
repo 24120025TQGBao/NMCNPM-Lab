@@ -267,7 +267,6 @@ Lỗi:
 | `steps[]` | `buoc_cong_thuc` (`stt` → `order`, `noi_dung` → `content`) |
 
 Không trả email, số điện thoại hoặc dữ liệu nhạy cảm của người dùng qua API công khai.
-
 ---
 
 ## 6. Việc còn mở
@@ -276,3 +275,61 @@ Không trả email, số điện thoại hoặc dữ liệu nhạy cảm của n
 |---|---|---|
 | 1 | Áp dụng và kiểm thử `create_post_with_recipe` trên staging; SQL đã có trong repo nhưng chưa xác nhận trạng thái DB. | TV3 |
 | 2 | Chạy `supabase/grant_service_role_profile_read.sql` trên staging; xác nhận quyền `service_role` đọc `nguoi_dung` và quyền RPC cho các luồng bài viết. | TV3 |
+
+---
+
+## 7. Catalog Sprint 2 — đối chiếu BE09, bổ sung FE tra cứu ngày 24/11/2026
+
+Các response vẫn theo envelope/error và ID số nguyên của Sprint 1. Quyền: công khai, chỉ món/công thức công khai và ACTIVE. SQL BE09: `supabase/202611220002_be09_catalog_read.sql`, dựa trên schema/view BE07. Đây là mô tả implementation trong repo; chưa xác nhận triển khai lên Supabase đích.
+
+### 7.1. Tìm và lọc: `GET /api/dishes`
+
+Giữ nguyên `search`, `page`, `limit`, `ingredients` ở mục 2.5. `search` tối đa 100 ký tự sau trim, không phân biệt hoa/thường và dấu tiếng Việt; các bộ lọc kết hợp bằng AND trước khi phân trang.
+
+| Query | Quy tắc |
+|---|---|
+| `category` | Bổ sung trong thay đổi FE tra cứu: mã lấy từ `/api/dishes/categories`, 1–100 ký tự `A-Z`, `0-9`, `_`. Truyền `p_category` vào RPC `search_catalog_dishes` đã có của BE09 |
+| `flavor` | `MAN`, `CAY`, `NGOT`, `CHUA`, `THANH` |
+| `max_cook_time` | Số nguyên 1–1440, phút. So với thời gian nhỏ nhất của các công thức công khai của món; món chưa có thời gian bị loại khi bật bộ lọc |
+| `the` | Giữ API BE09: các tag cách nhau dấu phẩy (`TROI_MUA`, `LUOI_NAU`, `CUOI_THANG`, `NAU_CHO_4`, `AN_NHE`) |
+
+Frontend gửi 12 món/trang. Không có kết quả trả `200 { data: [], meta: { page, limit, total: 0 } }`. Sai query trả `400 VALIDATION_ERROR`; lỗi DB trả `500 INTERNAL_ERROR`.
+
+### 7.2. Danh mục loại món: `GET /api/dishes/categories`
+
+Endpoint bổ sung cho dropdown, không yêu cầu đăng nhập. Đọc `thuoc_tinh_mon` thuộc nhóm `LOAI_MON`, `LOAI`, `CATEGORY`, `TYPE` (chuẩn hóa bỏ dấu/hoa thường). Mã chuẩn hóa tương ứng phép so khớp category của SQL BE09. Không tự thêm taxonomy hay gán loại món vào DB.
+
+```json
+{ "data": [{ "code": "MON_NUOC", "name": "Món nước" }] }
+```
+
+Đây là ví dụ, không phải danh mục bắt buộc. Không có taxonomy trả `data: []`; lỗi DB trả 500. Mã trùng được gộp, tên sắp xếp theo tiếng Việt.
+
+### 7.3. Món và danh sách công thức
+
+- `GET /api/dishes/:id` trả `{ data: { id, name, description, image_url, cook_time_minutes, flavor, region, tags, recipes } }` theo BE09. Frontend dùng tên, mô tả, hình; thiếu hình có placeholder.
+- `GET /api/dishes/:id/recipes?page=1&limit=12` trả `{ data: [RecipeSummary], meta: { page, limit, total } }`.
+- `RecipeSummary`: `{ id, dish_id, name, servings, prep_time_minutes, ingredient_count, incomplete }`.
+- Món tồn tại nhưng chưa có công thức: `data: []`, total 0. Món không tồn tại/không công khai: 404. Sai ID/page/limit: 400.
+
+### 7.4. Chi tiết công thức: `GET /api/recipes/:id`
+
+```json
+{
+  "data": {
+    "id": 501,
+    "dish_id": 101,
+    "name": "Phở bò truyền thống",
+    "servings": null,
+    "prep_time_minutes": 180,
+    "incomplete": false,
+    "ingredients": [
+      { "ingredient_id": 100, "name": "Xương bò", "quantity": 1, "unit": "kg", "role": "PRIMARY" },
+      { "ingredient_id": 101, "name": "Muối", "quantity": null, "unit": null, "role": "SECONDARY" }
+    ],
+    "steps": [{ "order": 1, "content": "Chần xương và rửa sạch." }]
+  }
+}
+```
+
+`servings` và `prep_time_minutes` nullable. BE07 chưa lưu khẩu phần nên BE09 hiện trả `servings: null`; UI hiện “Chưa cập nhật”, không tự gán khẩu phần. Số lượng/đơn vị hiển thị theo dữ liệu; chỉ `quantity: null` hiện “Tùy khẩu vị”; số lượng có nhưng đơn vị thiếu thì báo “chưa có đơn vị”. Các bước sắp xếp và hiển thị theo `order`. `incomplete` là `NOT du_thong_tin_huong_dan` của view BE07, được hiển thị cảnh báo; không ẩn dữ liệu còn có. Không tồn tại/không công khai: 404; DB lỗi: 500.

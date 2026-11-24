@@ -51,6 +51,27 @@ describe('VITE_USE_MOCK gate (DEV is true under Vitest)', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
+  it('runs the entire catalog through mock in dev, including search filters and metadata', async () => {
+    vi.stubEnv('VITE_USE_MOCK', 'true')
+    const { dishes, recipes } = await load()
+    const found = await dishes.search({ search: 'PHO BO', category: 'MON_NUOC', flavor: 'THANH', maxCookTime: 60, page: 1, limit: 12 })
+    expect(found.data.map((dish) => dish.name)).toEqual(['Phở bò'])
+    expect((await dishes.categories())[0]).toHaveProperty('code')
+    expect(await dishes.get(101)).toMatchObject({ name: 'Phở bò', description: 'Món phở truyền thống Việt Nam' })
+    expect((await recipes.listByDish(101)).data[0]).toMatchObject({ servings: 4 })
+    expect(await recipes.get(501)).toMatchObject({ servings: 4, prepTimeMinutes: 180 })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('sends catalog filter names and pagination unchanged to BE09 when mock is off', async () => {
+    vi.stubEnv('VITE_USE_MOCK', 'false')
+    const { dishes } = await load()
+    await dishes.search({ search: 'pho bo', category: 'MON_NUOC', flavor: 'CAY', maxCookTime: 30, page: 2, limit: 12 })
+    const url = new URL(fetchMock.mock.calls[0][0], 'http://localhost')
+    expect(url.pathname).toBe('/api/dishes')
+    expect(Object.fromEntries(url.searchParams)).toEqual({ search: 'pho bo', category: 'MON_NUOC', flavor: 'CAY', max_cook_time: '30', page: '2', limit: '12' })
+  })
+
   it('errors from the mock go through the same ApiError normalization', async () => {
     vi.stubEnv('VITE_USE_MOCK', 'true')
     const { posts } = await load()

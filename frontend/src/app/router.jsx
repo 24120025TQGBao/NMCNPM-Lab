@@ -14,6 +14,7 @@ import SuggestPage from '../pages/SuggestPage'
 import SearchPage from '../pages/SearchPage'
 import DishDetailPage from '../pages/DishDetailPage'
 import RecipeDetailPage from '../pages/RecipeDetailPage'
+import DishRecipesPage from '../pages/DishRecipesPage'
 import { ROLE_ADMIN } from '../lib/config'
 import { vi } from '../i18n/vi'
 
@@ -35,7 +36,7 @@ export const router = createBrowserRouter([
       { path: 'search', element: <SearchPage /> },
       { path: 'dishes/:id', element: <DishDetailPage /> },
       { path: 'recipes/:id', element: <RecipeDetailPage /> },
-      { path: 'dishes/:id/recipes', element: wip(f.dishRecipes) },
+      { path: 'dishes/:id/recipes', element: <DishRecipesPage /> },
       { path: 'by-ingredient', element: wip(f.byIngredient) },
       { path: 'restaurants', element: wip(f.restaurants) },
       {
