@@ -1,17 +1,19 @@
 // Dữ liệu mẫu cho bộ giả lập (chỉ nạp khi DEV và VITE_USE_MOCK=true).
-// Năm món lấy từ supabase/seed.sql. ID là UUID giả theo contract (api.md ghi UUID v4).
+// Món mẫu dùng ID số nguyên theo contract; taxonomy chỉ phục vụ mock.
 // Chuỗi đặc trưng để kiểm tra bản build production không chứa mock: 'Phở Thìn' (tên quán mẫu bên dưới).
 
 // Theo api.md v1.0: post/dish/ingredient/comment/report id là SỐ NGUYÊN; chỉ author.id (nguoi_dung.ma_nd) là UUID.
 const uuid = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
 
 export const DISHES = [
-  { id: 101, name: 'Phở bò', description: 'Món phở truyền thống Việt Nam' },
-  { id: 102, name: 'Bún bò Huế', description: 'Món bún đặc trưng của Huế' },
-  { id: 103, name: 'Cơm tấm', description: 'Cơm tấm với sườn nướng' },
-  { id: 104, name: 'Bánh mì', description: 'Bánh mì Việt Nam' },
-  { id: 105, name: 'Bún thịt nướng', description: 'Bún với thịt nướng và rau' },
+  { id: 101, name: 'Phở bò', description: 'Món phở truyền thống Việt Nam', category: 'MON_NUOC', flavor: 'THANH', image_url: null },
+  { id: 102, name: 'Bún bò Huế', description: 'Món bún đặc trưng của Huế', category: 'MON_NUOC', flavor: 'CAY', image_url: null },
+  { id: 103, name: 'Cơm tấm', description: 'Cơm tấm với sườn nướng', category: 'MON_KHO', flavor: 'MAN', image_url: null },
+  { id: 104, name: 'Bánh mì', description: 'Bánh mì Việt Nam', category: 'MON_KHO', flavor: 'MAN', image_url: null },
+  { id: 105, name: 'Bún thịt nướng', description: 'Bún với thịt nướng và rau', category: 'MON_KHO', flavor: 'NGOT', image_url: null },
 ]
+
+export const CATEGORIES = [{ code: 'MON_NUOC', name: 'Món nước' }, { code: 'MON_KHO', name: 'Món khô' }]
 
 export const USERS = {
   minh: { id: uuid(201), display_name: 'Minh' },
@@ -136,7 +138,7 @@ export const REPORTS = [
 
 // Công thức theo món (GET /dishes/:id/recipes, /recipes/:id). Một công thức cố ý thiếu bước (QĐ 4.4).
 const rec = (n, dish, name, prep, ingredients, stepList, incomplete = false) => ({
-  id: 500 + n, dish_id: dish.id, name, prep_time_minutes: prep, incomplete, ingredients, steps: steps(...stepList),
+  id: 500 + n, dish_id: dish.id, name, servings: incomplete ? null : 4, prep_time_minutes: prep, incomplete, ingredients, steps: steps(...stepList),
 })
 export const RECIPES = [
   rec(1, DISHES[0], 'Phở bò truyền thống', 180, [ing('xương bò', 1, 'kg'), ing('bánh phở', 400, 'g'), ing('hành tây', 2, 'củ')], ['Hầm xương.', 'Trụng bánh phở.', 'Chan nước dùng.']),

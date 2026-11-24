@@ -2,7 +2,7 @@
 // import.meta.env.DEV và VITE_USE_MOCK === 'true'. Trả { status, body } đúng hình dạng contract thật
 // ({ data, meta } | { error: { code, message, details } }, snake_case) và đi qua cùng đường chuẩn hóa lỗi
 // như phản hồi thật. Dữ liệu mất khi tải lại trang.
-import { COMMENTS, DISHES, POSTS, RECIPES, REACTIONS, REPORTS } from './seed'
+import { CATEGORIES, COMMENTS, DISHES, POSTS, RECIPES, REACTIONS, REPORTS } from './seed'
 
 const options = { latencyMs: 300 }
 let state = freshState()
@@ -202,15 +202,33 @@ function postFields(body) {
 
 // ----- Bảng route -----
 // Mỗi route: [method, mẫu đường dẫn, handler(ctx)]. ctx: { params, query, body, session, userId }.
+const normalizeSearch = (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().trim()
+const recipeSummary = (r) => ({ id: r.id, dish_id: r.dish_id, name: r.name, servings: r.servings, prep_time_minutes: r.prep_time_minutes, ingredient_count: r.ingredients.length, incomplete: r.incomplete })
+const dishSummary = (d) => ({ id: d.id, name: d.name, description: d.description, image_url: d.image_url })
 const routes = [
+  ['GET', '/dishes/categories', () => ok(clone(CATEGORIES))],
+  ['GET', '/dishes', ({ query }) => {
+    if (typeof (query.search ?? '') !== 'string' || (query.search ?? '').trim().length > 100) return invalid('search', 'Từ khóa tối đa 100 ký tự')
+    if (query.category && !/^[A-Z0-9_]{1,100}$/.test(query.category)) return invalid('category', 'Loại món không hợp lệ')
+    if (query.flavor && !['MAN', 'CAY', 'NGOT', 'CHUA', 'THANH'].includes(query.flavor)) return invalid('flavor', 'Khẩu vị không hợp lệ')
+    const maxTime = query.max_cook_time === undefined ? null : Number(query.max_cook_time)
+    if (maxTime !== null && (!Number.isInteger(maxTime) || maxTime < 1 || maxTime > 1440)) return invalid('max_cook_time', 'Thời gian không hợp lệ')
+    const search = normalizeSearch(query.search ?? '')
+    const items = DISHES.filter((dish) => normalizeSearch(dish.name).includes(search))
+      .filter((dish) => !query.category || dish.category === query.category)
+      .filter((dish) => !query.flavor || dish.flavor === query.flavor)
+      .filter((dish) => maxTime === null || RECIPES.some((r) => r.dish_id === dish.id && r.prep_time_minutes !== null && r.prep_time_minutes <= maxTime))
+      .sort((a, b) => a.name.localeCompare(b.name, 'vi') || a.id - b.id)
+    return paginate(items, query, dishSummary)
+  }],
   ['GET', '/dishes/:id', ({ params }) => {
     const dish = DISHES.find((d) => d.id === params.id)
-    return dish ? ok({ id: dish.id, name: dish.name }) : notFound('Không tìm thấy món ăn')
+    return dish ? ok({ ...dishSummary(dish), recipes: RECIPES.filter((r) => r.dish_id === dish.id).map(recipeSummary) }) : notFound('Không tìm thấy món ăn')
   }],
   ['GET', '/dishes/:id/recipes', ({ params, query }) => {
     if (!DISHES.some((d) => d.id === params.id)) return notFound('Không tìm thấy món ăn')
     const items = RECIPES.filter((r) => r.dish_id === params.id)
-    return paginate(items, query, (r) => ({ id: r.id, dish_id: r.dish_id, name: r.name, prep_time_minutes: r.prep_time_minutes, ingredient_count: r.ingredients.length, incomplete: r.incomplete }))
+    return paginate(items, query, recipeSummary)
   }],
   ['GET', '/recipes/:id', ({ params }) => {
     const recipe = RECIPES.find((r) => r.id === params.id)

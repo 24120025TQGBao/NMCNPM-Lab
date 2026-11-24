@@ -128,6 +128,10 @@ export function createDishesController(client) {
     ).map(Number);
 
     const rawFlavor = req.query.flavor;
+    const category = req.query.category ?? null;
+    if (category !== null && (typeof category !== 'string' || !/^[A-Z0-9_]{1,100}$/.test(category))) {
+      details.push({ field: 'category', message: 'category phải là mã loại món hợp lệ' });
+    }
     let flavor = null;
 
     if (rawFlavor !== undefined) {
@@ -171,6 +175,7 @@ export function createDishesController(client) {
         page,
         limit,
         tags,
+        category,
         flavor,
         maxCookTime,
         ingredients
@@ -199,6 +204,13 @@ export function createDishesController(client) {
   }
 
   return {
+    async getCategories(req, res) {
+      try {
+        return res.status(200).json({ data: await service.getCategories() });
+      } catch (error) {
+        return serverError(res, error);
+      }
+    },
     // GET /api/dishes
     getDishes(req, res) {
       return list(req, res, 'search');

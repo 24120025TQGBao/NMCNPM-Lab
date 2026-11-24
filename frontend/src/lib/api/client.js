@@ -36,7 +36,8 @@ async function parseJson(response) {
 // request(method, path, { query, body, auth, signal, mockable })
 //  - auth: true thì gắn Authorization: Bearer <token>; chưa đăng nhập thì ném ApiError 401 mà không gọi mạng.
 //  - mockable: true thì khi (DEV và VITE_USE_MOCK === 'true') request đi qua bộ giả lập thay vì mạng.
-//    Chỉ dùng cho endpoint chưa có trên backend thật. `dishes.list` và `me` không bao giờ đặt cờ này.
+//    Dùng cho endpoint cần mock trong dev. `dishes.list` và `me` luôn gọi API thật;
+//    luồng tra cứu dùng `dishes.search` để có thể chạy độc lập khi BE09 chưa sẵn sàng.
 // Trả về phần thân JSON của phản hồi thành công ({ data, meta } theo contract, hoặc dạng cũ của main).
 // Ném ApiError cho mọi lỗi; AbortError được ném nguyên vẹn để nơi gọi kiểm tra signal.aborted.
 export async function request(method, path, { query, body, auth = false, signal, mockable = false } = {}) {

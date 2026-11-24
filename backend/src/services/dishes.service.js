@@ -21,12 +21,13 @@ export function createDishesService(client) {
   }
 
   return {
-    async getDishes({ search = null, page = 1, limit = 20, tags = [], flavor = null,
+    async getDishes({ search = null, page = 1, limit = 20, tags = [], category = null, flavor = null,
       maxCookTime = null, ingredients = [] }) {
-      const filters = tags.length > 0 || flavor !== null ||
+      const filters = tags.length > 0 || category !== null || flavor !== null ||
         maxCookTime !== null || ingredients.length > 0;
       const name = filters ? 'search_catalog_dishes' : 'search_public_dishes';
       const params = filters ? {
+        ...(category === null ? {} : { p_category: category }),
         p_search: search,
         p_tag_codes: tags,
         p_flavor: flavor,
@@ -36,6 +37,21 @@ export function createDishesService(client) {
         p_limit: limit
       } : { p_search: search, p_page: page, p_limit: limit };
       return listResult(await call(name, params));
+    },
+
+    async getCategories() {
+      const { data, error } = await client.from('thuoc_tinh_mon').select('nhom_tt, gia_tri');
+      if (error) throw error;
+      const normalize = value => value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[đĐ]/g, 'd').toUpperCase().replace(/ /g, '_');
+      const categories = new Map();
+      for (const row of data ?? []) {
+        if (typeof row.nhom_tt !== 'string' || typeof row.gia_tri !== 'string') continue;
+        if (!['LOAI_MON', 'LOAI', 'CATEGORY', 'TYPE'].includes(normalize(row.nhom_tt))) continue;
+        const code = normalize(row.gia_tri);
+        if (code && /^[A-Z0-9_]{1,100}$/.test(code)) categories.set(code, { code, name: row.gia_tri.trim() });
+      }
+      return [...categories.values()].sort((a, b) => a.name.localeCompare(b.name, 'vi'));
     },
 
     async getDishById(id) {

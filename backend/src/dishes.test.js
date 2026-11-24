@@ -147,3 +147,65 @@ test('database errors return a generic 500 response without exposing details', a
     assert.equal(JSON.stringify(body).includes('mon_an'), false)
   })
 })
+
+test('category, flavor, time and name are combined before pagination', async () => {
+  const calls = []
+  const client = { async rpc(name, args) {
+    calls.push({ name, args })
+    return { data: { data: [], total: 0 }, error: null }
+  } }
+  await withServer(client, async url => {
+    const response = await fetch(`${url}/api/dishes?search=pho&category=MON_NUOC&flavor=CAY&max_cook_time=30&page=2&limit=12`)
+    assert.equal(response.status, 200)
+    assert.deepEqual((await response.json()).meta, { page: 2, limit: 12, total: 0 })
+  })
+  assert.deepEqual(calls, [{ name: 'search_catalog_dishes', args: {
+    p_search: 'pho', p_category: 'MON_NUOC', p_tag_codes: [], p_flavor: 'CAY',
+    p_max_cook_time: 30, p_ingredient_ids: [], p_page: 2, p_limit: 12
+  } }])
+})
+
+test('category-only queries use the catalog RPC instead of dropping the filter', async () => {
+  const client = { async rpc(name, args) {
+    assert.equal(name, 'search_catalog_dishes')
+    assert.equal(args.p_category, 'SOUP')
+    return { data: { data: [], total: 0 }, error: null }
+  } }
+  await withServer(client, async url => {
+    assert.equal((await fetch(`${url}/api/dishes?category=SOUP`)).status, 200)
+  })
+})
+
+test('invalid category query returns validation errors without querying the database', async () => {
+  const client = { async rpc() { assert.fail('must not query invalid input') } }
+  await withServer(client, async url => {
+    for (const query of ['category=mon%20nuoc', 'category=A&category=B', `category=${'A'.repeat(101)}`]) {
+      const response = await fetch(`${url}/api/dishes?${query}`)
+      assert.equal(response.status, 400)
+      assert.equal((await response.json()).error.details[0].field, 'category')
+    }
+  })
+})
+
+test('category lookup reads the existing taxonomy, deduplicates codes and ignores other groups', async () => {
+  const client = { from(table) {
+    assert.equal(table, 'thuoc_tinh_mon')
+    return { async select(fields) {
+      assert.equal(fields, 'nhom_tt, gia_tri')
+      return { data: [
+        { nhom_tt: 'Loại món', gia_tri: 'Món nước' },
+        { nhom_tt: 'CATEGORY', gia_tri: 'Món nước' },
+        { nhom_tt: 'TYPE', gia_tri: 'Soup' },
+        { nhom_tt: 'KHAU_VI', gia_tri: 'Cay' },
+        { nhom_tt: 'LOAI_MON', gia_tri: null }
+      ], error: null }
+    } }
+  } }
+  await withServer(client, async url => {
+    const response = await fetch(`${url}/api/dishes/categories`)
+    assert.equal(response.status, 200)
+    assert.deepEqual(await response.json(), { data: [
+      { code: 'MON_NUOC', name: 'Món nước' }, { code: 'SOUP', name: 'Soup' }
+    ] })
+  })
+})
