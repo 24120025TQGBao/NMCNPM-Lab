@@ -1,0 +1,1048 @@
+{
+  "checkedAt": "2026-11-25T13:55:05.500Z",
+  "candidate": "PO-selected PR36 at 4549d4ed44f7cc19af11c48f2b57aff466e13990, including INT03 9f8a6cb",
+  "mainRevertNotApplied": true,
+  "results": [
+    {
+      "name": "chromium-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "checks": [
+        {
+          "ac": [
+            "S2-01.1"
+          ],
+          "name": "guest suggestion has required actions",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.2"
+          ],
+          "name": "next dish excludes viewed ID",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.3"
+          ],
+          "name": "review previous card",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.6"
+          ],
+          "name": "guest random keeps exclusions",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.7",
+            "S2-04.10"
+          ],
+          "name": "app return link preserves suggestion origin",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.7"
+          ],
+          "name": "native Browser Back preserves suggestion card",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.8"
+          ],
+          "name": "switching tabs preserves suggestion state",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.9"
+          ],
+          "name": "suggestion loading prevents duplicate actions",
+          "status": "PASS",
+          "mode": "LIVE_WITH_NETWORK_DELAY"
+        },
+        {
+          "ac": [
+            "S2-01.10"
+          ],
+          "name": "suggestion failure preserves history and retry recovers",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION"
+        },
+        {
+          "ac": [
+            "S2-01.4",
+            "S2-01.5"
+          ],
+          "name": "chip request keeps AND criteria and never silently relaxes them",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "positive tag AND dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "tag/mon_an_tag contain0 rows; UI AND/exhaustion observed but positive live filter cannot be accepted"
+        },
+        {
+          "ac": [
+            "S2-01.12"
+          ],
+          "name": "positive region dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "all dishes have null region"
+        },
+        {
+          "ac": [
+            "S2-02.1"
+          ],
+          "name": "zero ingredient selection blocks search",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.2"
+          ],
+          "name": "autocomplete accent and case variants",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.3"
+          ],
+          "name": "ingredient synonym resolves canonical ID",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.4",
+            "S2-02.6"
+          ],
+          "name": "unknown/free text does not become a chip",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.5"
+          ],
+          "name": "canonical chips deduplicate and can be removed",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.7",
+            "S2-02.8"
+          ],
+          "name": "pantry-dependent live matching",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "0 canonical ingredients have pantry flag; UI default/toggle/request can pass but live availability difference cannot be checked"
+        },
+        {
+          "ac": [
+            "S2-02.7"
+          ],
+          "name": "pantry UI is enabled by default",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.9",
+            "S2-02.10",
+            "S2-02.11",
+            "S2-02.12",
+            "S2-02.15"
+          ],
+          "name": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.1"
+          ],
+          "name": "dish details show API cooking time",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.14",
+            "S2-04.10"
+          ],
+          "name": "app return link preserves ingredient-tab origin",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.3"
+          ],
+          "name": "one recipe still opens recipe list after Tự nấu",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.4",
+            "S2-04.5",
+            "S2-04.9"
+          ],
+          "name": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.14",
+            "S2-04.10"
+          ],
+          "name": "native back from recipe restores original ingredient state",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.8",
+            "S2-02.16"
+          ],
+          "name": "matching loading/error/retry preserves chips and sends pantry=false",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION_WITH_DELAY"
+        },
+        {
+          "ac": [
+            "S2-02.13"
+          ],
+          "name": "canonical unused ingredient gives empty API and UI",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.10"
+          ],
+          "name": "live INCOMPLETE at100% remains in group4",
+          "status": "PASS",
+          "mode": "LIVE_API_WITH_RESTORED_SESSION"
+        },
+        {
+          "ac": [
+            "S2-03.1",
+            "S2-03.7"
+          ],
+          "name": "guest name search supports accents and case",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.2"
+          ],
+          "name": "time filter is sent with search criteria",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.3"
+          ],
+          "name": "empty search is a distinct non-error state",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.4",
+            "S2-03.6"
+          ],
+          "name": "server pagination and back keep URL criteria/page",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.8"
+          ],
+          "name": "search failure retries without dropping query",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION"
+        },
+        {
+          "ac": [
+            "S2-04.7"
+          ],
+          "name": "unknown dish and recipe show not-found UI",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.11"
+          ],
+          "name": "recipe failure retries and keeps a return route",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION"
+        },
+        {
+          "ac": [
+            "S2-04.2"
+          ],
+          "name": "dish without recipes is reported on dish-detail entry",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE"
+        },
+        {
+          "ac": [
+            "S2-04.2"
+          ],
+          "name": "empty recipe list itself is explained",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE"
+        },
+        {
+          "ac": [
+            "S2-04.6"
+          ],
+          "name": "incomplete public recipe explains missing data",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "QA04-MOBILE"
+          ],
+          "name": "candidate layout has no horizontal overflow",
+          "status": "PASS",
+          "mode": "LIVE"
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "source": "4549d4ed44f7cc19af11c48f2b57aff466e13990",
+      "weightedExample": {
+        "id": 35,
+        "ratio": 0.4545,
+        "have": 3,
+        "total": 6
+      }
+    },
+    {
+      "name": "firefox-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "checks": [
+        {
+          "ac": [
+            "S2-01.1"
+          ],
+          "name": "guest suggestion has required actions",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.2"
+          ],
+          "name": "next dish excludes viewed ID",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.3"
+          ],
+          "name": "review previous card",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.6"
+          ],
+          "name": "guest random keeps exclusions",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.7",
+            "S2-04.10"
+          ],
+          "name": "app return link preserves suggestion origin",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.7"
+          ],
+          "name": "native Browser Back preserves suggestion card",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.8"
+          ],
+          "name": "switching tabs preserves suggestion state",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.9"
+          ],
+          "name": "suggestion loading prevents duplicate actions",
+          "status": "PASS",
+          "mode": "LIVE_WITH_NETWORK_DELAY"
+        },
+        {
+          "ac": [
+            "S2-01.10"
+          ],
+          "name": "suggestion failure preserves history and retry recovers",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION"
+        },
+        {
+          "ac": [
+            "S2-01.4",
+            "S2-01.5"
+          ],
+          "name": "chip request keeps AND criteria and never silently relaxes them",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "positive tag AND dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "tag/mon_an_tag contain0 rows; UI AND/exhaustion observed but positive live filter cannot be accepted"
+        },
+        {
+          "ac": [
+            "S2-01.12"
+          ],
+          "name": "positive region dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "all dishes have null region"
+        },
+        {
+          "ac": [
+            "S2-02.1"
+          ],
+          "name": "zero ingredient selection blocks search",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.2"
+          ],
+          "name": "autocomplete accent and case variants",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.3"
+          ],
+          "name": "ingredient synonym resolves canonical ID",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.4",
+            "S2-02.6"
+          ],
+          "name": "unknown/free text does not become a chip",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.5"
+          ],
+          "name": "canonical chips deduplicate and can be removed",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.7",
+            "S2-02.8"
+          ],
+          "name": "pantry-dependent live matching",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "0 canonical ingredients have pantry flag; UI default/toggle/request can pass but live availability difference cannot be checked"
+        },
+        {
+          "ac": [
+            "S2-02.7"
+          ],
+          "name": "pantry UI is enabled by default",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.9",
+            "S2-02.10",
+            "S2-02.11",
+            "S2-02.12",
+            "S2-02.15"
+          ],
+          "name": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.1"
+          ],
+          "name": "dish details show API cooking time",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.14",
+            "S2-04.10"
+          ],
+          "name": "app return link preserves ingredient-tab origin",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.3"
+          ],
+          "name": "one recipe still opens recipe list after Tự nấu",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.4",
+            "S2-04.5",
+            "S2-04.9"
+          ],
+          "name": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.14",
+            "S2-04.10"
+          ],
+          "name": "native back from recipe restores original ingredient state",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.8",
+            "S2-02.16"
+          ],
+          "name": "matching loading/error/retry preserves chips and sends pantry=false",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION_WITH_DELAY"
+        },
+        {
+          "ac": [
+            "S2-02.13"
+          ],
+          "name": "canonical unused ingredient gives empty API and UI",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.10"
+          ],
+          "name": "live INCOMPLETE at100% remains in group4",
+          "status": "PASS",
+          "mode": "LIVE_API_WITH_RESTORED_SESSION"
+        },
+        {
+          "ac": [
+            "S2-03.1",
+            "S2-03.7"
+          ],
+          "name": "guest name search supports accents and case",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.2"
+          ],
+          "name": "time filter is sent with search criteria",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.3"
+          ],
+          "name": "empty search is a distinct non-error state",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.4",
+            "S2-03.6"
+          ],
+          "name": "server pagination and back keep URL criteria/page",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.8"
+          ],
+          "name": "search failure retries without dropping query",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION"
+        },
+        {
+          "ac": [
+            "S2-04.7"
+          ],
+          "name": "unknown dish and recipe show not-found UI",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.11"
+          ],
+          "name": "recipe failure retries and keeps a return route",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION"
+        },
+        {
+          "ac": [
+            "S2-04.2"
+          ],
+          "name": "dish without recipes is reported on dish-detail entry",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE"
+        },
+        {
+          "ac": [
+            "S2-04.2"
+          ],
+          "name": "empty recipe list itself is explained",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE"
+        },
+        {
+          "ac": [
+            "S2-04.6"
+          ],
+          "name": "incomplete public recipe explains missing data",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "QA04-MOBILE"
+          ],
+          "name": "candidate layout has no horizontal overflow",
+          "status": "PASS",
+          "mode": "LIVE"
+        }
+      ],
+      "browserVersion": "159.0",
+      "source": "4549d4ed44f7cc19af11c48f2b57aff466e13990",
+      "weightedExample": {
+        "id": 35,
+        "ratio": 0.4545,
+        "have": 3,
+        "total": 6
+      }
+    },
+    {
+      "name": "chromium-mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "checks": [
+        {
+          "ac": [
+            "S2-01.1"
+          ],
+          "name": "guest suggestion has required actions",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.2"
+          ],
+          "name": "next dish excludes viewed ID",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.3"
+          ],
+          "name": "review previous card",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.6"
+          ],
+          "name": "guest random keeps exclusions",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.7",
+            "S2-04.10"
+          ],
+          "name": "app return link preserves suggestion origin",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.7"
+          ],
+          "name": "native Browser Back preserves suggestion card",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.8"
+          ],
+          "name": "switching tabs preserves suggestion state",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.9"
+          ],
+          "name": "suggestion loading prevents duplicate actions",
+          "status": "PASS",
+          "mode": "LIVE_WITH_NETWORK_DELAY"
+        },
+        {
+          "ac": [
+            "S2-01.10"
+          ],
+          "name": "suggestion failure preserves history and retry recovers",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION"
+        },
+        {
+          "ac": [
+            "S2-01.4",
+            "S2-01.5"
+          ],
+          "name": "chip request keeps AND criteria and never silently relaxes them",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "positive tag AND dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "tag/mon_an_tag contain0 rows; UI AND/exhaustion observed but positive live filter cannot be accepted"
+        },
+        {
+          "ac": [
+            "S2-01.12"
+          ],
+          "name": "positive region dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "all dishes have null region"
+        },
+        {
+          "ac": [
+            "S2-02.1"
+          ],
+          "name": "zero ingredient selection blocks search",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.2"
+          ],
+          "name": "autocomplete accent and case variants",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.3"
+          ],
+          "name": "ingredient synonym resolves canonical ID",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.4",
+            "S2-02.6"
+          ],
+          "name": "unknown/free text does not become a chip",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.5"
+          ],
+          "name": "canonical chips deduplicate and can be removed",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.7",
+            "S2-02.8"
+          ],
+          "name": "pantry-dependent live matching",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "0 canonical ingredients have pantry flag; UI default/toggle/request can pass but live availability difference cannot be checked"
+        },
+        {
+          "ac": [
+            "S2-02.7"
+          ],
+          "name": "pantry UI is enabled by default",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.9",
+            "S2-02.10",
+            "S2-02.11",
+            "S2-02.12",
+            "S2-02.15"
+          ],
+          "name": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.1"
+          ],
+          "name": "dish details show API cooking time",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.14",
+            "S2-04.10"
+          ],
+          "name": "app return link preserves ingredient-tab origin",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.3"
+          ],
+          "name": "one recipe still opens recipe list after Tự nấu",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.4",
+            "S2-04.5",
+            "S2-04.9"
+          ],
+          "name": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.14",
+            "S2-04.10"
+          ],
+          "name": "native back from recipe restores original ingredient state",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.8",
+            "S2-02.16"
+          ],
+          "name": "matching loading/error/retry preserves chips and sends pantry=false",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION_WITH_DELAY"
+        },
+        {
+          "ac": [
+            "S2-02.13"
+          ],
+          "name": "canonical unused ingredient gives empty API and UI",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-02.10"
+          ],
+          "name": "live INCOMPLETE at100% remains in group4",
+          "status": "PASS",
+          "mode": "LIVE_API_WITH_RESTORED_SESSION"
+        },
+        {
+          "ac": [
+            "S2-03.1",
+            "S2-03.7"
+          ],
+          "name": "guest name search supports accents and case",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.2"
+          ],
+          "name": "time filter is sent with search criteria",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.3"
+          ],
+          "name": "empty search is a distinct non-error state",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.4",
+            "S2-03.6"
+          ],
+          "name": "server pagination and back keep URL criteria/page",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-03.8"
+          ],
+          "name": "search failure retries without dropping query",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION"
+        },
+        {
+          "ac": [
+            "S2-04.7"
+          ],
+          "name": "unknown dish and recipe show not-found UI",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "S2-04.11"
+          ],
+          "name": "recipe failure retries and keeps a return route",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION"
+        },
+        {
+          "ac": [
+            "S2-04.2"
+          ],
+          "name": "dish without recipes is reported on dish-detail entry",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE"
+        },
+        {
+          "ac": [
+            "S2-04.2"
+          ],
+          "name": "empty recipe list itself is explained",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE"
+        },
+        {
+          "ac": [
+            "S2-04.6"
+          ],
+          "name": "incomplete public recipe explains missing data",
+          "status": "PASS",
+          "mode": "LIVE"
+        },
+        {
+          "ac": [
+            "QA04-MOBILE"
+          ],
+          "name": "candidate layout has no horizontal overflow",
+          "status": "PASS",
+          "mode": "LIVE"
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "source": "4549d4ed44f7cc19af11c48f2b57aff466e13990",
+      "weightedExample": {
+        "id": 35,
+        "ratio": 0.4545,
+        "have": 3,
+        "total": 6
+      }
+    }
+  ]
+}

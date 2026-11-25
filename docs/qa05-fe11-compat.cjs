@@ -115,6 +115,6 @@ async function run(spec){
   await step('responsive layout has no horizontal overflow',async()=>assert(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)))
   await page.screenshot({path:path.join(output,spec.name+'-complete.png'),fullPage:true})
  }catch(error){entry.checks.push({name:'browser setup or prerequisites',status:'FAIL',reason:String(error.message).slice(0,160)})}
- finally{if(browser)await browser.close();fs.writeFileSync(path.join(output,'results.json'),JSON.stringify({checkedAt:new Date().toISOString(),source:{candidate:process.env.QA_SOURCE_REF,frontend:'FE10+FE11 on main413a7b6'},results},null,2)+String.fromCharCode(10))}
+ finally{if(browser)await browser.close();fs.writeFileSync(path.join(output,'results.json'),JSON.stringify({checkedAt:new Date().toISOString(),source:{candidate:process.env.QA_SOURCE_REF,frontend:process.env.QA_SOURCE_LABEL||'FE10+FE11 on main413a7b6'},results},null,2)+String.fromCharCode(10))}
 }
 ;(async()=>{for(const spec of specs.filter(x=>!process.env.QA_BROWSER_FILTER||x.name===process.env.QA_BROWSER_FILTER)){await run(spec);console.log(spec.name+': '+JSON.stringify(results.at(-1).checks))}if(results.some(x=>x.checks.some(y=>y.status==='FAIL')))process.exitCode=1})()

@@ -1,5 +1,11 @@
 # QA05 — Kết quả tự động và phần cần làm thủ công, 24/11/2026
 
+## PO chọn PR #36 — chạy lại đúng SHA ngày 25/11/2026
+
+PO xác nhận tiếp tục dùng bản tích hợp `hien/FE10-qa-fixes@4549d4ed44f7cc19af11c48f2b57aff466e13990` (gồm INT03 `9f8a6cb`). Đã chạy lại **trên đúng HEAD này** bằng backend GET-only với Supabase thật, cả hai mock flag false: API **56/56 PASS**; luồng browser QA05 Chromium desktop, Firefox desktop, Chromium mobile **108 PASS / 9 BLOCKED / 0 FAIL**; FE11 compatibility browser **33/33 PASS**. Mỗi cấu hình full-flow có 36 PASS và 3 BLOCKED, không cộng số checkpoint thành AC. Evidence mới: `qa05-fe10-fix-api-2026-11-25.json`, `qa05-pr36-browser-2026-11-25/results.json`, `qa05-fe11-compat-2026-11-25/results.json`.
+
+Kiểm kê DB cùng SHA tại `qa05-dataset-audit-2026-11-25.json`: 72 món ACTIVE, 299 nguyên liệu chuẩn, 67 món matching-ready; **0 tag, 0 liên kết món–tag, 0 vùng miền, 0 pantry**. Bốn AC vẫn BLOCKED do dữ liệu; cần TV3/DA04 bổ sung trên DB QA rồi retest. Ma trận QA06 ngày 25/11 được sinh lại từ chính ba suite này: 45 PASS / 0 FAIL / 4 BLOCKED. PR #29 giữ draft cho đến khi bốn AC và release SHA cuối được xử lý. Các đoạn bên dưới ghi lại mốc kiểm thử trước khi PO xác nhận PR #36.
+
 ## Browser retest bản sửa — 25/11/2026
 
 Trên `hien/FE10-qa-fixes@30b7fc2` (nền INT03 `9f8a6cb`), API thật qua backend GET-only: Chromium desktop, Firefox desktop và Chromium mobile mỗi cấu hình **36 PASS, 3 BLOCKED**. Firefox khởi động lỗi trong sandbox, chạy lại riêng ngoài sandbox đạt. `qa05-fe10-fix-evidence/final-results.json` là bản tổng hợp chuẩn; ba BLOCKED mỗi trình duyệt là tag, vùng miền, pantry thiếu dữ liệu. Năm AC thuộc `BUG-S2-003..005` đã PASS trên browser. Ma trận QA06 ngày 25/11: **45 PASS / 0 FAIL / 4 BLOCKED**; không coi các bug lịch sử là đã đóng Jira. Cần dữ liệu QA thật để retest bốn AC và chốt SHA release trước khi đổi PR #29 khỏi draft.

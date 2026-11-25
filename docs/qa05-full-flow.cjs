@@ -256,6 +256,6 @@ async function run(spec){
   await check(['QA04-MOBILE'],'candidate layout has no horizontal overflow',async()=>assert(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)))
   await page.screenshot({path:path.join(output,spec.name+'-incomplete.png'),fullPage:true})
  }catch(e){entry.checks.push({ac:[],name:'runner prerequisites',status:'FAIL',reason:String(e.message).slice(0,220)})}
- finally{if(browser)await browser.close();fs.writeFileSync(path.join(output,'results.json'),JSON.stringify({checkedAt:new Date().toISOString(),candidate:'main413a7b6 + FE10 587171e + FE11 e8de078 (detached e47c5f6)',mainRevertNotApplied:true,results},null,2)+String.fromCharCode(10))}
+ finally{if(browser)await browser.close();fs.writeFileSync(path.join(output,'results.json'),JSON.stringify({checkedAt:new Date().toISOString(),candidate:process.env.QA_SOURCE_LABEL||'main413a7b6 + FE10 587171e + FE11 e8de078 (detached e47c5f6)',mainRevertNotApplied:true,results},null,2)+String.fromCharCode(10))}
 }
 ;(async()=>{for(const spec of specs.filter(x=>!process.env.QA_BROWSER_FILTER||x.name===process.env.QA_BROWSER_FILTER)){await run(spec);console.log(spec.name+': '+JSON.stringify(results.at(-1).checks.map(x=>({name:x.name,status:x.status,...(x.status==='FAIL'?{reason:x.reason}:{})}))))}if(results.some(x=>x.checks.some(c=>c.status==='FAIL')))process.exitCode=1})()
