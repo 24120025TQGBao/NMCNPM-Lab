@@ -1,5 +1,9 @@
 # QA05 — Kết quả tự động và phần cần làm thủ công, 24/11/2026
 
+## Browser retest bản sửa — 25/11/2026
+
+Trên `hien/FE10-qa-fixes@30b7fc2` (nền INT03 `9f8a6cb`), API thật qua backend GET-only: Chromium desktop, Firefox desktop và Chromium mobile mỗi cấu hình **36 PASS, 3 BLOCKED**. Firefox khởi động lỗi trong sandbox, chạy lại riêng ngoài sandbox đạt. `qa05-fe10-fix-evidence/final-results.json` là bản tổng hợp chuẩn; ba BLOCKED mỗi trình duyệt là tag, vùng miền, pantry thiếu dữ liệu. Năm AC thuộc `BUG-S2-003..005` đã PASS trên browser. Ma trận QA06 ngày 25/11: **45 PASS / 0 FAIL / 4 BLOCKED**; không coi các bug lịch sử là đã đóng Jira. Cần dữ liệu QA thật để retest bốn AC và chốt SHA release trước khi đổi PR #29 khỏi draft.
+
 ## Bản sửa FE10 đang chờ browser QA — 25/11/2026
 
 Đã tạo PR [#36](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/36), nhánh `hien/FE10-qa-fixes@30b7fc2` từ `main@413a7b6` rồi fast-forward INT03 `9f8a6cb`. Code xử lý ba lỗi `BUG-S2-003..005`; frontend 229/229 tests, lint và build đạt. Hai test mới kiểm tra trang chi tiết có thời gian/danh sách công thức, empty state và nguồn quay về `/goi-y`. Đây là bản sửa đề xuất, chưa cập nhật 5 AC FAIL thành PASS trước khi chạy browser trên đúng SHA `30b7fc2`. Bốn AC BLOCKED vẫn cần tag, vùng miền và pantry thật trên DB QA. Khi dữ liệu có, audit ID/cờ rồi chạy lại ma trận; không giả lập dữ liệu DB chung.
