@@ -1,5 +1,9 @@
 # QA05 — Kết quả tự động và phần cần làm thủ công, 24/11/2026
 
+## Cập nhật INT03 — 25/11/2026
+
+`origin/linh/int03@9f8a6cb` đã push, ghép `sprint2-po-be → be09 → db → FE10 → FE11` trên main `413a7b6`, sau đó bỏ dependency `d` và cập nhật demo. `docs/api.md` mục 7 v2.0 là contract chính; `docs/catalog-handoff.md` ghi sáu điểm khác implementation. INT03 công bố BE 258 Vitest + 10 Node, FE 227 test, lint/build và `/api/me` guest 401. Đây là bằng chứng của nhánh INT03, chưa thay thế kết quả browser QA của nhánh ứng viên trước. Code `DishDetailPage.jsx` và `catalogNavigation.js` của FE10 trong INT03 vẫn là source đã tái hiện BUG-S2-003..005; chưa có commit sửa ba lỗi. Sau khi nhóm chốt INT03 làm release, chạy lại năm AC fail và bốn AC thiếu dữ liệu trên đúng HEAD release trước khi chuyển PR này khỏi draft. Không merge revert PR #33.
+
 PR [#29](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/29) giữ trạng thái draft vì ứng viên còn lỗi P0 và thiếu dữ liệu kiểm thử. FE10 đã có trên `587171e`, không còn là blocker “chưa có code”. Ứng viên QA ghép `main@413a7b6` + FE10 + FE11 tại `e47c5f6`; nhánh revert PR #33 chưa được áp vào ứng viên này.
 
 ## Đã tự thực hiện
