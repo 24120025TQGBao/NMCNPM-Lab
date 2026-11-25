@@ -1,0 +1,2212 @@
+{
+  "generatedAt": "2026-11-25T00:59:29.455477+00:00",
+  "scope": "INT03 9f8a6cb + FE10 QA fix 30b7fc2; browser live 25/11, API56 and FE11 compatibility33 carried from prior unchanged backend/FE11 source",
+  "acceptance": "not accepted while P0 data prerequisites remain; requires release SHA and PO review",
+  "summary": {
+    "PASS": 45,
+    "FAIL": 0,
+    "BLOCKED": 4,
+    "NOT RUN": 0
+  },
+  "stories": {
+    "S2-01": {
+      "PASS": 10,
+      "FAIL": 0,
+      "BLOCKED": 2,
+      "NOT RUN": 0
+    },
+    "S2-02": {
+      "PASS": 16,
+      "FAIL": 0,
+      "BLOCKED": 2,
+      "NOT RUN": 0
+    },
+    "S2-03": {
+      "PASS": 8,
+      "FAIL": 0,
+      "BLOCKED": 0,
+      "NOT RUN": 0
+    },
+    "S2-04": {
+      "PASS": 11,
+      "FAIL": 0,
+      "BLOCKED": 0,
+      "NOT RUN": 0
+    }
+  },
+  "liveData": {
+    "checkedAt": "2026-11-24T03:02:40.488Z",
+    "source": "e47c5f638cd30924603bc4956426c0961a3c22be",
+    "readOnly": true,
+    "activeDishes": 72,
+    "canonicalIngredients": 299,
+    "pantryFlagged": 0,
+    "taggedRows": 0,
+    "dishTagRows": 0,
+    "knownRegionDishes": 0,
+    "completeMatchingDishes": 67,
+    "unusedIngredient": {
+      "id": 2,
+      "name": "Cá chẽm"
+    },
+    "errors": []
+  },
+  "cases": [
+    {
+      "id": "S2-01.1",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Khách (chưa đăng nhập) mở `/goi-y`, không nhập nguyên liệu hay sở thích",
+      "when": "Trang tải xong",
+      "expected": "Hiện **một** thẻ món gồm ảnh, tên, mô tả ngắn, thời gian nấu và ba nút **Nấu món này / Bỏ qua / Gợi ý khác**. Không yêu cầu đăng nhập hay nhập gì thêm",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "guest suggestion has required actions",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "guest suggestion has required actions",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "guest suggestion has required actions",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.2",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Trong phiên này đã hiện món A và B",
+      "when": "Bấm **Gợi ý khác** hoặc **Bỏ qua**",
+      "expected": "Món mới **không** thuộc A, B (frontend gửi danh sách đã xem qua `exclude`). Món đã hiện không quay lại trong cùng phiên (QĐ 1.1)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "next dish excludes viewed ID",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "next dish excludes viewed ID",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "next dish excludes viewed ID",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.3",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đã xem nhiều thẻ",
+      "when": "Bấm xem lại thẻ trước",
+      "expected": "Hiện lại thẻ của lượt trước (QĐ 1.1). Thao tác này không làm món nào bị tính là \"lặp\"",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "review previous card",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "review previous card",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "review previous card",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.4",
+      "priority": "P0",
+      "status": "BLOCKED",
+      "given": "Có 5 chip hoàn cảnh: **Trời mưa** (`TROI_MUA`), **Lười nấu** (`LUOI_NAU`), **Cuối tháng** (`CUOI_THANG`), **Nấu cho 4 người** (`NAU_CHO_4`), **Ăn nhẹ** (`AN_NHE`); mã là mã tag của DB10",
+      "when": "Chọn một hoặc nhiều chip",
+      "expected": "Chỉ hiện món gắn **tất cả** tag của các chip đang chọn (điều kiện AND). Bỏ chip thì lọc lại theo các chip còn lại. Không có chip khẩu vị hay thời gian ở tab này",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "chip request keeps AND criteria and never silently relaxes them",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "positive tag AND dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "tag/mon_an_tag contain0 rows; UI AND/exhaustion observed but positive live filter cannot be accepted",
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "chip request keeps AND criteria and never silently relaxes them",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "positive tag AND dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "tag/mon_an_tag contain0 rows; UI AND/exhaustion observed but positive live filter cannot be accepted",
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "chip request keeps AND criteria and never silently relaxes them",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "positive tag AND dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "tag/mon_an_tag contain0 rows; UI AND/exhaustion observed but positive live filter cannot be accepted",
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.5",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đã chọn chip, không còn món nào thỏa chip mà chưa xuất hiện",
+      "when": "Bấm **Gợi ý khác**",
+      "expected": "API trả 200 + `[]`. Giao diện hiện trạng thái \"hết món phù hợp\". **Không tự bỏ hay nới chip** (QĐ 1.2); người dùng tự quyết định đổi chip",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "chip request keeps AND criteria and never silently relaxes them",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "chip request keeps AND criteria and never silently relaxes them",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "chip request keeps AND criteria and never silently relaxes them",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.6",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Khách ở tab Gợi ý món, có hoặc không có chip đang chọn",
+      "when": "Bấm nút ngẫu nhiên **\"Hôm nay ăn gì?\"**",
+      "expected": "Nhận một món ngẫu nhiên có thật trong dữ liệu hệ thống, **thỏa các chip đang chọn** và **không thuộc danh sách đã xem**. Hết món thì xử lý như S2-01.5. Nút dùng được khi chưa đăng nhập",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "guest random keeps exclusions",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "guest random keeps exclusions",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "guest random keeps exclusions",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.7",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đang xem thẻ món X với một số chip đã chọn",
+      "when": "Bấm **Nấu món này**",
+      "expected": "Chuyển sang `/dishes/X`. Bấm quay lại thì tab, chip, thẻ hiện tại và danh sách đã xem được giữ nguyên (QĐ 1.4)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "app return link preserves suggestion origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "native Browser Back preserves suggestion card",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "app return link preserves suggestion origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "native Browser Back preserves suggestion card",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "app return link preserves suggestion origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "native Browser Back preserves suggestion card",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.8",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đang ở tab Gợi ý món",
+      "when": "Chuyển sang tab Theo nguyên liệu rồi quay lại",
+      "expected": "Trạng thái tab Gợi ý món không mất",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "switching tabs preserves suggestion state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "switching tabs preserves suggestion state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "switching tabs preserves suggestion state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.9",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Gọi API chậm",
+      "when": "Chờ phản hồi",
+      "expected": "Hiện trạng thái đang tải, các nút không gửi trùng yêu cầu",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "suggestion loading prevents duplicate actions",
+          "status": "PASS",
+          "mode": "LIVE_WITH_NETWORK_DELAY",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "suggestion loading prevents duplicate actions",
+          "status": "PASS",
+          "mode": "LIVE_WITH_NETWORK_DELAY",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "suggestion loading prevents duplicate actions",
+          "status": "PASS",
+          "mode": "LIVE_WITH_NETWORK_DELAY",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.10",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "API lỗi mạng hoặc 500",
+      "when": "Hiện thông báo lỗi",
+      "expected": "Có nút **Thử lại**. Món của lần gọi lỗi không bị tính là đã xem. Thử lại thành công thì tiếp tục bình thường",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "suggestion failure preserves history and retry recovers",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "suggestion failure preserves history and retry recovers",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "suggestion failure preserves history and retry recovers",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-01.11",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Tham số gợi ý không hợp lệ (mã chip lạ, `limit` ngoài khoảng, `exclude` không phải danh sách số)",
+      "when": "Gọi API trực tiếp",
+      "expected": "400, không trả dữ liệu",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "live HTTP API",
+          "check": "validation /suggestions?limit=0",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "validation /suggestions?the=UNKNOWN",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "extra validation /suggestions?exclude=abc",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "extra validation /suggestions?limit=11",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "extra validation /suggestions?vung_mien=UNKNOWN",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        }
+      ]
+    },
+    {
+      "id": "S2-01.12",
+      "priority": "P1",
+      "status": "BLOCKED",
+      "given": "Có chip vùng miền **Bắc/Trung/Nam** (`BAC`/`TRUNG`/`NAM`)",
+      "when": "Chọn chip vùng miền",
+      "expected": "Chỉ hiện món thuộc vùng đó, kết hợp AND với chip hoàn cảnh",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "positive region dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "all dishes have null region",
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "positive region dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "all dishes have null region",
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "positive region dataset",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "all dishes have null region",
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.1",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Tab Theo nguyên liệu, chưa chọn nguyên liệu nào",
+      "when": "Bấm tìm món",
+      "expected": "Không gửi tìm kiếm; nhắc cần ít nhất **1 nguyên liệu hợp lệ** (QĐ 4.1). Gọi thẳng API đối sánh không có nguyên liệu → 400",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "zero ingredient selection blocks search",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "zero ingredient selection blocks search",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "zero ingredient selection blocks search",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "validation /dishes/match",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        }
+      ]
+    },
+    {
+      "id": "S2-02.2",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Ô nhập nguyên liệu",
+      "when": "Gõ `ca chua`, `Cà Chua` hoặc `cà chua`",
+      "expected": "Cả ba cho gợi ý \"cà chua\": không phân biệt hoa/thường, có dấu hay không dấu",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "autocomplete accent and case variants",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "autocomplete accent and case variants",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "autocomplete accent and case variants",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.3",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Ô nhập nguyên liệu",
+      "when": "Gõ từ đồng nghĩa, ví dụ `hành xanh`",
+      "expected": "Gợi ý \"hành lá\" (từ bảng đồng nghĩa)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "ingredient synonym resolves canonical ID",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "ingredient synonym resolves canonical ID",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "ingredient synonym resolves canonical ID",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.4",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Ô nhập nguyên liệu",
+      "when": "Gõ chuỗi không khớp nguyên liệu nào",
+      "expected": "Hiện \"không tìm thấy\" (API trả 200 + `[]`), không báo lỗi",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "unknown/free text does not become a chip",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "unknown/free text does not become a chip",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "unknown/free text does not become a chip",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.5",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Gợi ý đang hiện",
+      "when": "Chọn một gợi ý",
+      "expected": "Thành chip nguyên liệu; chọn lại nguyên liệu đã có không tạo chip trùng; xóa được từng chip. **Chỉ nguyên liệu có trong từ điển mới thành chip**",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "canonical chips deduplicate and can be removed",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "canonical chips deduplicate and can be removed",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "canonical chips deduplicate and can be removed",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.6",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Người dùng gõ một chữ không chọn gợi ý nào",
+      "when": "Bấm Enter",
+      "expected": "**Không thêm gì** (không tạo chip, không gửi tìm kiếm), vì chỉ nguyên liệu hợp lệ mới được tính (QĐ 4.1)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "unknown/free text does not become a chip",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "unknown/free text does not become a chip",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "unknown/free text does not become a chip",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.7",
+      "priority": "P0",
+      "status": "BLOCKED",
+      "given": "Công tắc **Tủ bếp cơ bản** (muối, đường, dầu ăn, nước mắm, tiêu)",
+      "when": "Mở tab lần đầu",
+      "expected": "Công tắc **bật mặc định**: các nguyên liệu cơ bản được tính là đã có khi đối sánh",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "pantry-dependent live matching",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "0 canonical ingredients have pantry flag; UI default/toggle/request can pass but live availability difference cannot be checked",
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "pantry UI is enabled by default",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "pantry-dependent live matching",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "0 canonical ingredients have pantry flag; UI default/toggle/request can pass but live availability difference cannot be checked",
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "pantry UI is enabled by default",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "pantry-dependent live matching",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "0 canonical ingredients have pantry flag; UI default/toggle/request can pass but live availability difference cannot be checked",
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "pantry UI is enabled by default",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.8",
+      "priority": "P0",
+      "status": "BLOCKED",
+      "given": "Như trên",
+      "when": "Tắt công tắc",
+      "expected": "Các nguyên liệu cơ bản được tính như mọi nguyên liệu khác: thiếu thì ghi vào danh sách thiếu",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "pantry-dependent live matching",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "0 canonical ingredients have pantry flag; UI default/toggle/request can pass but live availability difference cannot be checked",
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "matching loading/error/retry preserves chips and sends pantry=false",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION_WITH_DELAY",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "pantry-dependent live matching",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "0 canonical ingredients have pantry flag; UI default/toggle/request can pass but live availability difference cannot be checked",
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "matching loading/error/retry preserves chips and sends pantry=false",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION_WITH_DELAY",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "pantry-dependent live matching",
+          "status": "BLOCKED",
+          "mode": "LIVE_DATA_PRECONDITION",
+          "reason": "0 canonical ingredients have pantry flag; UI default/toggle/request can pass but live availability difference cannot be checked",
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "matching loading/error/retry preserves chips and sends pantry=false",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION_WITH_DELAY",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.9",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đã có ít nhất 1 nguyên liệu",
+      "when": "Tìm món",
+      "expected": "Kết quả chia thành **4 nhóm** theo thứ tự: **Nấu ngay / Thiếu 1–2 thứ / Cần đi chợ / Chưa đủ dữ liệu để kết luận** (QĐ 4.4). API trả `readiness` 3 giá trị (`READY`, `MISSING_1_2`, `NEED_SHOPPING`) cùng cờ `is_incomplete`; nhóm thứ tư do giao diện suy ra từ cờ này. Quy tắc xếp nhóm (món không `is_incomplete`) theo RPC `match_dishes` của DB12: số nguyên liệu thiếu bằng 0 → Nấu ngay; 1 hoặc 2 → Thiếu 1–2 thứ; còn lại → Cần đi chợ. Tỷ lệ khớp tính với trọng số nguyên liệu chính : phụ = 2 : 1",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.10",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Một món có `is_incomplete = true`",
+      "when": "Xem kết quả",
+      "expected": "Món vào nhóm **Chưa đủ dữ liệu để kết luận** bất kể `readiness`, và không được trình bày như đã đủ nguyên liệu (QĐ 4.4). Nhóm không có món nào thì không hiển thị",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "live INCOMPLETE at100% remains in group4",
+          "status": "PASS",
+          "mode": "LIVE_API_WITH_RESTORED_SESSION",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "live INCOMPLETE at100% remains in group4",
+          "status": "PASS",
+          "mode": "LIVE_API_WITH_RESTORED_SESSION",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "live INCOMPLETE at100% remains in group4",
+          "status": "PASS",
+          "mode": "LIVE_API_WITH_RESTORED_SESSION",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.11",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Có kết quả",
+      "when": "Duyệt từng nhóm",
+      "expected": "Thứ tự món trong mỗi nhóm đúng như API trả về, tức giữ thứ tự của RPC `match_dishes` (món đủ dữ liệu trước, rồi % khớp giảm dần, rồi món ít thiếu hơn trước); frontend không sắp xếp lại và không tính lại %",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.12",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Có kết quả",
+      "when": "Xem một món",
+      "expected": "Hiện thanh tiến độ và **\"X% khớp\"** lấy từ `match_ratio` (có trọng số theo vai trò chính/phụ, QĐ 4.2). Cạnh đó hiện dòng **\"Có a/b nguyên liệu\"** là số đếm, cùng chip nguyên liệu thiếu, ví dụ \"Có 5/7 nguyên liệu, thiếu: hành lá, nước mắm\". Hai con số có thể không tương ứng nhau (ví dụ 5/7 nhưng không phải 71%); đó là thiết kế",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.13",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Không món nào phù hợp",
+      "when": "Tìm món",
+      "expected": "API trả 200 + `[]`; giao diện hiện thông báo rỗng, không phải lỗi",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "canonical unused ingredient gives empty API and UI",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "canonical unused ingredient gives empty API and UI",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "canonical unused ingredient gives empty API and UI",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "valid unused ingredient gives empty matches",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        }
+      ]
+    },
+    {
+      "id": "S2-02.14",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Có kết quả",
+      "when": "Chọn một món",
+      "expected": "Chuyển sang `/dishes/:id` rồi tới công thức. Quay lại thì giữ nguyên chip nguyên liệu, công tắc tủ bếp và kết quả (QĐ 1.4)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "app return link preserves ingredient-tab origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "native back from recipe restores original ingredient state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "app return link preserves ingredient-tab origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "native back from recipe restores original ingredient state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "app return link preserves ingredient-tab origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "native back from recipe restores original ingredient state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.15",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Khách chưa đăng nhập",
+      "when": "Dùng toàn bộ tab",
+      "expected": "Dùng được, không bị chặn",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "four groups, API order, weighted ratio and counts",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.16",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đang tải hoặc API lỗi",
+      "when": "Chờ phản hồi",
+      "expected": "Có trạng thái đang tải; lỗi thì có thông báo và nút **Thử lại**",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "matching loading/error/retry preserves chips and sends pantry=false",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION_WITH_DELAY",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "matching loading/error/retry preserves chips and sends pantry=false",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION_WITH_DELAY",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "matching loading/error/retry preserves chips and sends pantry=false",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION_WITH_DELAY",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-02.17",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Bộ 3–5 ca mẫu tính tay (dữ liệu mẫu chốt cùng TV3)",
+      "when": "Chạy đối sánh",
+      "expected": "Nhóm, `match_ratio`, \"có/tổng\", danh sách thiếu và thứ tự khớp với kết quả tính tay",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "live HTTP API",
+          "check": "independent oracle 1/8",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "independent oracle 2/8",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "independent oracle 4/8",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "independent oracle 7/8",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "independent oracle 8/8",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        }
+      ]
+    },
+    {
+      "id": "S2-02.18",
+      "priority": "P1",
+      "status": "PASS",
+      "given": "Đã có nguyên liệu",
+      "when": "Xem gợi ý \"mua thêm\"",
+      "expected": "Hiện nguyên liệu mở khóa nhiều món nhất kèm số món. Có thể ghim nguyên liệu và sao chép danh sách đi chợ (FE11). Không có gợi ý thì API 200 + `[]` và giao diện ẩn mục này",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "select seven canonical demo ingredients through autocomplete",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "BE12 live: pork unlocks dish33 in FE09 extension slot",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "pin verified ingredient changes order within group, keeping score and completeness",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "unpin restores API order",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "selected dish copies only its known missing pork ingredient",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "clipboard denial shows error and clears success",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "pin and shopping selection persist on reload",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "mark purchased ingredient as available and search again",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "BE12 error leaves matches usable and retry to [] hides purchase section",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "pin lookup failure preserves API order and retry recovers",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "responsive layout has no horizontal overflow",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "select seven canonical demo ingredients through autocomplete",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "BE12 live: pork unlocks dish33 in FE09 extension slot",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "pin verified ingredient changes order within group, keeping score and completeness",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "unpin restores API order",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "selected dish copies only its known missing pork ingredient",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "clipboard denial shows error and clears success",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "pin and shopping selection persist on reload",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "mark purchased ingredient as available and search again",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "BE12 error leaves matches usable and retry to [] hides purchase section",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "pin lookup failure preserves API order and retry recovers",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "responsive layout has no horizontal overflow",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "select seven canonical demo ingredients through autocomplete",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "BE12 live: pork unlocks dish33 in FE09 extension slot",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "pin verified ingredient changes order within group, keeping score and completeness",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "unpin restores API order",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "selected dish copies only its known missing pork ingredient",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "clipboard denial shows error and clears success",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "pin and shopping selection persist on reload",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "mark purchased ingredient as available and search again",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "BE12 error leaves matches usable and retry to [] hides purchase section",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "pin lookup failure preserves API order and retry recovers",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "responsive layout has no horizontal overflow",
+          "status": "PASS",
+          "mode": "LIVE_P1_WITH_LABELLED_FAULT_INJECTION"
+        }
+      ]
+    },
+    {
+      "id": "S2-03.1",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Có món \"Phở bò\"",
+      "when": "Tìm `pho bo`, `PHỞ BÒ` hoặc `Pho`",
+      "expected": "Đều thấy \"Phở bò\" (không phân biệt hoa/thường, có dấu/không dấu)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "guest name search supports accents and case",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "guest name search supports accents and case",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "guest name search supports accents and case",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-03.2",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Trang tìm kiếm",
+      "when": "Lọc theo **thời gian chế biến** (`max_cook_time`, phút)",
+      "expected": "Chỉ hiện món có ít nhất một công thức công khai với thời gian nấu không quá giá trị đã chọn, kết hợp AND với từ khóa tên. **Lọc theo khẩu vị (`MAN`, `CAY`, `NGOT`, `CHUA`, `THANH`) và theo loại món: DEFERRED Sprint 3**, vì `flavor` hiện luôn `null` và chưa có nguồn dữ liệu (`thuoc_tinh_mon`); giao diện không hiển thị hai bộ lọc này trong Sprint 2",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "time filter is sent with search criteria",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "time filter is sent with search criteria",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "time filter is sent with search criteria",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "cook time filter independently checked via dish details",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        }
+      ]
+    },
+    {
+      "id": "S2-03.3",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Từ khóa hoặc bộ lọc không có món nào",
+      "when": "Tìm",
+      "expected": "API 200 + `[]` với `total` = 0; giao diện hiện thông báo \"không tìm thấy món phù hợp\"",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "empty search is a distinct non-error state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "empty search is a distinct non-error state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "empty search is a distinct non-error state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-03.4",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Nhiều món hơn một trang",
+      "when": "Chuyển trang",
+      "expected": "Phân trang đúng quy ước mục 1.3 của `docs/api.md`: không trùng, không sót món với dữ liệu cố định; `meta.total` đúng",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "server pagination and back keep URL criteria/page",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "server pagination and back keep URL criteria/page",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "server pagination and back keep URL criteria/page",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "fixed-dataset pagination has no duplicates or gaps",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        }
+      ]
+    },
+    {
+      "id": "S2-03.5",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "`page`/`limit` sai (≤0, không phải số, vượt giới hạn) hoặc mã bộ lọc lạ",
+      "when": "Gọi API trực tiếp",
+      "expected": "400",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "live HTTP API",
+          "check": "validation /dishes?page=0",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "validation /dishes?flavor=UNKNOWN",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "extra validation /dishes?limit=51",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "extra validation /dishes?max_cook_time=0",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        }
+      ]
+    },
+    {
+      "id": "S2-03.6",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đã nhập từ khóa, bộ lọc và sang trang 2, rồi mở chi tiết một món",
+      "when": "Bấm quay lại",
+      "expected": "Từ khóa, bộ lọc và số trang giữ nguyên (QĐ 1.4)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "server pagination and back keep URL criteria/page",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "server pagination and back keep URL criteria/page",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "server pagination and back keep URL criteria/page",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-03.7",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Khách chưa đăng nhập",
+      "when": "Tìm món",
+      "expected": "Dùng được",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "guest name search supports accents and case",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "guest name search supports accents and case",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "guest name search supports accents and case",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-03.8",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đang tải hoặc API lỗi",
+      "when": "Chờ phản hồi",
+      "expected": "Có đang tải; lỗi thì có thông báo và **Thử lại**",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "search failure retries without dropping query",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "search failure retries without dropping query",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "search failure retries without dropping query",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-04.1",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Món tồn tại",
+      "when": "Mở `/dishes/:id`",
+      "expected": "Hiện tên, ảnh, mô tả, thời gian nấu, nút **Tự nấu**, mục \"Quán ăn: Sắp có\" (chưa có chức năng), và danh sách công thức (tên, khẩu phần, thời gian). Khẩu phần hiện hiển thị **\"chưa có thông tin\"** vì `servings` luôn `null` (thêm cột ở Sprint 3)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "dish details show API cooking time",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "dish details show API cooking time",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "dish details show API cooking time",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-04.2",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Món chưa có công thức nào",
+      "when": "Mở chi tiết",
+      "expected": "Hiện thông báo rõ \"chưa có công thức\", không để vùng trống khó hiểu (QĐ 1.5)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "dish without recipes is reported on dish-detail entry",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "empty recipe list itself is explained",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "dish without recipes is reported on dish-detail entry",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "empty recipe list itself is explained",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "dish without recipes is reported on dish-detail entry",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "empty recipe list itself is explained",
+          "status": "PASS",
+          "mode": "VALID_HTTP_FIXTURE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-04.3",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Món có công thức, kể cả chỉ có **một** công thức",
+      "when": "Bấm **Tự nấu**",
+      "expected": "Hiện danh sách công thức của món; người dùng chọn một công thức để mở `/recipes/:id`. Không tự vào thẳng công thức khi chỉ có một",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "one recipe still opens recipe list after Tự nấu",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "one recipe still opens recipe list after Tự nấu",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "one recipe still opens recipe list after Tự nấu",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-04.4",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Công thức tồn tại",
+      "when": "Mở `/recipes/:id`",
+      "expected": "Hiện tên, khẩu phần, thời gian chuẩn bị, **nguyên liệu kèm định lượng và đơn vị**, và **các bước đánh số theo thứ tự** (QĐ 1.5). Khẩu phần hiện hiển thị **\"chưa có thông tin\"** vì `servings` luôn `null` (thêm cột ở Sprint 3)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-04.5",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Nguyên liệu không có định lượng cố định (`quantity` rỗng)",
+      "when": "Xem danh sách nguyên liệu",
+      "expected": "Hiện \"tùy khẩu vị\", không hiện 0 hay để trống",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-04.6",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Công thức thiếu thành phần (đánh dấu chưa đầy đủ, hoặc thiếu thời gian/khẩu phần)",
+      "when": "Xem công thức hoặc danh sách công thức",
+      "expected": "Báo rõ phần nào thiếu (\"chưa có thông tin\") và gắn nhãn \"chưa đầy đủ\" nếu có; không khẳng định đủ nguyên liệu và không bịa giá trị (QĐ 1.5, QĐ 4.4)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "incomplete public recipe explains missing data",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "incomplete public recipe explains missing data",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "incomplete public recipe explains missing data",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-04.7",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "ID món hoặc công thức không tồn tại, hoặc món không còn `ACTIVE`",
+      "when": "Mở trang, hoặc gọi API",
+      "expected": "API 404; giao diện hiện trang \"không tìm thấy\" có đường quay về",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "unknown dish and recipe show not-found UI",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "unknown dish and recipe show not-found UI",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "unknown dish and recipe show not-found UI",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "dish not found",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "recipe not found",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "missing dish recipe list",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        }
+      ],
+      "variantLimitations": [
+        "unknown ID branch passed; live HIDDEN/DELETED fixture not created or altered in the shared database"
+      ]
+    },
+    {
+      "id": "S2-04.8",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "ID sai định dạng (chữ, số âm)",
+      "when": "Gọi API",
+      "expected": "400",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "live HTTP API",
+          "check": "validation /dishes/abc",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "validation /recipes/-1",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        },
+        {
+          "layer": "live HTTP API",
+          "check": "extra validation /dishes/abc/recipes",
+          "status": "PASS",
+          "mode": "LIVE_API"
+        }
+      ]
+    },
+    {
+      "id": "S2-04.9",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Khách chưa đăng nhập",
+      "when": "Xem chi tiết và công thức",
+      "expected": "Dùng được",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-04.10",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đến công thức từ gợi ý, đối sánh hoặc tìm kiếm",
+      "when": "Bấm quay lại",
+      "expected": "Về đúng màn hình trước với danh sách và tiêu chí được giữ (QĐ 1.4)",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "app return link preserves suggestion origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "app return link preserves ingredient-tab origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-desktop",
+          "check": "native back from recipe restores original ingredient state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "app return link preserves suggestion origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "app return link preserves ingredient-tab origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "native back from recipe restores original ingredient state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "app return link preserves suggestion origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "app return link preserves ingredient-tab origin",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "native back from recipe restores original ingredient state",
+          "status": "PASS",
+          "mode": "LIVE",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "S2-04.11",
+      "priority": "P0",
+      "status": "PASS",
+      "given": "Đang tải hoặc API lỗi",
+      "when": "Chờ phản hồi",
+      "expected": "Có đang tải; lỗi thì có thông báo và **Thử lại**",
+      "issues": [],
+      "evidence": [
+        {
+          "layer": "chromium-desktop",
+          "check": "recipe failure retries and keeps a return route",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "firefox-desktop",
+          "check": "recipe failure retries and keeps a return route",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION",
+          "reason": null,
+          "screenshot": null
+        },
+        {
+          "layer": "chromium-mobile",
+          "check": "recipe failure retries and keeps a return route",
+          "status": "PASS",
+          "mode": "HTTP_FAULT_INJECTION",
+          "reason": null,
+          "screenshot": null
+        }
+      ]
+    }
+  ]
+}

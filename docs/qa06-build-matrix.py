@@ -1,5 +1,5 @@
 """Build an AC matrix from recorded evidence; does not run apps or write databases."""
-import argparse,json,pathlib,datetime
+import argparse,json,pathlib,datetime,os
 parser=argparse.ArgumentParser()
 for key in ['plan','browser','api','compat','audit','output']:parser.add_argument('--'+key,required=True)
 a=parser.parse_args()
@@ -40,7 +40,7 @@ for line in pathlib.Path(a.plan).read_text(encoding='utf-8').splitlines():
 assert len(rows)==49,len(rows)
 summary={x:sum(row['status']==x for row in rows) for x in ['PASS','FAIL','BLOCKED','NOT RUN']}
 by_story={story:{x:sum(row['id'].startswith(story+'.') and row['status']==x for row in rows) for x in summary} for story in ['S2-01','S2-02','S2-03','S2-04']}
-report={'generatedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'candidate main413a7b6 + FE10 587171e + FE11 e8de078, not merge/revert approval','acceptance':'not accepted; failures, data prerequisites and pending revert remain','summary':summary,'stories':by_story,'liveData':audit,'cases':rows}
+report={'generatedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':os.environ.get('QA_SOURCE_LABEL','candidate main413a7b6 + FE10 587171e + FE11 e8de078, not merge/revert approval'),'acceptance':'not accepted while P0 data prerequisites remain; requires release SHA and PO review','summary':summary,'stories':by_story,'liveData':audit,'cases':rows}
 output=pathlib.Path(a.output);output.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 lines=['# QA06 — Ma trận49 AC đã đối chiếu bằng chứng','',f'Kết quả ứng viên, không phải phê duyệt merge/revert: {summary}.','Không cộng số API checks, browser checks và AC. HTTP fixture/fault injection được ghi theo từng proof.','', '| AC | Priority | Kết quả | Bug / lý do |','|---|---|---|---|']
 for row in rows:

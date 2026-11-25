@@ -1,5 +1,9 @@
 # QA06 — Báo cáo hồi quy Sprint 2, 24/11/2026
 
+## Ma trận mới sau browser retest — 25/11/2026
+
+Ma trận `qa06-acceptance-matrix-2026-11-25.json/.md`: **45 PASS, 0 FAIL, 4 BLOCKED, 0 NOT RUN** trên 49 AC. Browser thật trên `hien/FE10-qa-fixes@30b7fc2` + INT03: Chromium desktop, Firefox desktop, Chromium mobile đều 36 PASS / 3 BLOCKED checkpoint; năm AC trước đây FAIL đã PASS. API 56/56 và FE11 compatibility 33/33 là bằng chứng từ backend/FE11 source trước đó không đổi, chưa chạy lại cùng SHA. Bốn AC chờ dữ liệu tag AND, vùng miền, pantry; release main còn chưa chốt. QA06 chưa nghiệm thu khi còn P0 BLOCKED. Các số 40/5/4 phía dưới là lịch sử trước bản sửa FE10.
+
 ## Bản sửa FE10 đang chờ hồi quy — 25/11/2026
 
 PR [#36](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/36) tại `30b7fc2` trên nền INT03 sửa code cho ba bug và đạt frontend 229/229 tests, lint/build. Ma trận 40/5/4 vẫn phản ánh browser evidence của source trước fix. QA cần chạy năm AC từng fail trên PR #36 trong Chromium/Firefox/mobile; sau khi có tag, vùng miền, pantry từ nhóm thì chạy bốn AC blocked và sinh lại matrix trên cùng release SHA. Không chuyển PR #30 sang review từ unit test.
