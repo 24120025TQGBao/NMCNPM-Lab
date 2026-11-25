@@ -4,10 +4,10 @@ import { mapDish, mapDishList, mapPostDetail, mapPostPage, mapPostSummary, toCre
 describe('mapDish', () => {
   it('maps the DB-column shape returned by main', () => {
     expect(mapDish({ ma_mon: 'a1', ten_mon: 'Phở bò', mo_ta_ngan: 'Mô tả', hinh_anh: 'http://x/y.png' }))
-      .toEqual({ id: 'a1', name: 'Phở bò', description: 'Mô tả', imageUrl: 'http://x/y.png' })
+      .toEqual({ id: 'a1', name: 'Phở bò', description: 'Mô tả', imageUrl: 'http://x/y.png', cookTimeMinutes: null })
   })
   it('maps the contract shape { id, name }', () => {
-    expect(mapDish({ id: 7, name: 'Cơm tấm' })).toEqual({ id: 7, name: 'Cơm tấm', description: '', imageUrl: null })
+    expect(mapDish({ id: 7, name: 'Cơm tấm', cook_time_minutes: 60 })).toEqual({ id: 7, name: 'Cơm tấm', description: '', imageUrl: null, cookTimeMinutes: 60 })
   })
   it('returns null for non-objects', () => {
     expect(mapDish(null)).toBeNull()

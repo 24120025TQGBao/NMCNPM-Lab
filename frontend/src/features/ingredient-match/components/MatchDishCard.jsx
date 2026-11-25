@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { ImageOff, AlertTriangle } from 'lucide-react'
 
 export default function MatchDishCard({ dish }) {
+  const location = useLocation()
   const [imageError, setImageError] = useState(false)
 
   // Tính phần trăm khớp
@@ -16,6 +17,7 @@ export default function MatchDishCard({ dish }) {
   return (
     <Link
       to={`/dishes/${dish.id}`}
+      state={{ searchReturnTo: `${location.pathname}${location.search}` }}
       className="group flex flex-col sm:flex-row items-start gap-4 rounded-xl border border-border bg-white p-4 shadow-sm transition-all motion-reduce:transition-none hover:border-lemon-gold hover:shadow-md no-underline text-foreground"    >
       {/* Ảnh nhỏ */}
       <div className="relative h-28 w-full sm:w-28 flex-shrink-0 overflow-hidden rounded-lg bg-paper">

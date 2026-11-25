@@ -23,6 +23,7 @@ async function mockGet(path, { query, signal } = {}) {
 function open(entry = '/search') {
   const router = createMemoryRouter([
     { path: '/search', element: <SearchPage /> },
+    { path: '/goi-y', element: <div>Gợi ý món giữ trạng thái</div> },
     { path: '/dishes/:id', element: <DishDetailPage /> },
     { path: '/dishes/:id/recipes', element: <DishRecipesPage /> },
     { path: '/recipes/:id', element: <RecipeDetailPage /> },
@@ -38,6 +39,29 @@ beforeEach(() => {
 })
 
 describe('S2-03 / S2-04 catalog flow', () => {
+  it('shows cooking time and recipes on the dish and returns to the suggestion source', async () => {
+    const user = userEvent.setup()
+    get.mockImplementation(async (path, options) => {
+      if (path === '/dishes/101') return { data: { id: 101, name: 'Phở bò', cook_time_minutes: 60 } }
+      if (path === '/dishes/101/recipes') return { data: [{ id: 501, dish_id: 101, name: 'Phở bò nấu nhanh', servings: null, prep_time_minutes: 45 }], meta: { page: 1, limit: 12, total: 1 } }
+      return mockGet(path, options)
+    })
+    open({ pathname: '/dishes/101', state: { searchReturnTo: '/goi-y?tab=nguyen-lieu' } })
+    expect(await screen.findByText('Thời gian nấu: 60 phút')).toBeInTheDocument()
+    expect(screen.getByText('Phở bò nấu nhanh')).toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: 'Quay lại tìm món' }))
+    expect(await screen.findByText('Gợi ý món giữ trạng thái')).toBeInTheDocument()
+  })
+
+  it('explains on the dish page when there is no recipe', async () => {
+    get.mockImplementation(async (path, options) => {
+      if (path === '/dishes/101') return { data: { id: 101, name: 'Phở bò' } }
+      if (path === '/dishes/101/recipes') return { data: [], meta: { page: 1, limit: 12, total: 0 } }
+      return mockGet(path, options)
+    })
+    open('/dishes/101')
+    expect(await screen.findByText('Món này chưa có công thức.')).toBeInTheDocument()
+  })
   it('searches without accents, combines filters, opens recipe details and restores the search on return', async () => {
     const user = userEvent.setup()
     const router = open('/search?search=pho&category=MON_NUOC&flavor=THANH&max_cook_time=60')

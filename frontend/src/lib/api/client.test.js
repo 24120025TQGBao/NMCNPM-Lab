@@ -89,7 +89,7 @@ describe('dishes.list', () => {
   it('reads the bare array that main returns', async () => {
     fetchMock.mockReturnValue(respond(200, [{ ma_mon: '1', ten_mon: 'Phở bò', mo_ta_ngan: 'ngon' }]))
     const r = await dishes.list()
-    expect(r.data).toEqual([{ id: '1', name: 'Phở bò', description: 'ngon', imageUrl: null }])
+    expect(r.data).toEqual([{ id: '1', name: 'Phở bò', description: 'ngon', imageUrl: null, cookTimeMinutes: null }])
     expect(r.meta.total).toBe(1)
   })
 
