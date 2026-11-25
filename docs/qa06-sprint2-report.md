@@ -1,5 +1,9 @@
 # QA06 — Báo cáo hồi quy Sprint 2, 24/11/2026
 
+## Bản sửa FE10 đang chờ hồi quy — 25/11/2026
+
+PR [#36](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/36) tại `30b7fc2` trên nền INT03 sửa code cho ba bug và đạt frontend 229/229 tests, lint/build. Ma trận 40/5/4 vẫn phản ánh browser evidence của source trước fix. QA cần chạy năm AC từng fail trên PR #36 trong Chromium/Firefox/mobile; sau khi có tag, vùng miền, pantry từ nhóm thì chạy bốn AC blocked và sinh lại matrix trên cùng release SHA. Không chuyển PR #30 sang review từ unit test.
+
 ## Cập nhật INT03 — 25/11/2026
 
 Nhánh `origin/linh/int03@9f8a6cb` đã push đúng thứ tự PO docs, BE09 tests, DB grants, FE10, FE11; không áp revert. Backend công bố 258 Vitest + 10 Node, frontend 227 tests, lint/build và guest `/api/me` 401. Main vẫn `413a7b6`, nên INT03 chưa là release main. Diff code FE10 liên quan ba lỗi `BUG-S2-003..005` chưa có sửa; ma trận 40 PASS / 5 FAIL / 4 BLOCKED vẫn là bằng chứng browser gần nhất, không tự nâng trạng thái AC nhờ các test mới. Cần retest release SHA sau khi fix và có dữ liệu tag/vùng miền/pantry.
