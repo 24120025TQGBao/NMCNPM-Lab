@@ -1,5 +1,9 @@
 # QA05 — Kết quả tự động và phần cần làm thủ công, 24/11/2026
 
+## Bản sửa FE10 đang chờ browser QA — 25/11/2026
+
+Đã tạo PR [#36](https://github.com/24120025TQGBao/NMCNPM-Lab/pull/36), nhánh `hien/FE10-qa-fixes@30b7fc2` từ `main@413a7b6` rồi fast-forward INT03 `9f8a6cb`. Code xử lý ba lỗi `BUG-S2-003..005`; frontend 229/229 tests, lint và build đạt. Hai test mới kiểm tra trang chi tiết có thời gian/danh sách công thức, empty state và nguồn quay về `/goi-y`. Đây là bản sửa đề xuất, chưa cập nhật 5 AC FAIL thành PASS trước khi chạy browser trên đúng SHA `30b7fc2`. Bốn AC BLOCKED vẫn cần tag, vùng miền và pantry thật trên DB QA. Khi dữ liệu có, audit ID/cờ rồi chạy lại ma trận; không giả lập dữ liệu DB chung.
+
 ## Cập nhật INT03 — 25/11/2026
 
 `origin/linh/int03@9f8a6cb` đã push, ghép `sprint2-po-be → be09 → db → FE10 → FE11` trên main `413a7b6`, sau đó bỏ dependency `d` và cập nhật demo. `docs/api.md` mục 7 v2.0 là contract chính; `docs/catalog-handoff.md` ghi sáu điểm khác implementation. INT03 công bố BE 258 Vitest + 10 Node, FE 227 test, lint/build và `/api/me` guest 401. Đây là bằng chứng của nhánh INT03, chưa thay thế kết quả browser QA của nhánh ứng viên trước. Code `DishDetailPage.jsx` và `catalogNavigation.js` của FE10 trong INT03 vẫn là source đã tái hiện BUG-S2-003..005; chưa có commit sửa ba lỗi. Sau khi nhóm chốt INT03 làm release, chạy lại năm AC fail và bốn AC thiếu dữ liệu trên đúng HEAD release trước khi chuyển PR này khỏi draft. Không merge revert PR #33.
