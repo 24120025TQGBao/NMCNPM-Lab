@@ -1,5 +1,9 @@
 # Trạng thái Sprint 2 — cập nhật 24/11/2026
 
+## Retest 25/11/2026
+
+INT03 `9f8a6cb` + bản sửa FE10 `30b7fc2` đã qua browser QA trên Chromium desktop, Firefox desktop và Chromium mobile: 36 PASS / 3 BLOCKED checkpoint mỗi cấu hình. Ma trận QA06 mới: **45 PASS, 0 FAIL, 4 BLOCKED / 49 AC**. Năm AC giao diện trước đây FAIL đã PASS; bốn AC về tag AND, vùng miền, pantry vẫn đợi dữ liệu DB QA. Plan dưới đây được gắn trạng thái bản sửa; báo cáo cũ tiếp theo là lịch sử trước retest. Source chưa nằm trên release main.
+
 Nguồn mới nhất đã dùng: `main@413a7b6` (merge PR #32 INT02), FE10 `587171e`, FE09 `786605d`, FE11 `e8de078`, PO `72be7e1`. PR #33 `revert-32-linh/int02` đang đề xuất đưa source về trước merge; kết quả QA dưới đây chạy trên ứng viên có INT02, chưa áp revert.
 
 | Task | Trạng thái hiện tại | Còn lại |

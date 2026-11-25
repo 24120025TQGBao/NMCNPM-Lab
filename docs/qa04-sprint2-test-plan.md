@@ -18,7 +18,7 @@ Exit: mọi P0 pass, không P0 mở, lỗi còn lại có owner/hạn xử lý, 
 | QA04-S2-01.4 | S2-01.4 | Có 5 chip hoàn cảnh: **Trời mưa** (`TROI_MUA`), **Lười nấu** (`LUOI_NAU`), **Cuối tháng** (`CUOI_THANG`), **Nấu cho 4 người** (`NAU_CHO_4`), **Ăn nhẹ** (`AN_NHE`); mã là mã tag của DB10 | Chọn một hoặc nhiều chip | Chỉ hiện món gắn **tất cả** tag của các chip đang chọn (điều kiện AND). Bỏ chip thì lọc lại theo các chip còn lại. Không có chip khẩu vị hay thời gian ở tab này | BLOCKED |
 | QA04-S2-01.5 | S2-01.5 | Đã chọn chip, không còn món nào thỏa chip mà chưa xuất hiện | Bấm **Gợi ý khác** | API trả 200 + `[]`. Giao diện hiện trạng thái "hết món phù hợp". **Không tự bỏ hay nới chip** (QĐ 1.2); người dùng tự quyết định đổi chip | PASS |
 | QA04-S2-01.6 | S2-01.6 | Khách ở tab Gợi ý món, có hoặc không có chip đang chọn | Bấm nút ngẫu nhiên **"Hôm nay ăn gì?"** | Nhận một món ngẫu nhiên có thật trong dữ liệu hệ thống, **thỏa các chip đang chọn** và **không thuộc danh sách đã xem**. Hết món thì xử lý như S2-01.5. Nút dùng được khi chưa đăng nhập | PASS |
-| QA04-S2-01.7 | S2-01.7 | Đang xem thẻ món X với một số chip đã chọn | Bấm **Nấu món này** | Chuyển sang `/dishes/X`. Bấm quay lại thì tab, chip, thẻ hiện tại và danh sách đã xem được giữ nguyên (QĐ 1.4) | FAIL |
+| QA04-S2-01.7 | S2-01.7 | Đang xem thẻ món X với một số chip đã chọn | Bấm **Nấu món này** | Chuyển sang `/dishes/X`. Bấm quay lại thì tab, chip, thẻ hiện tại và danh sách đã xem được giữ nguyên (QĐ 1.4) | PASS |
 | QA04-S2-01.8 | S2-01.8 | Đang ở tab Gợi ý món | Chuyển sang tab Theo nguyên liệu rồi quay lại | Trạng thái tab Gợi ý món không mất | PASS |
 | QA04-S2-01.9 | S2-01.9 | Gọi API chậm | Chờ phản hồi | Hiện trạng thái đang tải, các nút không gửi trùng yêu cầu | PASS |
 | QA04-S2-01.10 | S2-01.10 | API lỗi mạng hoặc 500 | Hiện thông báo lỗi | Có nút **Thử lại**. Món của lần gọi lỗi không bị tính là đã xem. Thử lại thành công thì tiếp tục bình thường | PASS |
@@ -37,7 +37,7 @@ Exit: mọi P0 pass, không P0 mở, lỗi còn lại có owner/hạn xử lý, 
 | QA04-S2-02.11 | S2-02.11 | Có kết quả | Duyệt từng nhóm | Thứ tự món trong mỗi nhóm đúng như API trả về, tức giữ thứ tự của RPC `match_dishes` (món đủ dữ liệu trước, rồi % khớp giảm dần, rồi món ít thiếu hơn trước); frontend không sắp xếp lại và không tính lại % | PASS |
 | QA04-S2-02.12 | S2-02.12 | Có kết quả | Xem một món | Hiện thanh tiến độ và **"X% khớp"** lấy từ `match_ratio` (có trọng số theo vai trò chính/phụ, QĐ 4.2). Cạnh đó hiện dòng **"Có a/b nguyên liệu"** là số đếm, cùng chip nguyên liệu thiếu, ví dụ "Có 5/7 nguyên liệu, thiếu: hành lá, nước mắm". Hai con số có thể không tương ứng nhau (ví dụ 5/7 nhưng không phải 71%); đó là thiết kế | PASS |
 | QA04-S2-02.13 | S2-02.13 | Không món nào phù hợp | Tìm món | API trả 200 + `[]`; giao diện hiện thông báo rỗng, không phải lỗi | PASS |
-| QA04-S2-02.14 | S2-02.14 | Có kết quả | Chọn một món | Chuyển sang `/dishes/:id` rồi tới công thức. Quay lại thì giữ nguyên chip nguyên liệu, công tắc tủ bếp và kết quả (QĐ 1.4) | FAIL |
+| QA04-S2-02.14 | S2-02.14 | Có kết quả | Chọn một món | Chuyển sang `/dishes/:id` rồi tới công thức. Quay lại thì giữ nguyên chip nguyên liệu, công tắc tủ bếp và kết quả (QĐ 1.4) | PASS |
 | QA04-S2-02.15 | S2-02.15 | Khách chưa đăng nhập | Dùng toàn bộ tab | Dùng được, không bị chặn | PASS |
 | QA04-S2-02.16 | S2-02.16 | Đang tải hoặc API lỗi | Chờ phản hồi | Có trạng thái đang tải; lỗi thì có thông báo và nút **Thử lại** | PASS |
 | QA04-S2-02.17 | S2-02.17 | Bộ 3–5 ca mẫu tính tay (dữ liệu mẫu chốt cùng TV3) | Chạy đối sánh | Nhóm, `match_ratio`, "có/tổng", danh sách thiếu và thứ tự khớp với kết quả tính tay | PASS |
@@ -50,8 +50,8 @@ Exit: mọi P0 pass, không P0 mở, lỗi còn lại có owner/hạn xử lý, 
 | QA04-S2-03.6 | S2-03.6 | Đã nhập từ khóa, bộ lọc và sang trang 2, rồi mở chi tiết một món | Bấm quay lại | Từ khóa, bộ lọc và số trang giữ nguyên (QĐ 1.4) | PASS |
 | QA04-S2-03.7 | S2-03.7 | Khách chưa đăng nhập | Tìm món | Dùng được | PASS |
 | QA04-S2-03.8 | S2-03.8 | Đang tải hoặc API lỗi | Chờ phản hồi | Có đang tải; lỗi thì có thông báo và **Thử lại** | PASS |
-| QA04-S2-04.1 | S2-04.1 | Món tồn tại | Mở `/dishes/:id` | Hiện tên, ảnh, mô tả, thời gian nấu, nút **Tự nấu**, mục "Quán ăn: Sắp có" (chưa có chức năng), và danh sách công thức (tên, khẩu phần, thời gian). Khẩu phần hiện hiển thị **"chưa có thông tin"** vì `servings` luôn `null` (thêm cột ở Sprint 3) | FAIL |
-| QA04-S2-04.2 | S2-04.2 | Món chưa có công thức nào | Mở chi tiết | Hiện thông báo rõ "chưa có công thức", không để vùng trống khó hiểu (QĐ 1.5) | FAIL |
+| QA04-S2-04.1 | S2-04.1 | Món tồn tại | Mở `/dishes/:id` | Hiện tên, ảnh, mô tả, thời gian nấu, nút **Tự nấu**, mục "Quán ăn: Sắp có" (chưa có chức năng), và danh sách công thức (tên, khẩu phần, thời gian). Khẩu phần hiện hiển thị **"chưa có thông tin"** vì `servings` luôn `null` (thêm cột ở Sprint 3) | PASS |
+| QA04-S2-04.2 | S2-04.2 | Món chưa có công thức nào | Mở chi tiết | Hiện thông báo rõ "chưa có công thức", không để vùng trống khó hiểu (QĐ 1.5) | PASS |
 | QA04-S2-04.3 | S2-04.3 | Món có công thức, kể cả chỉ có **một** công thức | Bấm **Tự nấu** | Hiện danh sách công thức của món; người dùng chọn một công thức để mở `/recipes/:id`. Không tự vào thẳng công thức khi chỉ có một | PASS |
 | QA04-S2-04.4 | S2-04.4 | Công thức tồn tại | Mở `/recipes/:id` | Hiện tên, khẩu phần, thời gian chuẩn bị, **nguyên liệu kèm định lượng và đơn vị**, và **các bước đánh số theo thứ tự** (QĐ 1.5). Khẩu phần hiện hiển thị **"chưa có thông tin"** vì `servings` luôn `null` (thêm cột ở Sprint 3) | PASS |
 | QA04-S2-04.5 | S2-04.5 | Nguyên liệu không có định lượng cố định (`quantity` rỗng) | Xem danh sách nguyên liệu | Hiện "tùy khẩu vị", không hiện 0 hay để trống | PASS |
@@ -59,7 +59,7 @@ Exit: mọi P0 pass, không P0 mở, lỗi còn lại có owner/hạn xử lý, 
 | QA04-S2-04.7 | S2-04.7 | ID món hoặc công thức không tồn tại, hoặc món không còn `ACTIVE` | Mở trang, hoặc gọi API | API 404; giao diện hiện trang "không tìm thấy" có đường quay về | PASS |
 | QA04-S2-04.8 | S2-04.8 | ID sai định dạng (chữ, số âm) | Gọi API | 400 | PASS |
 | QA04-S2-04.9 | S2-04.9 | Khách chưa đăng nhập | Xem chi tiết và công thức | Dùng được | PASS |
-| QA04-S2-04.10 | S2-04.10 | Đến công thức từ gợi ý, đối sánh hoặc tìm kiếm | Bấm quay lại | Về đúng màn hình trước với danh sách và tiêu chí được giữ (QĐ 1.4) | FAIL |
+| QA04-S2-04.10 | S2-04.10 | Đến công thức từ gợi ý, đối sánh hoặc tìm kiếm | Bấm quay lại | Về đúng màn hình trước với danh sách và tiêu chí được giữ (QĐ 1.4) | PASS |
 | QA04-S2-04.11 | S2-04.11 | Đang tải hoặc API lỗi | Chờ phản hồi | Có đang tải; lỗi thì có thông báo và **Thử lại** | PASS |
 
 ## Bổ sung
