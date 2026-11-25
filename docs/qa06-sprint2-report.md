@@ -1,5 +1,9 @@
 # QA06 — Báo cáo hồi quy Sprint 2, 24/11/2026
 
+## Retest trên bản PO chọn — 25/11/2026
+
+PO chọn `hien/FE10-qa-fixes@4549d4ed44f7cc19af11c48f2b57aff466e13990` (bao gồm INT03). QA05 đã chạy lại mọi lớp dùng cho ma trận trên **cùng HEAD**: HTTP API live 56/56 PASS, frontend full-flow Chromium/Firefox/mobile 108 PASS / 9 BLOCKED, FE11 compatibility browser 33/33 PASS. Ma trận `qa06-acceptance-matrix-2026-11-25.json/.md` sinh lại từ evidence cùng SHA: **45 PASS, 0 FAIL, 4 BLOCKED, 0 NOT RUN / 49 AC**. Bốn AC chưa đạt điều kiện dữ liệu là `S2-01.4`, `S2-01.12` (P1), `S2-02.7`, `S2-02.8`. Dataset đọc ngày 25/11 có 0 tag, 0 liên kết tag, 0 vùng miền, 0 pantry; không tự ghi fixture lên Supabase chung. Khi nhóm cấp dữ liệu QA, retest bốn AC và xác nhận release SHA cuối trước khi chuyển PR #30 khỏi draft. Các đoạn bên dưới là lịch sử trước lượt retest này.
+
 ## Ma trận mới sau browser retest — 25/11/2026
 
 Ma trận `qa06-acceptance-matrix-2026-11-25.json/.md`: **45 PASS, 0 FAIL, 4 BLOCKED, 0 NOT RUN** trên 49 AC. Browser thật trên `hien/FE10-qa-fixes@30b7fc2` + INT03: Chromium desktop, Firefox desktop, Chromium mobile đều 36 PASS / 3 BLOCKED checkpoint; năm AC trước đây FAIL đã PASS. API 56/56 và FE11 compatibility 33/33 là bằng chứng từ backend/FE11 source trước đó không đổi, chưa chạy lại cùng SHA. Bốn AC chờ dữ liệu tag AND, vùng miền, pantry; release main còn chưa chốt. QA06 chưa nghiệm thu khi còn P0 BLOCKED. Các số 40/5/4 phía dưới là lịch sử trước bản sửa FE10.

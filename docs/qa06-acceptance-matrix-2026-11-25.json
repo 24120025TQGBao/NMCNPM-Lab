@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-25T00:59:29.455477+00:00",
-  "scope": "INT03 9f8a6cb + FE10 QA fix 30b7fc2; browser live 25/11, API56 and FE11 compatibility33 carried from prior unchanged backend/FE11 source",
+  "generatedAt": "2026-11-25T13:55:40.140132+00:00",
+  "scope": "PO-selected PR36 4549d4ed44f7cc19af11c48f2b57aff466e13990 (includes INT03 9f8a6cb); browser, API, FE11 compatibility all rerun on this SHA 25/11/2026",
   "acceptance": "not accepted while P0 data prerequisites remain; requires release SHA and PO review",
   "summary": {
     "PASS": 45,
@@ -35,8 +35,8 @@
     }
   },
   "liveData": {
-    "checkedAt": "2026-11-24T03:02:40.488Z",
-    "source": "e47c5f638cd30924603bc4956426c0961a3c22be",
+    "checkedAt": "2026-11-25T13:47:43.154Z",
+    "source": "4549d4ed44f7cc19af11c48f2b57aff466e13990",
     "readOnly": true,
     "activeDishes": 72,
     "canonicalIngredients": 299,
