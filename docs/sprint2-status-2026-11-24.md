@@ -1,5 +1,9 @@
 # Trạng thái Sprint 2 — cập nhật 24/11/2026
 
+## Hiện trạng 27/11/2026
+
+Source giữ PR36 `4549d4e`, INT03 không đổi; PR revert33 đã đóng không merge. Dữ liệu tag/vùng miền/pantry đã có và đã retest ba browser. Ma trận mới **48 PASS / 1 FAIL / 0 BLOCKED**; S2-01.4 còn FAIL do slug tag Nấu cho4 lệch contract (BUG-S2-007). QA05/QA06 giữ draft, cần TV3/DA04 sửa tag/seed và retest. Xem handoff QA05 ngày27 và matrix QA06 ngày27; các số bên dưới là lịch sử.
+
 ## Retest 25/11/2026
 
 INT03 `9f8a6cb` + bản sửa FE10 `30b7fc2` đã qua browser QA trên Chromium desktop, Firefox desktop và Chromium mobile: 36 PASS / 3 BLOCKED checkpoint mỗi cấu hình. Ma trận QA06 mới: **45 PASS, 0 FAIL, 4 BLOCKED / 49 AC**. Năm AC giao diện trước đây FAIL đã PASS; bốn AC về tag AND, vùng miền, pantry vẫn đợi dữ liệu DB QA. Plan dưới đây được gắn trạng thái bản sửa; báo cáo cũ tiếp theo là lịch sử trước retest. Source chưa nằm trên release main.
