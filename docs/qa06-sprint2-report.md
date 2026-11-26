@@ -1,5 +1,9 @@
 # QA06 — Báo cáo hồi quy Sprint 2, 24/11/2026
 
+## Hiện trạng 27/11/2026
+
+Ma trận `qa06-acceptance-matrix-2026-11-27.json/.md`: **48 PASS / 1 FAIL / 0 BLOCKED / 0 NOT RUN / 49 AC**. Source PO chọn vẫn PR #36 `4549d4e`, main chưa đổi; PR revert #33 đã đóng không merge. Kết hợp full regression ngày 25/11 trên cùng source với live retest bốn AC dữ liệu ngày 27/11. Metadata DB độc lập xác nhận pantry/vùng miền đã có và ba AC tương ứng đạt. `S2-01.4` FAIL vì tag Nấu cho 4 người có slug `nau-cho-4-nguoi` thay vì contract `nau-cho-4`; canonical request trả [] thay vì món 39/43/47/49/57. Không còn blocker thiếu dữ liệu, nhưng cần TV3/DA04 sửa seed/tag theo BUG-S2-007 rồi retest. Firefox bước AND/bỏ chip còn timeout hai lượt, retained FAIL; chưa kết luận bug sản phẩm mới. QA06 vẫn draft vì P0 S2-01.4 chưa đạt. Evidence mới trên nhánh QA05; handoff hướng dẫn từng bước tại docs/qa05-data-handoff-2026-11-27.md. Các mốc bên dưới là lịch sử.
+
 ## Retest trên bản PO chọn — 25/11/2026
 
 PO chọn `hien/FE10-qa-fixes@4549d4ed44f7cc19af11c48f2b57aff466e13990` (bao gồm INT03). QA05 đã chạy lại mọi lớp dùng cho ma trận trên **cùng HEAD**: HTTP API live 56/56 PASS, frontend full-flow Chromium/Firefox/mobile 108 PASS / 9 BLOCKED, FE11 compatibility browser 33/33 PASS. Ma trận `qa06-acceptance-matrix-2026-11-25.json/.md` sinh lại từ evidence cùng SHA: **45 PASS, 0 FAIL, 4 BLOCKED, 0 NOT RUN / 49 AC**. Bốn AC chưa đạt điều kiện dữ liệu là `S2-01.4`, `S2-01.12` (P1), `S2-02.7`, `S2-02.8`. Dataset đọc ngày 25/11 có 0 tag, 0 liên kết tag, 0 vùng miền, 0 pantry; không tự ghi fixture lên Supabase chung. Khi nhóm cấp dữ liệu QA, retest bốn AC và xác nhận release SHA cuối trước khi chuyển PR #30 khỏi draft. Các đoạn bên dưới là lịch sử trước lượt retest này.
