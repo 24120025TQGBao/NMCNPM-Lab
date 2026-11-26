@@ -1,5 +1,11 @@
 # QA05 — Kết quả tự động và phần cần làm thủ công, 24/11/2026
 
+## Hiện trạng 27/11/2026 — dữ liệu đã có, còn lệch slug tag
+
+Fetch lại: source PO chọn PR #36 vẫn `4549d4e`; PR revert #33 đã đóng không merge. Kiểm kê Supabase hôm nay có 5 tag, 25 liên kết, 72 món có vùng miền, 5 pantry. Đã chạy ca dữ liệu dương tính trên Chromium desktop, Firefox desktop, Chromium mobile bằng expected độc lập từ metadata DB. Vùng miền, pantry bật/tắt đều đạt; Chromium desktop/mobile đạt cả AND/bỏ chip. Chip `NAU_CHO_4` trả [] trên cả ba dù có năm món gắn tag: DB dùng `nau-cho-4-nguoi`, contract yêu cầu `nau-cho-4`. Firefox bước AND/bỏ chip timeout cả retest, giữ FAIL evidence và chưa phân loại thành bug sản phẩm thứ hai.
+
+Ma trận mới **48 PASS / 1 FAIL / 0 BLOCKED / 49 AC**. `S2-01.4` còn FAIL, theo `BUG-S2-007`; chi tiết và hướng dẫn TV3/DA04 ở [qa05-data-handoff-2026-11-27.md](qa05-data-handoff-2026-11-27.md). QA không ghi/sửa DB. Evidence chuẩn hóa `qa05-data-evidence-2026-11-27/final-results.json` (20 PASS / 4 FAIL checkpoint, gồm ba lần cùng lỗi tag và một Firefox timeout), oracle `qa05-data-oracle-2026-11-27.json`. PR #29 giữ draft. Các mốc bên dưới là lịch sử.
+
 ## PO chọn PR #36 — chạy lại đúng SHA ngày 25/11/2026
 
 PO xác nhận tiếp tục dùng bản tích hợp `hien/FE10-qa-fixes@4549d4ed44f7cc19af11c48f2b57aff466e13990` (gồm INT03 `9f8a6cb`). Đã chạy lại **trên đúng HEAD này** bằng backend GET-only với Supabase thật, cả hai mock flag false: API **56/56 PASS**; luồng browser QA05 Chromium desktop, Firefox desktop, Chromium mobile **108 PASS / 9 BLOCKED / 0 FAIL**; FE11 compatibility browser **33/33 PASS**. Mỗi cấu hình full-flow có 36 PASS và 3 BLOCKED, không cộng số checkpoint thành AC. Evidence mới: `qa05-fe10-fix-api-2026-11-25.json`, `qa05-pr36-browser-2026-11-25/results.json`, `qa05-fe11-compat-2026-11-25/results.json`.

@@ -1,0 +1,589 @@
+{
+  "checkedAt": "2026-11-26T23:33:08.430Z",
+  "readOnly": true,
+  "dishes": [
+    {
+      "ma_mon": 40,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/04/CookProduct/phobovien-1200x676.jpg",
+      "mo_ta_ngan": "Công thức nấu món phở bò viên chuẩn vị thơm ngon hấp dẫn mà đơn giản tại nhà, thịt bò mềm, không dai, nước dùng ngọt thanh đậm đà. Click xem ngay và thực hiện nhé!"
+    },
+    {
+      "ma_mon": 53,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/go%CC%89i%20ga%CC%80%20ma%CC%86ng%20cu%CC%A3t%20tl.jpg",
+      "mo_ta_ngan": "Khám phá ngay cách làm gỏi gà măng cụt giòn ngọt, đậm đà chuẩn vị tại nhà."
+    },
+    {
+      "ma_mon": 17,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/12/CookDish/cach-lam-cha-trung-ngon-nhu-ngoai-hang-com-tam-avt-1200x676.jpg",
+      "mo_ta_ngan": "Trong bài viết này sẽ hướng dẫn bạn 2 cách làm món chả trứng hấp thơm ngon, hấp dẫn, đơn giản nên bạn có thể thực hiện ngay tại nhà"
+    },
+    {
+      "ma_mon": 18,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/11/CookDish/cach-lam-ca-chem-hap-ngon-ngot-thom-lung-chieu-dai-ca-nha-avt-1200x676.jpg",
+      "mo_ta_ngan": "Chi tiết công thức cách làm cá chẽm hấp cực kỳ thơm ngon hấp dẫn. Còn chần chờ gì mà không vào bếp thực hiện món hấp này ngay nào"
+    },
+    {
+      "ma_mon": 19,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/04/CookProduct/thumb3-1200x676-1.jpg",
+      "mo_ta_ngan": "Bài viết này sẽ hướng dẫn bạn cách làm rau muống xào tỏi ngon thơm nức mũi. Một món ăn dân dã có mặt hàng ngày trong bữa cơm gia đình bạn. Click xem liền!"
+    },
+    {
+      "ma_mon": 20,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2022/04/CookDish/cach-lam-rau-muong-xao-bo-toi-thom-beo-gion-ngon-cuc-bat-com-avt-1200x676.jpg",
+      "mo_ta_ngan": "Chi tiết công thức làm rau muống xào bơ tỏi, món ăn dân dã nhưng thơm ngon tự nhiên đầy hấp dẫn."
+    },
+    {
+      "ma_mon": 21,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/05/CookProduct/thum-1-1200x676-15.jpg",
+      "mo_ta_ngan": "2 cách làm rau muống xào thịt bò và rau muống xào chao giòn ngon, xanh mướt, cực kỳ đơn giản cho bữa cơm gia đình. Cùng vào bếp thực hiện ngay món ăn nhé!"
+    },
+    {
+      "ma_mon": 22,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2022/03/CookDish/cach-lam-canh-ga-kho-gung-mem-thom-dam-vi-cuc-da-cho-bua-com-avt-1200x676.jpg",
+      "mo_ta_ngan": "Thịt gà được biến tấu thành vô vàn món ngon hấp dẫn. Mách bạn cách làm cánh gà kho gừng và ức gà kho gừng mềm thơm đậm vị cực đã cho bữa cơm đậm đà nhé!"
+    },
+    {
+      "ma_mon": 23,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2022/03/CookDish/cach-lam-canh-ga-kho-gung-mem-thom-dam-vi-cuc-da-cho-bua-com-avt-1200x676.jpg",
+      "mo_ta_ngan": "Thịt gà được biến tấu thành vô vàn món ngon hấp dẫn. Mách bạn cách làm cánh gà kho gừng và ức gà kho gừng mềm thơm đậm vị cực đã cho bữa cơm đậm đà nhé!"
+    },
+    {
+      "ma_mon": 24,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/03/CookProduct/THITKHOTIEUXANHBepCuaVo0-13screenshot-1200x676-1.jpg",
+      "mo_ta_ngan": "Hướng dẫn cách làm món thịt kho tiêu xanh thơm ngon, hấp dẫn, dễ thực hiện. Với những nguyên liệu quen thuộc, công thức đơn giản và không tốn nhiều thời gian. Xem ngay!"
+    },
+    {
+      "ma_mon": 25,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/01/CookProduct/Thitkhotieu-1200x676.jpg",
+      "mo_ta_ngan": "Cùng vào xem cách nấu món thịt ba chỉ kho tiêu siêu ngon, với các bước hướng dẫn cực kì chi tiết và dễ hiểu."
+    },
+    {
+      "ma_mon": 26,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2020/07/CookProduct/7-1200x676-5.jpg",
+      "mo_ta_ngan": "Trời bắt đầu se lạnh, bữa ăn gia đình sẽ ngon hơn với chén cơm nóng, miếng cá kho thơm nồng. Cùng vào bếp, làm món cá lóc kho tộ thơm ngon nhé!"
+    },
+    {
+      "ma_mon": 27,
+      "vung_mien": "NAM",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/05052025%20-%202025-05-09T154044.858.jpg",
+      "mo_ta_ngan": "Cá kho tộ bằng nồi đất là món ăn đậm đà, quen thuộc với người miền Tây. Hãy khám phá cách nấu món ăn dân dã này chuẩn vị quê nhà bạn nhé."
+    },
+    {
+      "ma_mon": 28,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/H%C3%ACnh%20thumb%20to%20t7%20%2845%29.jpg",
+      "mo_ta_ngan": "Khám phá ngay bí quyết nấu cá chim kho tộ bằng nồi đất, để món ăn thêm đậm đà, hấp dẫn, làm phong phú thêm bữa cơm gia đình bạn. Click xem ngay hướng dẫn chi tiết."
+    },
+    {
+      "ma_mon": 29,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2022/06/CookDish/cach-lam-ca-trau-kho-to-thom-ngon-dam-da-cho-bua-com-gia-dinh-avt-1200x676-1.jpg",
+      "mo_ta_ngan": "Mâm cơm gia đình sẽ trở nên đậm đà và hấp dẫn với món cá tràu kho tộ cực bắt miệng."
+    },
+    {
+      "ma_mon": 30,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/05/CookProduct/Cachlamtrungcakhotocucngoncucdongian-DienmayXANH-1200x675-1.jpg",
+      "mo_ta_ngan": "Nếu bạn đang phân vân chưa biết nấu món gì cho bữa cơm tối của cả nhà thì hãy thử trứng cá kho tộ, một món ăn cực kỳ thơm ngon và đưa cơm đấy!"
+    },
+    {
+      "ma_mon": 31,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/05/CookProduct/Canhchuacaloc-1200x676.jpg",
+      "mo_ta_ngan": "Mô tả chi tiết cách nấu canh chua cá lóc đúng chuẩn vị mẹ nấu với các bước đơn giản, dễ thành công, còn chờ gì mà không click vào xem và thực hiện ngay nào!"
+    },
+    {
+      "ma_mon": 33,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/01/CookProduct/CanhKhoQuaHamXuongBiQuyetCanhKhoQuaXanhNuocNgotKhongBiDangBitterMelonSoup3-8screenshot-1200x676.jpg",
+      "mo_ta_ngan": "Hướng dẫn cách nấu canh khổ qua hầm xương ngon ngọt, thanh mát không hề bị đắng giải nhiệt cho ngày nóng bức. Click xem ngay công thức!"
+    },
+    {
+      "ma_mon": 34,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2020/08/CookProduct/1200mm-1200x676.jpg",
+      "mo_ta_ngan": "Cách nấu canh khổ qua nhồi thịt thanh mát, không bị đắng với cách nấu đơn giản, nhanh chóng cho gia đình bạn nhé!"
+    },
+    {
+      "ma_mon": 36,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/05/CookProduct/t1-1200x676-20.jpg",
+      "mo_ta_ngan": "Canh bí đỏ nấu tôm tươi và tôm khô, món ăn ngọt thanh để chiêu đãi gia đình"
+    },
+    {
+      "ma_mon": 37,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/07/CookProduct/thum-1200x676-18.jpg",
+      "mo_ta_ngan": "Hướng dẫn chi tiết cách thực hiện canh bí đỏ da xanh nhồi thịt thơm ngon, đậm đà lạ miệng cho bữa cơm gia đình thêm thú vị. Nhấp vào để xem chi tiết và trổ tài ngay nhé!"
+    },
+    {
+      "ma_mon": 38,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2022/09/CookDish/2-cach-lam-ca-chim-nau-canh-chua-thanh-nhiet-hap-dan-ngon-de-avt-1200x676.jpg",
+      "mo_ta_ngan": "Công thức món cá chim nấu canh chua hấp dẫn mà bạn có thể dễ dàng thực hiện ngay tại nhà để chiêu đãi gia đình."
+    },
+    {
+      "ma_mon": 39,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/11/CookDish/huong-dan-chi-tiet-cach-nau-pho-bo-thom-ngon-bo-duong-avt-1200x676-1.jpg",
+      "mo_ta_ngan": "Công thức chi tiết 3 cách nấu phở bò cực ngon như ngoài hàng, đơn giản, nhanh chóng ngay tại nhà cho gia đình. Click xem và thực hiện món phở ngon này ngay thôi nhé!"
+    },
+    {
+      "ma_mon": 35,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2020/08/CookProduct/1200mm-1200x676.jpg",
+      "mo_ta_ngan": "Cách nấu canh khổ qua nhồi thịt thanh mát, không bị đắng với cách nấu đơn giản, nhanh chóng cho gia đình bạn nhé!"
+    },
+    {
+      "ma_mon": 87,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/goi-bo-rau-muong-thumb.jpg",
+      "mo_ta_ngan": "Gỏi bò rau muống giòn ngon, thịt bò mềm, nước mắm chua ngọt hấp dẫn."
+    },
+    {
+      "ma_mon": 88,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/04/CookProduct/ikkkk-1200x675.jpg",
+      "mo_ta_ngan": "Cháo đậu đỏ thịt bò cực hấp dẫn, đầy chất dinh dưỡng và dễ dàng thực hiện, giúp bữa ăn cả nhà thêm ngon."
+    },
+    {
+      "ma_mon": 41,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/04/CookProduct/phobovien-1200x676.jpg",
+      "mo_ta_ngan": "Công thức nấu món phở bò viên chuẩn vị thơm ngon hấp dẫn mà đơn giản tại nhà, thịt bò mềm, không dai, nước dùng ngọt thanh đậm đà. Click xem ngay và thực hiện nhé!"
+    },
+    {
+      "ma_mon": 42,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/12/CookDish/cach-nau-pho-bap-bo-bang-noi-ap-suat-thom-ngon-dam-da-huong-avt-1200x676.jpg",
+      "mo_ta_ngan": "Chi tiết về cách nấu phở bắp bò bằng nồi áp suất cực kỳ đơn giản"
+    },
+    {
+      "ma_mon": 43,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2020/11/CookProduct/cach-nau-bun-rieu-cua-dong-ngon-tuyet-de-lam-tai-nha-24-1200x676.jpg",
+      "mo_ta_ngan": "3 công thức chi tiết cách nấu bún riêu cua đồng cực ngon, đơn giản với nước dùng đậm đà ăn vào những ngày mưa cùng chút mắm tôm và rau sống là hết sẩy. Click xem ngay!"
+    },
+    {
+      "ma_mon": 44,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/11/CookDish/cach-nau-bun-rieu-cua-dong-ngon-kho-cuong-an-la-ghien-ngay-avt-1200x674.jpg",
+      "mo_ta_ngan": "Hướng dẫn cách nấu bún riêu cua đồng thanh ngọt, riêu cua béo mềm, giò heo beo béo thơm lừng. Món ăn vô cùng hấp dẫn, ngon như ngoài hàng. Xem ngay công thức nhé!"
+    },
+    {
+      "ma_mon": 45,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2020/08/CookProduct/Untitled-1-1200x676-10.jpg",
+      "mo_ta_ngan": "Hẳn các bạn đã quá quen với các món bún riêu: cua, ốc, giò heo… hôm nay mình chia sẻ các bạn món bún riêu chay mà mình rất thích trong những ngày chay của mình."
+    },
+    {
+      "ma_mon": 46,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/b%C3%B9n%20b%C3%B2%20tr%E1%BB%99n%201200x676.jpg",
+      "mo_ta_ngan": "Học cách làm bún bò trộn chuẩn vị, thơm ngon tại nhà với công thức chi tiết. Tự tay chế biến món ăn Việt hấp dẫn, chiêu đãi cả gia đình ngay hôm nay!"
+    },
+    {
+      "ma_mon": 47,
+      "vung_mien": "BAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/H%C3%ACnh%20thumb%20m%C3%B3n%20an%20t11%20%282%29.jpg",
+      "mo_ta_ngan": "Học cách nấu cháo gà miền Bắc sánh mịn, ngọt nước với công thức chi tiết từ chuyên gia. Bắt tay vào bếp ngay để thưởng thức món cháo gà dinh dưỡng, thơm ngon!"
+    },
+    {
+      "ma_mon": 49,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2020/09/CookProduct/Screenshotter--YouTube-GICUNTHPCMthmngonhpdnnlghinBpCaV-7’54”-1200x676.jpg",
+      "mo_ta_ngan": "Thật dễ dàng để thực hiện món gỏi cuốn thập cẩm với màu sắc bắt mắt và hương vị đậm đà hấp dẫn. Click xem ngay và cùng vào bếp thực hiện món ăn cho cả nhà ngay nhé!"
+    },
+    {
+      "ma_mon": 51,
+      "vung_mien": "TRUNG",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/02/CookProduct/banhramitHue-1200x676-1.jpg",
+      "mo_ta_ngan": "Hướng dẫn cách làm bánh ram ít Huế vừa mềm vừa giòn, siêu hấp dẫn cho các bữa tiệc họp mặt gia đình, với các bước được hướng dẫn vô cùng chi tiết."
+    },
+    {
+      "ma_mon": 52,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t06%201200676%20%2821%29.jpg",
+      "mo_ta_ngan": "Bạn muốn tự tay làm chuối nếp nướng lá dứa thơm ngon, béo ngậy như ngoài hàng? Xem ngay công thức chi tiết để trổ tài đầu bếp ngay hôm nay nhé!"
+    },
+    {
+      "ma_mon": 54,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t06%201200676.jpg",
+      "mo_ta_ngan": "Bạn muốn trổ tài làm món bánh truyền thống chuẩn vị cho ngày Tết Đoan Ngọ? Khám phá ngay công thức làm bánh ú tro dẻo ngon, thanh mát cực chi tiết tại đây!"
+    },
+    {
+      "ma_mon": 55,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t04%201200676%20%2833%29.jpg",
+      "mo_ta_ngan": "Học ngay cách làm miến trộn thập cẩm dai ngon, thấm vị sốt đậm đà mà sợi miến không bị dính chùm."
+    },
+    {
+      "ma_mon": 56,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t05%201200676%20%2841%29.jpg",
+      "mo_ta_ngan": "Bí quyết nấu món thịt kho trám xanh bùi béo, mềm tan đậm đà chuẩn vị truyền thống."
+    },
+    {
+      "ma_mon": 57,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t05%201200676%20%2831%29.jpg",
+      "mo_ta_ngan": "Học ngay cách làm gà ủ muối thảo mộc chuẩn vị kinh doanh tại nhà."
+    },
+    {
+      "ma_mon": 58,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t05%201200676%20%2826%29.jpg",
+      "mo_ta_ngan": "Bí quyết làm thịt băm kho trứng cút đậm đà, cực kỳ bắt cơm với nguyên liệu đơn giản."
+    },
+    {
+      "ma_mon": 60,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Canh%20rau%20die%CC%82%CC%81p%20ca%CC%81%20tl.jpg",
+      "mo_ta_ngan": "Khám phá ngay cách nấu canh rau diếp cá cá chép thơm ngon, giải nhiệt cực tốt cho mùa hè. Xem hướng dẫn chi tiết và trổ tài vào bếp ngay hôm nay!"
+    },
+    {
+      "ma_mon": 61,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t05%201200676%20%2833%29.jpg",
+      "mo_ta_ngan": "Học ngay cách nấu canh cà xanh thơm ngon, béo ngậy từ thịt ba chỉ và đậu hũ. Công thức chi tiết, dễ làm từ Điện máy XANH giúp bữa cơm gia đình thêm hấp dẫn."
+    },
+    {
+      "ma_mon": 62,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/10/CookDish/cach-nau-che-dau-xanh-nha-dam-thanh-mat-giai-nhiet-cho-ngay-avt-1200x676.jpg",
+      "mo_ta_ngan": "Click xem ngay cùng Điện máy XANH để bỏ túi liền tay 2 cách nấu chè đậu xanh nha đam thanh mát, ngọt dịu, giải nhiệt cho ngày nóng theo cách siêu đơn giản, tiện lợi nhé!"
+    },
+    {
+      "ma_mon": 50,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2022/09/CookDish/cach-lam-nuoc-mam-an-com-tam-chua-ngot-ngon-nhu-ngoai-hang-avt-1200x676-2.jpg",
+      "mo_ta_ngan": "Cách làm nước mắm cơm tấm thơm lừng, cực ngon. Công thức đơn giản, dễ làm, hãy thực hiện ngay nước chấm hấp dẫn này cho gia đình nhé!"
+    },
+    {
+      "ma_mon": 59,
+      "vung_mien": "BAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/ca%CC%81ch%20na%CC%82%CC%81u%20la%CC%82%CC%89u%20cua%20%C4%91o%CC%82%CC%80ng%20mie%CC%82%CC%80n%20ba%CC%86%CC%81c%20tl.jpg",
+      "mo_ta_ngan": "Học ngay cách nấu lẩu cua đồng miền bắc thơm ngon, riêu cua đóng mảng lớn cực hấp dẫn."
+    },
+    {
+      "ma_mon": 63,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t03%201200676%20-%202026-03-23T151519.869.jpg",
+      "mo_ta_ngan": "Khám phá bí quyết làm bò sốt trứng muối béo ngậy, chuẩn vị steak nhà hàng với công thức đơn giản. Miếng bò mềm mọng quyện cùng sốt trứng muối phô mai cực ngon!"
+    },
+    {
+      "ma_mon": 64,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/ru%E1%BB%99t%20h%C3%A0u%20n%C6%B0%E1%BB%9Bng%20m%E1%BB%A1%20h%C3%A0nh%20b%E1%BA%B1ng%20n%E1%BB%93i%20chi%C3%AAn%20kh%C3%B4ng%20d%E1%BA%A7u%201200x676.jpg",
+      "mo_ta_ngan": "Học cách làm ruột hàu nướng mỡ hành bằng nồi chiên không dầu siêu nhanh, siêu ngon. Hàu mọng nước, mỡ hành xanh mướt."
+    },
+    {
+      "ma_mon": 65,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t04%201200676%20%2835%29.jpg",
+      "mo_ta_ngan": "Dạ dày kho tiêu thơm ngon, giòn dai đúng điệu với công thức đơn giản. Món ăn đậm đà, vị cay nồng của tiêu là lựa chọn hoàn hảo cho bữa cơm ấm cúng."
+    },
+    {
+      "ma_mon": 66,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/m%E1%BB%B1c%20rim%20m%E1%BA%B7n%20ng%E1%BB%8Dt%201200x676.jpg",
+      "mo_ta_ngan": "Học cách làm mực rim mặn ngọt săn giòn, thấm vị với công thức đơn giản này. Món kho đậm đà, cực đưa cơm. Cùng vào bếp ngay nào!"
+    },
+    {
+      "ma_mon": 67,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/cach-lam-tom-rim-thit-ba-chi..jpg",
+      "mo_ta_ngan": "Tôm rim thịt ba chỉ mặn ngọt đậm đà cho bữa cơm gia đình cực kỳ đơn giản. Công thức tôm rang thịt dễ làm, cực kỳ hao cơm."
+    },
+    {
+      "ma_mon": 68,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/H%C3%ACnh%20m%C3%B3n%20an%20t11%20%281200%20x%20676%20px%29%20%2861%29.jpg",
+      "mo_ta_ngan": "Học cách nấu thịt lợn giả cầy chân giò đậm đà, thơm lừng với công thức chuẩn vị. Vào bếp ngay để chiêu đãi cả nhà món kho cực phẩm này cùng Điện máy XANH."
+    },
+    {
+      "ma_mon": 32,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/05/CookProduct/Canhchuacaloc-1200x676.jpg",
+      "mo_ta_ngan": "Mô tả chi tiết cách nấu canh chua cá lóc đúng chuẩn vị mẹ nấu với các bước đơn giản, dễ thành công, còn chờ gì mà không click vào xem và thực hiện ngay nào!"
+    },
+    {
+      "ma_mon": 48,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/H%C3%ACnh%20m%C3%B3n%20an%20t11%20%281200%20x%20676%20px%29%20-%202025-12-01T120737.506.jpg",
+      "mo_ta_ngan": "Học cách nấu cháo gà nguyên con thơm ngon, bổ dưỡng với công thức chi tiết. Cháo gà nhanh nhừ, đậm đà, gỏi gà chua ngọt hấp dẫn. Bắt tay vào làm ngay!"
+    },
+    {
+      "ma_mon": 69,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/c%C3%A1%20m%C3%B2i%20kho%20r%E1%BB%A5c%20x%C6%B0%C6%A1ng%201200c676.jpg",
+      "mo_ta_ngan": "Học cách kho cá mòi rục xương chuẩn vị với công thức độc đáo. Món cá kho đậm đà, xương rục tan, ăn kèm cơm nóng hay bánh mì đều tuyệt vời."
+    },
+    {
+      "ma_mon": 70,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/cach-lam-ca-chim-sot-ca-chua.jpg",
+      "mo_ta_ngan": "Học cách làm cá chim sốt cà chua vàng giòn, sốt cà đậm đà chỉ trong 30 phút. Công thức Món ăn Việt chuẩn vị, đảm bảo thành công. Nấu ngay đãi gia đình bạn nhé!"
+    },
+    {
+      "ma_mon": 71,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/11/CookDish/cach-lam-ga-kho-mang-dam-da-hap-dan-doi-vi-cho-bua-com-gia-avt-1200x676.jpg",
+      "mo_ta_ngan": "Gà kho măng đơn giản, nhưng lại đầy hấp dẫn khiến ai ăn rồi cũng phải vương vấn không rời."
+    },
+    {
+      "ma_mon": 72,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/H%C3%ACnh%20thumb%20m%C3%B3n%20an%20t10%20%2864%29.jpg",
+      "mo_ta_ngan": "Thịt bò om dưa chua mềm ngon, đậm đà ngay tại nhà. Công thức đơn giản, chuẩn vị. Bắt tay vào bếp ngay để chiêu đãi gia đình món ăn hấp dẫn này!"
+    },
+    {
+      "ma_mon": 73,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/10/CookDish/cach-lam-dau-hu-kho-nam-dong-co-nam-huong-thom-ngon-bat-vi-avt-1200x676-2.jpg",
+      "mo_ta_ngan": "Đậu hũ kho nấm đông cô cực bắt vị, hấp dẫn cho bữa cơm thêm phần đậm đà, đong đầy."
+    },
+    {
+      "ma_mon": 74,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/H%C3%ACnh%20thumb%20to%20t8%20%2860%29.jpg",
+      "mo_ta_ngan": "Vịt kho nước dừa chuẩn vị, thịt mềm thơm lừng. "
+    },
+    {
+      "ma_mon": 75,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/luon-um-la-nhauul.jpg",
+      "mo_ta_ngan": "Vào bếp cùng món kho đậm đà lươn um lá nhàu béo thơm, mềm ngọt, dễ làm tại nhà."
+    },
+    {
+      "ma_mon": 76,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/08/CookProduct/1-1200x676-27.jpg",
+      "mo_ta_ngan": "Khô cá cơm kho tiêu đậm đà, thơm ngon cực dễ làm để đãi cả nhà."
+    },
+    {
+      "ma_mon": 77,
+      "vung_mien": "NAM",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t04%201200676%20%2869%29.jpg",
+      "mo_ta_ngan": "Chả giò miền Nam giòn rụm, nhân tôm thịt đậm đà, không bị mềm."
+    },
+    {
+      "ma_mon": 78,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t01%201200676%20%2847%29.jpg",
+      "mo_ta_ngan": "Bò lá lốt mỡ chài bằng nồi chiên không dầu thơm ngon, béo ngậy tại nhà."
+    },
+    {
+      "ma_mon": 79,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/H%C3%ACnh%20m%C3%B3n%20an%20t12%20%281200%20x%20676%20px%29%20%2828%29.jpg",
+      "mo_ta_ngan": "Bún cuốn thập cẩm thịt luộc chắc chắn là gợi ý lý tưởng."
+    },
+    {
+      "ma_mon": 80,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdn.tgdd.vn/2021/09/CookProduct/BeFunky-collage(83)-1200x676.jpg",
+      "mo_ta_ngan": "Mì trộn xá xíu thơm ngon hấp dẫn đậm đà dễ làm tại nhà."
+    },
+    {
+      "ma_mon": 81,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t04%201200676%20%2893%29.jpg",
+      "mo_ta_ngan": "Ốc nhồi hấp sả giòn ngon, đậm đà chuẩn vị cho cả gia đình."
+    },
+    {
+      "ma_mon": 82,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t03%201200676%20%2893%29.jpg",
+      "mo_ta_ngan": "Cá diêu hồng hấp hành gừng thơm ngon, đậm đà ngay tại nhà."
+    },
+    {
+      "ma_mon": 83,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t03%201200676%20%2854%29.jpg",
+      "mo_ta_ngan": "Mì căn xào sả ớt chay thơm ngon, đậm đà ngay tại nhà."
+    },
+    {
+      "ma_mon": 84,
+      "vung_mien": "NAM",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t05%201200676%20%287%29.jpg",
+      "mo_ta_ngan": "Bbún bò miền Nam cấp tốc không cần hầm xương. Nước dùng đậm đà, thịt bò giòn ngọt kết hợp cùng mắm ruốc thơm nồng."
+    },
+    {
+      "ma_mon": 85,
+      "vung_mien": "NAM",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t03%201200676%20%2877%29.jpg",
+      "mo_ta_ngan": "Bò kho miền nam thơm ngon, béo ngậy với nước dừa và sữa đặc."
+    },
+    {
+      "ma_mon": 86,
+      "vung_mien": "KHAC",
+      "hinh_anh": "https://cdnv2.tgdd.vn/mwg-static/common/Common/Hinh%20thumb%20t01%201200676%20%2851%29.jpg",
+      "mo_ta_ngan": "Udon xào bò tại nhà với công thức đơn giản. Món mì udon xào thịt bò mềm mọng, thấm vị, sẵn sàng làm hài lòng cả gia đình."
+    }
+  ],
+  "tags": [
+    {
+      "ma_tag": 2,
+      "slug": "troi-mua"
+    },
+    {
+      "ma_tag": 3,
+      "slug": "luoi-nau"
+    },
+    {
+      "ma_tag": 4,
+      "slug": "cuoi-thang"
+    },
+    {
+      "ma_tag": 5,
+      "slug": "nau-cho-4-nguoi"
+    },
+    {
+      "ma_tag": 6,
+      "slug": "an-nhe"
+    }
+  ],
+  "links": [
+    {
+      "ma_mon": 57,
+      "ma_tag": 5
+    },
+    {
+      "ma_mon": 49,
+      "ma_tag": 6
+    },
+    {
+      "ma_mon": 55,
+      "ma_tag": 3
+    },
+    {
+      "ma_mon": 39,
+      "ma_tag": 5
+    },
+    {
+      "ma_mon": 54,
+      "ma_tag": 6
+    },
+    {
+      "ma_mon": 86,
+      "ma_tag": 3
+    },
+    {
+      "ma_mon": 83,
+      "ma_tag": 4
+    },
+    {
+      "ma_mon": 73,
+      "ma_tag": 4
+    },
+    {
+      "ma_mon": 21,
+      "ma_tag": 3
+    },
+    {
+      "ma_mon": 52,
+      "ma_tag": 6
+    },
+    {
+      "ma_mon": 31,
+      "ma_tag": 2
+    },
+    {
+      "ma_mon": 58,
+      "ma_tag": 4
+    },
+    {
+      "ma_mon": 33,
+      "ma_tag": 2
+    },
+    {
+      "ma_mon": 73,
+      "ma_tag": 3
+    },
+    {
+      "ma_mon": 83,
+      "ma_tag": 3
+    },
+    {
+      "ma_mon": 39,
+      "ma_tag": 2
+    },
+    {
+      "ma_mon": 60,
+      "ma_tag": 4
+    },
+    {
+      "ma_mon": 43,
+      "ma_tag": 5
+    },
+    {
+      "ma_mon": 62,
+      "ma_tag": 6
+    },
+    {
+      "ma_mon": 47,
+      "ma_tag": 2
+    },
+    {
+      "ma_mon": 47,
+      "ma_tag": 5
+    },
+    {
+      "ma_mon": 51,
+      "ma_tag": 6
+    },
+    {
+      "ma_mon": 25,
+      "ma_tag": 4
+    },
+    {
+      "ma_mon": 49,
+      "ma_tag": 5
+    },
+    {
+      "ma_mon": 43,
+      "ma_tag": 2
+    }
+  ],
+  "pantry": [
+    {
+      "ma_nl": 5,
+      "ten_nl": "Dầu ăn",
+      "la_gia_vi_co_ban": true
+    },
+    {
+      "ma_nl": 13,
+      "ten_nl": "Nước mắm",
+      "la_gia_vi_co_ban": true
+    },
+    {
+      "ma_nl": 40,
+      "ten_nl": "Đường",
+      "la_gia_vi_co_ban": true
+    },
+    {
+      "ma_nl": 41,
+      "ten_nl": "Tiêu xay",
+      "la_gia_vi_co_ban": true
+    },
+    {
+      "ma_nl": 76,
+      "ten_nl": "Muối",
+      "la_gia_vi_co_ban": true
+    }
+  ]
+}
