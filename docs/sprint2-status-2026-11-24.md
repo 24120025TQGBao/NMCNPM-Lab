@@ -1,5 +1,9 @@
 # Trạng thái Sprint 2 — cập nhật 24/11/2026
 
+## Sau sửa tag — 27/11/2026
+
+Người dùng sửa tag ID5 đúng contract, QA đọc lại xác nhận và retest24/24 ca dữ liệu cùng API56/56 trên PR36 `4549d4e`; Firefox AND/bỏ chip đã đạt. Ma trận sau tagfix và hồi quy mới nằm trên QA06, QA05/QA06 đề nghị chuyển review sau CI. Không có merge main hoặc quyết định nghiệm thu thay PO; các báo cáo phía dưới giữ làm lịch sử.
+
 ## Hiện trạng 27/11/2026
 
 Source giữ PR36 `4549d4e`, INT03 không đổi; PR revert33 đã đóng không merge. Dữ liệu tag/vùng miền/pantry đã có và đã retest ba browser. Ma trận mới **48 PASS / 1 FAIL / 0 BLOCKED**; S2-01.4 còn FAIL do slug tag Nấu cho4 lệch contract (BUG-S2-007). QA05/QA06 giữ draft, cần TV3/DA04 sửa tag/seed và retest. Xem handoff QA05 ngày27 và matrix QA06 ngày27; các số bên dưới là lịch sử.
