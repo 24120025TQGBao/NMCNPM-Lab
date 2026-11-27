@@ -1,5 +1,7 @@
 # QA05 — dữ liệu đã bổ sung và lỗi còn lại, 27/11/2026
 
+> Cập nhật sau sửa: người dùng đã đổi tag ID5 thành `nau-cho-4`; QA đọc lại Supabase xác nhận đúng slug và giữ nguyên liên kết. Retest dữ liệu cả ba browser đạt 24/24, bao gồm Firefox AND/bỏ chip; API đạt56/56. Nội dung mô tả BUG-S2-007 bên dưới là lịch sử trước sửa. Jira chưa được tạo/đóng thay nhóm. Nguồn seed DA04 không có trong source tích hợp hiện tại; TV3 cần đồng bộ nguồn nạp dữ liệu để tránh tái phát.
+
 Source PO chọn vẫn là PR #36 `4549d4ed44f7cc19af11c48f2b57aff466e13990`, gồm INT03. Fetch ngày 27/11 không có commit source mới; main vẫn `413a7b6`. PR #33 revert đã đóng, không merge. QA04/DO04/FE11 vẫn là PR ready; QA05/QA06 draft.
 
 Kiểm kê chỉ đọc: 72 món ACTIVE, 299 nguyên liệu, 67 món matching-ready; đã có 5 tag, 25 liên kết tag, 72 món có vùng miền (65 KHAC, 2 BAC, 1 TRUNG, 4 NAM) và 5 pantry ID 5/13/40/41/76. Bộ kiểm tra mới dùng metadata DB làm expected độc lập, kiểm đủ năm chip, giao AND, bỏ chip, vùng miền/AND và pantry bật/tắt trên Chromium desktop, Firefox desktop, Chromium mobile. API/browser cũ ngày 25/11 được giữ làm hồi quy source; không tuyên bố đã chạy lại full suite trên dataset mới.

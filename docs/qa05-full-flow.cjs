@@ -29,6 +29,22 @@ async function run(spec){
   const json=async(route)=>{const r=await page.request.get(base+'/api'+route);assert.equal(r.status(),200);return r.json()}
   const title=()=>page.locator('#panel-goi-y article h2')
 
+  if(process.env.QA_CASE_FILTER==='exhaustion'){
+   await page.goto(base+'/goi-y');await title().waitFor()
+   await check(['S2-01.4','S2-01.5'],'chip request keeps AND criteria and never silently relaxes them',async()=>{
+    let pending=page.waitForResponse(r=>r.url().includes('/api/suggestions?')&&r.status()===200)
+    await page.getByRole('button',{name:'Trời mưa',exact:true}).click();let batch=(await(await pending).json()).data
+    const seen=new Set()
+    while(batch.length){assert(!seen.has(batch[0].id));seen.add(batch[0].id);assert(seen.size<=100);await title().waitFor();pending=page.waitForResponse(r=>r.url().includes('/api/suggestions?')&&r.status()===200);await page.getByRole('button',{name:'Xem gợi ý khác',exact:true}).click();batch=(await(await pending).json()).data}
+    await page.getByRole('heading',{name:/^(Chưa có món phù hợp|Đã xem hết gợi ý)$/}).waitFor()
+    const wait=page.waitForResponse(r=>r.url().includes('/api/suggestions?')&&r.status()===200);await page.getByRole('button',{name:'Ăn nhẹ',exact:true}).click();const response=await wait
+    assert.deepEqual(new URL(response.url()).searchParams.get('the').split(',').sort(),['AN_NHE','TROI_MUA'])
+    for(const name of ['Trời mưa','Ăn nhẹ'])assert.equal(await page.getByRole('button',{name,exact:true}).getAttribute('aria-pressed'),'true')
+    entry.exhaustedDishIds=[...seen]
+   })
+   return
+  }
+
   if(process.env.QA_CASE_FILTER==='recipe-facts'){
    const recipe=await json('/recipes/25')
    await page.goto(base+'/recipes/25',{waitUntil:'domcontentloaded'})
@@ -118,7 +134,16 @@ async function run(spec){
    await page.unroute(match);await page.getByRole('button',{name:'Thử lại',exact:true}).click();await title().waitFor()
   },'HTTP_FAULT_INJECTION')
   await check(['S2-01.4','S2-01.5'],'chip request keeps AND criteria and never silently relaxes them',async()=>{
-   await page.getByRole('button',{name:'Trời mưa',exact:true}).click();await page.getByRole('heading',{name:'Chưa có món phù hợp',exact:true}).waitFor()
+   let pending=page.waitForResponse(r=>r.url().includes('/api/suggestions?')&&r.status()===200)
+   await page.getByRole('button',{name:'Trời mưa',exact:true}).click();let batch=(await(await pending).json()).data
+   // Exhaust actual matching dishes; tag seeding means the first response is no longer empty.
+   const seen=new Set()
+   while(batch.length){
+    assert(!seen.has(batch[0].id));seen.add(batch[0].id);assert(seen.size<=100)
+    await title().waitFor();pending=page.waitForResponse(r=>r.url().includes('/api/suggestions?')&&r.status()===200)
+    await page.getByRole('button',{name:'Xem gợi ý khác',exact:true}).click();batch=(await(await pending).json()).data
+   }
+   await page.getByRole('heading',{name:/^(Chưa có món phù hợp|Đã xem hết gợi ý)$/}).waitFor()
    const wait=page.waitForResponse(r=>r.url().includes('/api/suggestions?')&&r.status()===200)
    await page.getByRole('button',{name:'Ăn nhẹ',exact:true}).click();const response=await wait
    const tags=new URL(response.url()).searchParams.get('the').split(',').sort()

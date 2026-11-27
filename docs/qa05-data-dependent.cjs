@@ -23,10 +23,14 @@ const specs=[['chromium-desktop',chromium,'chromium-1255/chrome-win64/chrome.exe
   assert(pair);entry.tagPair=pair.map(i=>codes[i]);const want=expected(pair)
   assert.deepEqual((await json('/suggestions?the='+pair.map(i=>codes[i]).join(',')+'&limit=10')).data.map(x=>x.id),want.slice(0,10))
   await page.goto(base+'/goi-y');await page.locator('#panel-goi-y article h2').waitFor()
-  for(const i of pair){const wait=page.waitForResponse(r=>r.url().includes('/api/suggestions?')&&r.status()===200);await page.getByRole('button',{name:labels[i],exact:true}).click();await wait;await page.locator('#panel-goi-y article h2').waitFor()}
+  const active=[]
+  for(const i of pair){active.push(i);await page.getByRole('button',{name:labels[i],exact:true}).click();await page.waitForFunction(({ids,labels})=>{
+   const panel=document.querySelector('#panel-goi-y');return labels.every(text=>[...panel.querySelectorAll('button')].some(b=>b.textContent.trim()===text&&b.getAttribute('aria-pressed')==='true'&&!b.disabled))&&panel.querySelector('a[href="/dishes/'+ids[0]+'"]')
+  },{ids:expected(active),labels:active.map(j=>labels[j])})}
   const link=page.locator('#panel-goi-y a').filter({hasText:'Nấu món này'});assert(want.includes(Number((await link.getAttribute('href')).split('/').pop())))
   await page.locator('#panel-goi-y button[aria-pressed="true"]:not([disabled])').first().waitFor()
-  const wait=page.waitForResponse(r=>r.url().includes('/api/suggestions?')&&r.status()===200);await page.getByRole('button',{name:labels[pair[1]],exact:true}).click();const r=await wait;assert.equal(new URL(r.url()).searchParams.get('the'),codes[pair[0]])
+  await page.getByRole('button',{name:labels[pair[1]],exact:true}).click()
+  await page.waitForFunction(({id,label})=>{const panel=document.querySelector('#panel-goi-y');return [...panel.querySelectorAll('button')].some(b=>b.textContent.trim()===label&&b.getAttribute('aria-pressed')==='false'&&!b.disabled)&&panel.querySelector('a[href="/dishes/'+id+'"]')},{id:expected([pair[0]])[0],label:labels[pair[1]]})
  })
  await check(['S2-01.12'],'all regions and region/tag AND obey independent DB oracle',async()=>{
   for(const region of ['BAC','TRUNG','NAM']){const want=expected([],region);assert(want.length);assert.deepEqual((await json('/suggestions?vung_mien='+region+'&limit=10')).data.map(x=>x.id),want.slice(0,10))}

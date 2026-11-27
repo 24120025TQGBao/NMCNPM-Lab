@@ -1,5 +1,11 @@
 # QA05 — Kết quả tự động và phần cần làm thủ công, 24/11/2026
 
+## Sau khi sửa tag — sẵn sàng review ngày 27/11/2026
+
+Người dùng sửa tag ID5 sang `nau-cho-4` đúng contract; QA đọc lại metadata và chạy trên PR36 `4549d4e` + Supabase thật. Bộ dữ liệu dương tính đạt24/24 trên Chromium desktop, Firefox desktop, Chromium mobile; Firefox AND/bỏ chip đã đạt khi runner chờ đúng trạng thái UI thay vì phụ thuộc sự kiện response. API56/56 đạt. Hồi quy full-flow sau sửa dữ liệu được chuẩn hóa bằng retest riêng ca exhaustion: tag có món nên phải xem hết các món thật, UI hiện “Đã xem hết gợi ý”. Raw evidence được giữ.
+
+Ma trận sau sửa tag ở QA06 `qa06-acceptance-matrix-after-tagfix-2026-11-27.json/.md`. Không còn bug tag tái hiện; đề xuất chuyển QA05 sang review, không coi là PO nghiệm thu hoặc merge. Giới hạn: không tạo live HIDDEN/DELETED fixture trên DB chung; ca404 dùng unknown ID, no-recipe dùng HTTP fixture được ghi mode. FE11 compatibility33/33 từ lượt25/11 trên cùng code được giữ, không tuyên bố đã rerun FE11 ở lượt này. TV3 nên đồng bộ seed DA04 bên ngoài source đang có. Các mốc bên dưới là lịch sử.
+
 ## Hiện trạng 27/11/2026 — dữ liệu đã có, còn lệch slug tag
 
 Fetch lại: source PO chọn PR #36 vẫn `4549d4e`; PR revert #33 đã đóng không merge. Kiểm kê Supabase hôm nay có 5 tag, 25 liên kết, 72 món có vùng miền, 5 pantry. Đã chạy ca dữ liệu dương tính trên Chromium desktop, Firefox desktop, Chromium mobile bằng expected độc lập từ metadata DB. Vùng miền, pantry bật/tắt đều đạt; Chromium desktop/mobile đạt cả AND/bỏ chip. Chip `NAU_CHO_4` trả [] trên cả ba dù có năm món gắn tag: DB dùng `nau-cho-4-nguoi`, contract yêu cầu `nau-cho-4`. Firefox bước AND/bỏ chip timeout cả retest, giữ FAIL evidence và chưa phân loại thành bug sản phẩm thứ hai.
