@@ -1,5 +1,11 @@
 # QA06 — Báo cáo hồi quy Sprint 2, 24/11/2026
 
+## Sau sửa tag ID5 — đề nghị review ngày 27/11/2026
+
+PR36 `4549d4e` giữ nguyên code; người dùng đã sửa DB `nau-cho-4-nguoi` → `nau-cho-4`. Metadata độc lập đọc lại xác nhận đúng. Retest dữ liệu24/24 trên Chromium/Firefox/mobile, API56/56; full browser hồi quy trên dataset sau sửa được ghi trong QA05 `qa05-full-after-tagfix-2026-11-27/final-results.json`, có retest riêng exhaustion theo nhãn “Đã xem hết gợi ý”. Ma trận mới `qa06-acceptance-matrix-after-tagfix-2026-11-27.json/.md` dùng evidence mới cùng source và FE11 compatibility25/11 cùng code. Sẵn sàng review sau CI; quyết định nghiệm thu release thuộc PO.
+
+Giới hạn vẫn công khai: nhánh unknown-ID404 đã test, live HIDDEN/DELETED chưa tạo riêng; no-recipe dùng HTTP fixture; không tự đóng Jira hoặc đổi dữ liệu khác. Seed DA04 cần TV3 đồng bộ ở nguồn nạp, vì repo tích hợp không có seed slug sai. Các số48/1 và45/4 bên dưới là lịch sử trước sửa tag.
+
 ## Hiện trạng 27/11/2026
 
 Ma trận `qa06-acceptance-matrix-2026-11-27.json/.md`: **48 PASS / 1 FAIL / 0 BLOCKED / 0 NOT RUN / 49 AC**. Source PO chọn vẫn PR #36 `4549d4e`, main chưa đổi; PR revert #33 đã đóng không merge. Kết hợp full regression ngày 25/11 trên cùng source với live retest bốn AC dữ liệu ngày 27/11. Metadata DB độc lập xác nhận pantry/vùng miền đã có và ba AC tương ứng đạt. `S2-01.4` FAIL vì tag Nấu cho 4 người có slug `nau-cho-4-nguoi` thay vì contract `nau-cho-4`; canonical request trả [] thay vì món 39/43/47/49/57. Không còn blocker thiếu dữ liệu, nhưng cần TV3/DA04 sửa seed/tag theo BUG-S2-007 rồi retest. Firefox bước AND/bỏ chip còn timeout hai lượt, retained FAIL; chưa kết luận bug sản phẩm mới. QA06 vẫn draft vì P0 S2-01.4 chưa đạt. Evidence mới trên nhánh QA05; handoff hướng dẫn từng bước tại docs/qa05-data-handoff-2026-11-27.md. Các mốc bên dưới là lịch sử.
