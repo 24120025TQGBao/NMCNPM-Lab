@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Clock, Utensils, ImageOff, ChefHat } from 'lucide-react'
 import { CONTEXT_CHIPS, formatFlavor } from '../constants'
 
 export default function DishSuggestionCard({ dish, isSkipped, onCook, titleRef }) {
+  const location = useLocation()
   const [imageError, setImageError] = useState(false)
 
   // Map mã thẻ hoàn cảnh sang nhãn hiển thị
@@ -93,6 +94,7 @@ export default function DishSuggestionCard({ dish, isSkipped, onCook, titleRef }
         <div className="pt-2">
           <Link
             to={`/dishes/${dish.id}`}
+            state={{ searchReturnTo: `${location.pathname}${location.search}` }}
             onClick={onCook}
             className="w-full inline-flex items-center justify-center rounded-control bg-jungle-green px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-opacity-90 transition-colors"
           >

@@ -1,5 +1,5 @@
 export function searchReturnPath(value) {
-  return typeof value === 'string' && /^\/search(?:\?[^#]*)?$/.test(value) ? value : '/search'
+  return typeof value === 'string' && (/^\/search(?:\?[^#]*)?$/.test(value) || /^\/goi-y(?:\?[^#]*)?$/.test(value)) ? value : '/search'
 }
 
 export function positivePage(value) {

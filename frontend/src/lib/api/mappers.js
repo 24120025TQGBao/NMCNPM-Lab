@@ -23,6 +23,7 @@ export function mapDish(raw) {
     name: str(raw.name) ?? str(raw.ten_mon) ?? '',
     description: str(raw.description) ?? str(raw.mo_ta_ngan) ?? '',
     imageUrl: str(raw.image_url) ?? str(raw.hinh_anh),
+    cookTimeMinutes: num(raw.cook_time_minutes),
   }
 }
 
