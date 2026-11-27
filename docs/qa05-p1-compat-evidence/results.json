@@ -1,0 +1,194 @@
+{
+  "checkedAt": "2026-11-24T03:31:57.247Z",
+  "source": {
+    "candidate": "e47c5f638cd30924603bc4956426c0961a3c22be",
+    "frontend": "FE10+FE11 on main413a7b6"
+  },
+  "results": [
+    {
+      "name": "chromium-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "checks": [
+        {
+          "name": "select seven canonical demo ingredients through autocomplete",
+          "status": "PASS"
+        },
+        {
+          "name": "BE12 live: pork unlocks dish33 in FE09 extension slot",
+          "status": "PASS"
+        },
+        {
+          "name": "pin verified ingredient changes order within group, keeping score and completeness",
+          "status": "PASS"
+        },
+        {
+          "name": "unpin restores API order",
+          "status": "PASS"
+        },
+        {
+          "name": "selected dish copies only its known missing pork ingredient",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard denial shows error and clears success",
+          "status": "PASS"
+        },
+        {
+          "name": "pin and shopping selection persist on reload",
+          "status": "PASS"
+        },
+        {
+          "name": "mark purchased ingredient as available and search again",
+          "status": "PASS"
+        },
+        {
+          "name": "BE12 error leaves matches usable and retry to [] hides purchase section",
+          "status": "PASS"
+        },
+        {
+          "name": "pin lookup failure preserves API order and retry recovers",
+          "status": "PASS"
+        },
+        {
+          "name": "responsive layout has no horizontal overflow",
+          "status": "PASS"
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "clipboard": "native Chromium Clipboard API",
+      "pinExample": {
+        "ingredientId": 55,
+        "before": 47,
+        "after": 35
+      }
+    },
+    {
+      "name": "firefox-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "checks": [
+        {
+          "name": "select seven canonical demo ingredients through autocomplete",
+          "status": "PASS"
+        },
+        {
+          "name": "BE12 live: pork unlocks dish33 in FE09 extension slot",
+          "status": "PASS"
+        },
+        {
+          "name": "pin verified ingredient changes order within group, keeping score and completeness",
+          "status": "PASS"
+        },
+        {
+          "name": "unpin restores API order",
+          "status": "PASS"
+        },
+        {
+          "name": "selected dish copies only its known missing pork ingredient",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard denial shows error and clears success",
+          "status": "PASS"
+        },
+        {
+          "name": "pin and shopping selection persist on reload",
+          "status": "PASS"
+        },
+        {
+          "name": "mark purchased ingredient as available and search again",
+          "status": "PASS"
+        },
+        {
+          "name": "BE12 error leaves matches usable and retry to [] hides purchase section",
+          "status": "PASS"
+        },
+        {
+          "name": "pin lookup failure preserves API order and retry recovers",
+          "status": "PASS"
+        },
+        {
+          "name": "responsive layout has no horizontal overflow",
+          "status": "PASS"
+        }
+      ],
+      "browserVersion": "159.0",
+      "clipboard": "controlled clipboard implementation for Firefox",
+      "pinExample": {
+        "ingredientId": 55,
+        "before": 47,
+        "after": 35
+      }
+    },
+    {
+      "name": "chromium-mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "checks": [
+        {
+          "name": "select seven canonical demo ingredients through autocomplete",
+          "status": "PASS"
+        },
+        {
+          "name": "BE12 live: pork unlocks dish33 in FE09 extension slot",
+          "status": "PASS"
+        },
+        {
+          "name": "pin verified ingredient changes order within group, keeping score and completeness",
+          "status": "PASS"
+        },
+        {
+          "name": "unpin restores API order",
+          "status": "PASS"
+        },
+        {
+          "name": "selected dish copies only its known missing pork ingredient",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard denial shows error and clears success",
+          "status": "PASS"
+        },
+        {
+          "name": "pin and shopping selection persist on reload",
+          "status": "PASS"
+        },
+        {
+          "name": "mark purchased ingredient as available and search again",
+          "status": "PASS"
+        },
+        {
+          "name": "BE12 error leaves matches usable and retry to [] hides purchase section",
+          "status": "PASS"
+        },
+        {
+          "name": "pin lookup failure preserves API order and retry recovers",
+          "status": "PASS"
+        },
+        {
+          "name": "responsive layout has no horizontal overflow",
+          "status": "PASS"
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "clipboard": "native Chromium Clipboard API",
+      "pinExample": {
+        "ingredientId": 55,
+        "before": 47,
+        "after": 35
+      }
+    }
+  ],
+  "summary": {
+    "PASS": 33,
+    "FAIL": 0,
+    "BLOCKED": 0
+  }
+}

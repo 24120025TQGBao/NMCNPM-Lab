@@ -1,0 +1,287 @@
+{
+  "checkedAt": "2026-11-26T23:38:45.428Z",
+  "source": "PR36 4549d4e",
+  "results": [
+    {
+      "name": "chromium-desktop",
+      "checks": [
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip TROI_MUA matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip LUOI_NAU matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip CUOI_THANG matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip NAU_CHO_4 matches DB-tagged dishes",
+          "status": "FAIL",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE",
+          "reason": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   39,\n-   43,\n-   47,\n-   49,\n-   57\n- ]\n"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip AN_NHE matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "positive AND and removing one chip use exact intersection",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.12"
+          ],
+          "name": "all regions and region/tag AND obey independent DB oracle",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-02.7",
+            "S2-02.8"
+          ],
+          "name": "pantry true/false changes only known basic ingredients and UI recomputes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        }
+      ],
+      "source": "4549d4ed44f7cc19af11c48f2b57aff466e13990",
+      "tagPair": [
+        "LUOI_NAU",
+        "CUOI_THANG"
+      ],
+      "pantryOracle": {
+        "selected": [
+          6,
+          8,
+          28,
+          55,
+          57,
+          11,
+          56
+        ],
+        "missingWhenOff": [
+          5
+        ],
+        "offRatio": 0.9333,
+        "onRatio": 1
+      }
+    },
+    {
+      "name": "firefox-desktop",
+      "checks": [
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip TROI_MUA matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip LUOI_NAU matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip CUOI_THANG matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip NAU_CHO_4 matches DB-tagged dishes",
+          "status": "FAIL",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE",
+          "reason": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   39,\n-   43,\n-   47,\n-   49,\n-   57\n- ]\n"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip AN_NHE matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "positive AND and removing one chip use exact intersection",
+          "status": "FAIL",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE",
+          "reason": "page.waitForResponse: Timeout 60000ms exceeded while waiting for event \"response\""
+        },
+        {
+          "ac": [
+            "S2-01.12"
+          ],
+          "name": "all regions and region/tag AND obey independent DB oracle",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-02.7",
+            "S2-02.8"
+          ],
+          "name": "pantry true/false changes only known basic ingredients and UI recomputes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        }
+      ],
+      "source": "4549d4ed44f7cc19af11c48f2b57aff466e13990",
+      "tagPair": [
+        "LUOI_NAU",
+        "CUOI_THANG"
+      ],
+      "pantryOracle": {
+        "selected": [
+          6,
+          8,
+          28,
+          55,
+          57,
+          11,
+          56
+        ],
+        "missingWhenOff": [
+          5
+        ],
+        "offRatio": 0.9333,
+        "onRatio": 1
+      }
+    },
+    {
+      "name": "chromium-mobile",
+      "checks": [
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip TROI_MUA matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip LUOI_NAU matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip CUOI_THANG matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip NAU_CHO_4 matches DB-tagged dishes",
+          "status": "FAIL",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE",
+          "reason": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   39,\n-   43,\n-   47,\n-   49,\n-   57\n- ]\n"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "canonical chip AN_NHE matches DB-tagged dishes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.4"
+          ],
+          "name": "positive AND and removing one chip use exact intersection",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-01.12"
+          ],
+          "name": "all regions and region/tag AND obey independent DB oracle",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        },
+        {
+          "ac": [
+            "S2-02.7",
+            "S2-02.8"
+          ],
+          "name": "pantry true/false changes only known basic ingredients and UI recomputes",
+          "status": "PASS",
+          "mode": "LIVE_WITH_INDEPENDENT_DB_ORACLE"
+        }
+      ],
+      "source": "4549d4ed44f7cc19af11c48f2b57aff466e13990",
+      "tagPair": [
+        "LUOI_NAU",
+        "CUOI_THANG"
+      ],
+      "pantryOracle": {
+        "selected": [
+          6,
+          8,
+          28,
+          55,
+          57,
+          11,
+          56
+        ],
+        "missingWhenOff": [
+          5
+        ],
+        "offRatio": 0.9333,
+        "onRatio": 1
+      }
+    }
+  ],
+  "notes": [
+    "Expected from read-only independent DB metadata; NAU_CHO_4 mapped to intended seeded tag for diagnosis, and canonical contract slug checked separately in handoff.",
+    "Firefox AND/removal step timed out twice; retained FAIL, not classified as a second confirmed product bug. Other Firefox checks completed."
+  ]
+}

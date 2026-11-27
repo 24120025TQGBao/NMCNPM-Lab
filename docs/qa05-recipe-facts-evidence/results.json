@@ -1,0 +1,70 @@
+{
+  "checkedAt": "2026-11-24T03:45:37.792Z",
+  "candidate": "main413a7b6 + FE10 587171e + FE11 e8de078 (detached e47c5f6)",
+  "mainRevertNotApplied": true,
+  "results": [
+    {
+      "name": "chromium-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "checks": [
+        {
+          "ac": [
+            "S2-04.4",
+            "S2-04.5",
+            "S2-04.9"
+          ],
+          "name": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE"
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "source": "e47c5f638cd30924603bc4956426c0961a3c22be"
+    },
+    {
+      "name": "firefox-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "checks": [
+        {
+          "ac": [
+            "S2-04.4",
+            "S2-04.5",
+            "S2-04.9"
+          ],
+          "name": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE"
+        }
+      ],
+      "browserVersion": "159.0",
+      "source": "e47c5f638cd30924603bc4956426c0961a3c22be"
+    },
+    {
+      "name": "chromium-mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "checks": [
+        {
+          "ac": [
+            "S2-04.4",
+            "S2-04.5",
+            "S2-04.9"
+          ],
+          "name": "guest recipe has facts, quantities, to-taste and ordered steps",
+          "status": "PASS",
+          "mode": "LIVE"
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "source": "e47c5f638cd30924603bc4956426c0961a3c22be"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-11-24T03:36:44.878Z",
+  "table": "thuoc_tinh_mon",
+  "readOnly": true,
+  "readable": false,
+  "count": null,
+  "errorCode": null,
+  "candidateEndpoint": {
+    "path": "/api/dishes/categories",
+    "status": 500,
+    "databaseCode": "42501",
+    "evidence": "candidate server GET log: permission denied for table thuoc_tinh_mon"
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "environment": "FE09 786605d + explicit-router live Supabase preview; not INT02 acceptance",
+  "results": [
+    {
+      "name": "chromium-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "checks": [
+        {
+          "name": "guest suggestion from live API",
+          "status": "PASS"
+        },
+        {
+          "name": "next dish does not repeat",
+          "status": "PASS"
+        },
+        {
+          "name": "history previous card",
+          "status": "PASS"
+        },
+        {
+          "name": "dish navigation reaches FE10 placeholder and back preserves suggestion",
+          "status": "PASS"
+        },
+        {
+          "name": "zero ingredients prevents search",
+          "status": "PASS"
+        },
+        {
+          "name": "unselected free text cannot become ingredient chip",
+          "status": "PASS"
+        },
+        {
+          "name": "canonical autocomplete and alias selects seven ingredients",
+          "status": "PASS"
+        },
+        {
+          "name": "seven ingredients: dish33 87% and 7/8 with missing pork",
+          "status": "PASS"
+        },
+        {
+          "name": "eight ingredients: dish33 100% and 8/8",
+          "status": "PASS"
+        },
+        {
+          "name": "switching tabs preserves ingredient results",
+          "status": "PASS"
+        },
+        {
+          "name": "match detail placeholder and back preserves results",
+          "status": "PASS"
+        },
+        {
+          "name": "viewport has no horizontal overflow",
+          "status": "PASS"
+        }
+      ],
+      "apiRequests": 14,
+      "browserVersion": "159.0.8154.6",
+      "remaining": "FE10 complete flow, full QA04 matrix, controlled four groups, PO/Jira acceptance remain pending"
+    },
+    {
+      "name": "firefox-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "checks": [
+        {
+          "name": "guest suggestion from live API",
+          "status": "PASS"
+        },
+        {
+          "name": "next dish does not repeat",
+          "status": "PASS"
+        },
+        {
+          "name": "history previous card",
+          "status": "PASS"
+        },
+        {
+          "name": "dish navigation reaches FE10 placeholder and back preserves suggestion",
+          "status": "PASS"
+        },
+        {
+          "name": "zero ingredients prevents search",
+          "status": "PASS"
+        },
+        {
+          "name": "unselected free text cannot become ingredient chip",
+          "status": "PASS"
+        },
+        {
+          "name": "canonical autocomplete and alias selects seven ingredients",
+          "status": "PASS"
+        },
+        {
+          "name": "seven ingredients: dish33 87% and 7/8 with missing pork",
+          "status": "PASS"
+        },
+        {
+          "name": "eight ingredients: dish33 100% and 8/8",
+          "status": "PASS"
+        },
+        {
+          "name": "switching tabs preserves ingredient results",
+          "status": "PASS"
+        },
+        {
+          "name": "match detail placeholder and back preserves results",
+          "status": "PASS"
+        },
+        {
+          "name": "viewport has no horizontal overflow",
+          "status": "PASS"
+        }
+      ],
+      "apiRequests": 14,
+      "browserVersion": "159.0",
+      "remaining": "FE10 complete flow, full QA04 matrix, controlled four groups, PO/Jira acceptance remain pending"
+    },
+    {
+      "name": "chromium-mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "checks": [
+        {
+          "name": "guest suggestion from live API",
+          "status": "PASS"
+        },
+        {
+          "name": "next dish does not repeat",
+          "status": "PASS"
+        },
+        {
+          "name": "history previous card",
+          "status": "PASS"
+        },
+        {
+          "name": "dish navigation reaches FE10 placeholder and back preserves suggestion",
+          "status": "PASS"
+        },
+        {
+          "name": "zero ingredients prevents search",
+          "status": "PASS"
+        },
+        {
+          "name": "unselected free text cannot become ingredient chip",
+          "status": "PASS"
+        },
+        {
+          "name": "canonical autocomplete and alias selects seven ingredients",
+          "status": "PASS"
+        },
+        {
+          "name": "seven ingredients: dish33 87% and 7/8 with missing pork",
+          "status": "PASS"
+        },
+        {
+          "name": "eight ingredients: dish33 100% and 8/8",
+          "status": "PASS"
+        },
+        {
+          "name": "switching tabs preserves ingredient results",
+          "status": "PASS"
+        },
+        {
+          "name": "match detail placeholder and back preserves results",
+          "status": "PASS"
+        },
+        {
+          "name": "viewport has no horizontal overflow",
+          "status": "PASS"
+        }
+      ],
+      "apiRequests": 14,
+      "browserVersion": "159.0.8154.6",
+      "remaining": "FE10 complete flow, full QA04 matrix, controlled four groups, PO/Jira acceptance remain pending"
+    }
+  ],
+  "summary": {
+    "PASS": 36,
+    "FAIL": 0
+  },
+  "notes": [
+    "Initial Firefox launch failed in sandbox; elevated Firefox retest passed. Initial results retained.",
+    "Twelve smoke checks per browser/viewport; FE10 placeholder/back checks do not certify a complete recipe flow."
+  ]
+}
