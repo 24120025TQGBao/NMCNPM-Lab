@@ -26,6 +26,7 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ci-service-role-not-a-secret
       CORS_ORIGINS: http://localhost:5173
       VITE_USE_MOCK: 'false'
+      VITE_USE_MOCK_API: 'false'
 
     steps:
       - name: Checkout
@@ -65,8 +66,6 @@ jobs:
       - name: Build frontend
         run: npm run build --prefix frontend
 
-      - name: Check backend entrypoint syntax
-        run: |
-          node --check backend/index.js
-          node --check backend/src/app.js
-          node --check backend/src/server.js
+      # Backend is native ESM JavaScript: syntax validation is its build check.
+      - name: Check all backend JavaScript syntax
+        run: node scripts/check-backend-syntax.mjs
