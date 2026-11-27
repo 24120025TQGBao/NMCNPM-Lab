@@ -1,7 +1,3 @@
--- BE09: catalog lookup, dish detail, and recipe detail.
--- Q15: tags[] uses uppercase API codes (troi-mua -> TROI_MUA).
--- Q17: all recipe incomplete fields use NOT du_thong_tin_huong_dan.
--- Re-runnable: CREATE OR REPLACE keeps existing function signatures.
 
 BEGIN;
 

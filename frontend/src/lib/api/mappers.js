@@ -141,6 +141,7 @@ export function mapRecipeSummary(raw) {
     id: raw?.id ?? null,
     dishId: raw?.dish_id ?? null,
     name: str(raw?.name) ?? '',
+    servings: num(raw?.servings),
     prepTimeMinutes: num(raw?.prep_time_minutes),
     ingredientCount,
     incomplete: raw?.incomplete === true,

@@ -28,7 +28,7 @@ Toàn bộ chỗ gọi API nằm trong `src/lib/api/`; chỉ `mappers.js` biết
 | 1 | `GET /api/posts` chỉ trả `id`, `title`, `created_at`, `dish`, `author` | Card bảng tin chỉ hiện các trường này. Không có `content`, số nguyên liệu, số bước, số cảm xúc/bình luận. Nếu TV1 thêm `ingredient_count`, `step_count`, `content`, mapper đã đọc sẵn nên card tự hiện, không phải sửa giao diện |
 | 2 | Khi người đăng không nhập nội dung, backend lưu `content = title` | Giao diện ẩn đoạn trích khi `content` giống `title` |
 | 3 | Backend chỉ trả bài `RECIPE` + `PUBLIC` | Bài đánh giá quán, bản nháp, bài bị ẩn chưa có API (xem mục 3) |
-| 4 | `GET /api/dishes` mặc định trả 20 món | `DishListPage` chưa phân trang, DB có hơn 20 món thì chỉ thấy 20 (FE09 sẽ làm) |
+| 4 | `GET /api/dishes` mặc định trả 20 món | `/search` đã hỗ trợ phân trang (12 món/trang); `/dishes` là danh sách cũ |
 
 ## 3. Chỗ contract thật khác kế hoạch ban đầu (Frontend giả định, qua mock)
 
@@ -48,9 +48,6 @@ Tất cả gọi qua `request(..., { mockable: true })`: khi `VITE_USE_MOCK=true
 
 | Phương thức, đường dẫn | Đăng nhập | Body / query | Response thành công | Lỗi Frontend xử lý | Service |
 |---|---|---|---|---|---|
-| `GET /api/dishes/:id` | Không | | `{ data: { id, name, description, image_url } }` | 400, 404 | `dishes.get` |
-| `GET /api/dishes/:id/recipes` | Không | `page`, `limit` | `{ data: [{ id, dish_id, name, prep_time_minutes, ingredient_count, incomplete }], meta }`. Món chưa có công thức: `data: []` | 404 nếu món không tồn tại | `recipes.listByDish` |
-| `GET /api/recipes/:id` | Không | | `{ data: { id, dish_id, name, prep_time_minutes, incomplete, ingredients[], steps[{ order, content }] } }` | 404 | `recipes.get` |
 | `PATCH /api/posts/:id` | Có, chỉ tác giả | Như `POST /api/posts` | `{ data: <bài chi tiết> }` | 400, 403, 404 | `posts.update` |
 | `DELETE /api/posts/:id` | Có, chỉ tác giả | | `204` | 403, 404 | `posts.remove` |
 | `GET /api/me/drafts` | Có | `page`, `limit` | `{ data: [<bài tóm tắt>], meta }` | 401 | `posts.listDrafts` |
@@ -69,6 +66,8 @@ Quy tắc kèm theo Frontend giả định:
 - Backend tự kiểm tra quyền tác giả, quản trị viên (NFR03). Báo cáo trùng trả 409 (`CONFLICT`).
 
 ## 5. Hành vi của bộ giả lập cần biết (không phải yêu cầu với backend)
+
+**Cập nhật 24/11/2026:** luồng catalog đã đối chiếu mã BE09 trong repo: `/dishes/:id`, `/dishes/:id/recipes`, `/recipes/:id` không còn là endpoint giả định. Bổ sung tùy chọn `category` và lookup `/dishes/categories` cho bộ lọc loại món. `servings` hiện BE09 trả null vì schema BE07 chưa có khẩu phần; UI hiện “Chưa cập nhật”. Xem mục 7 trong `docs/api.md`. `dishes.search` hỗ trợ mock trong dev; `dishes.list` cũ luôn gọi API thật.
 
 - Chỉ nạp khi `import.meta.env.DEV` và `VITE_USE_MOCK === 'true'`. Dữ liệu nằm trong bộ nhớ, mất khi tải lại trang.
 - **Mock theo contract v1.0:** ID là số nguyên (`author.id` là UUID); `:id` không phải số nguyên dương trả 400; `dish_id` là chuỗi bị 400; `GET /api/posts` chỉ trả `id`, `title`, `created_at`, `dish`, `author` cho bài công thức; không gửi `content` thì lấy `title`.

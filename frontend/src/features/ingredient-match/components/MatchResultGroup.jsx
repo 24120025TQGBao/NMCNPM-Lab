@@ -2,7 +2,7 @@ import { useState } from 'react'
 import MatchDishCard from './MatchDishCard'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
-export default function MatchResultGroup({ group }) {
+export default function MatchResultGroup({ group, renderDishActions }) {
   const [showAll, setShowAll] = useState(false)
   const items = group.items || []
 
@@ -32,7 +32,10 @@ export default function MatchResultGroup({ group }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {visibleItems.map((dish) => (
-          <MatchDishCard key={dish.id} dish={dish} />
+          <div key={dish.id} className="space-y-2">
+            <MatchDishCard dish={dish} />
+            {renderDishActions?.(dish)}
+          </div>
         ))}
       </div>
 
